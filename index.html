@@ -226,6 +226,22 @@
     .mock-abrir img { width: 54px; }
     .mock-abrir b { font-weight: 900; font-size: 30px; letter-spacing: -0.02em; }
     .mock-abrir .p { background: linear-gradient(100deg, #e2a93f, #ffe9a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .passos4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+    .p4 { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 34px 16px 20px; border-radius: 20px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
+    .p4 > .n { position: absolute; top: -20px; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-family: var(--display); font-size: 22px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
+    .p4 .mini { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 118px; padding: 10px; border-radius: 14px; background: #0f0a0d; border: 1px solid rgba(255, 255, 255, 0.06); }
+    .p4 .mini .botao.pequeno { padding: 8px 12px; font-size: 12px; }
+    .p4 .nav-barra { padding: 10px; gap: 8px; }
+    .p4 .nav-barra b { font-size: 12px; }
+    .p4 .alvo { font-size: 12px; padding: 6px 10px; }
+    .mini-smart { width: 100%; min-height: 0; padding: 8px 10px; gap: 4px; }
+    .mini-smart b { font-size: 11px; }
+    .mini-smart .link { margin-top: 2px; font-size: 11px; }
+    .mini-smart .smart-rodape { padding-top: 6px; justify-content: flex-start; }
+    .p4 .mock-abrir { flex-direction: column; flex-wrap: nowrap; }
+    .p4 .mock-abrir img { width: 46px; }
+    .p4 h3 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; }
+    .p4 p { margin-top: 4px; font-size: 15px; color: var(--suave); }
     .verificar { margin-top: 26px; }
     .verificar p { padding: 0 22px 14px; color: var(--suave); font-size: 15px; }
     .verificar code { color: var(--tinta); }
@@ -282,8 +298,7 @@
       .soma { grid-template-columns: 1fr; }
       .contas { grid-column: auto; }
       .seta { transform: rotate(90deg); text-align: center; }
-      .etapa { grid-template-columns: 66px 1fr; }
-      .etapa .mock { grid-column: 1 / -1; margin-left: 26px; }
+      .passos4 { grid-template-columns: 1fr 1fr; gap: 30px 16px; }
       .linha-g { flex-direction: column; }
       .linha-g figure { width: 100%; }
     }
@@ -315,7 +330,7 @@
         <img class="bola" src="assets/pokebola.svg" alt="" />
         <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Twitch e Kick</span><span><i></i>Windows</span></div>
         <h1>Seu Pokéidle no <em>automático</em>.</h1>
-        <p class="lide">Ele não só mostra os números: ele joga por você. Troca de hunt, faz Top Catch, repõe pokébolas e poções e resgata os bônus das lives, nas 4 contas ao mesmo tempo.</p>
+        <p class="lide">Ele não só mostra os números: joga por você, nas 4 contas ao mesmo tempo.</p>
         <div class="acoes">
           <a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-heroi" data-goatcounter-title="baixar-instalador-heroi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zm8.5-1.2L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zm8.5 0H21V21l-9.5-1.3z"/></svg>Baixar para Windows</a>
           <a class="botao vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil" data-goatcounter-title="baixar-portatil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 7h4M12 17h.01"/></svg>Versão portátil</a>
@@ -339,7 +354,7 @@
         <div class="cab centro revela">
           <span class="rotulo">Não só mostra. Faz.</span>
           <h2>Um ciclo que roda sozinho</h2>
-          <p>Enquanto você faz outra coisa, cada conta caça, troca de rota, captura o que falta, repõe a mochila e farma pontos nas lives.</p>
+          <p>Caça, troca de rota, captura, repõe a mochila e farma nas lives, sozinho.</p>
         </div>
         <div class="ciclo revela">
           <div class="no placa"><div class="ico"><img src="assets/itens/metagross.png" alt="" style="width:58px;height:auto" /></div><div><h3>Hunt automática</h3><p>Caça sem parar e troca de rota quando a conta fica forte.</p></div></div>
@@ -502,40 +517,15 @@
       <div class="envolve">
         <div class="cab centro revela">
           <span class="rotulo">Instalar</span>
-          <h2>Como instalar, passo a passo</h2>
-          <p>Leva menos de 2 minutos. O Windows pode mostrar um aviso porque o programa é novo: é normal e está explicado no passo 3.</p>
+          <h2>Instale em 4 passos</h2>
+          <p>O aviso azul do passo 3 é normal em programa novo.</p>
         </div>
-        <ol class="trilha-inst">
-          <li class="etapa revela">
-            <span class="n">1</span>
-            <div class="txt"><h3>Escolha e baixe</h3><p><b>Instalador</b>: fica no PC, com atalho na área de trabalho. <b>Portátil</b>: um arquivo só, abre direto, sem instalar.</p></div>
-            <div class="mock mock-baixar"><a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-passo" data-goatcounter-title="baixar-instalador-passo">Instalador</a><a class="botao pequeno vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil-passo" data-goatcounter-title="baixar-portatil-passo">Portátil</a></div>
-          </li>
-          <li class="etapa revela">
-            <span class="n">2</span>
-            <div class="txt"><h3>Se o navegador perguntar, mantenha</h3><p>Chrome e Edge às vezes avisam que o arquivo "não costuma ser baixado". Clique em <b>Manter</b> (no Edge, fica no menu <b>…</b> do download).</p></div>
-            <div class="mock mock-nav"><div class="nav-barra"><span class="nav-ico">!</span><div><b>PokePocket-Setup.exe</b><small>não costuma ser baixado</small></div><span class="alvo">Manter</span><span class="cinza">Excluir</span></div></div>
-          </li>
-          <li class="etapa revela">
-            <span class="n">3</span>
-            <div class="txt"><h3>Passe pelo aviso azul do Windows</h3><p>Abra o arquivo baixado. Se aparecer <b>"O Windows protegeu o computador"</b>, clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>. O aviso aparece com todo programa novo que não tem assinatura paga.</p></div>
-            <div class="mock mock-smart">
-              <div class="smart"><b>O Windows protegeu o computador</b><p>O Microsoft Defender SmartScreen impediu a inicialização de um aplicativo não reconhecido.</p><span class="link alvo-link">Mais informações</span><div class="smart-rodape"><span class="cinza-b">Não executar</span></div></div>
-              <span class="seta-mock">→</span>
-              <div class="smart"><b>O Windows protegeu o computador</b><p>Aplicativo: PokePocket-Setup.exe<br />Fornecedor: Fornecedor desconhecido</p><div class="smart-rodape"><span class="alvo">Executar assim mesmo</span><span class="cinza-b">Não executar</span></div></div>
-            </div>
-          </li>
-          <li class="etapa revela">
-            <span class="n">4</span>
-            <div class="txt"><h3>Instale (só no instalador)</h3><p>Leia os termos e clique em <b>Concordo</b>, escolha a pasta (pode deixar a sugerida), clique em <b>Instalar</b> e depois em <b>Concluir</b>. Na portátil, pule esta etapa.</p></div>
-            <div class="mock mock-wizard"><div class="wiz"><div class="wiz-topo"><img src="assets/icone.png" alt="" />Instalação do PokePocket</div><div class="wiz-corpo"><i></i><i></i><i style="width:60%"></i></div><div class="wiz-botoes"><span class="cinza">Voltar</span><span class="alvo">Concordo</span></div></div><div class="wiz-ordem"><span>Concordo</span>›<span>Instalar</span>›<span>Concluir</span></div></div>
-          </li>
-          <li class="etapa revela">
-            <span class="n">5</span>
-            <div class="txt"><h3>Abra e comece</h3><p>Abra o <b>PokePocket</b> pelo atalho da área de trabalho, aceite os termos de uso, clique em <b>Começar</b> e entre nas suas contas do Pokéidle. Depois é só ligar o que quiser no automático.</p></div>
-            <div class="mock mock-abrir"><img src="assets/pokebola.svg" alt="" /><b><span class="p">Poke</span>Pocket</b><span class="botao pequeno" style="pointer-events:none">Começar</span></div>
-          </li>
-        </ol>
+        <div class="passos4">
+          <div class="p4 revela"><span class="n">1</span><div class="mini"><a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-passo" data-goatcounter-title="baixar-instalador-passo">Instalador</a><a class="botao pequeno vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil-passo" data-goatcounter-title="baixar-portatil-passo">Portátil</a></div><h3>Baixe</h3><p>Instalador ou portátil (sem instalar).</p></div>
+          <div class="p4 revela"><span class="n">2</span><div class="mini"><div class="nav-barra"><span class="nav-ico">!</span><div><b>PokePocket.exe</b></div><span class="alvo">Manter</span></div></div><h3>Mantenha</h3><p>Se o navegador perguntar, clique em Manter.</p></div>
+          <div class="p4 revela"><span class="n">3</span><div class="mini"><div class="smart mini-smart"><b>O Windows protegeu o computador</b><span class="link alvo-link">Mais informações</span><div class="smart-rodape"><span class="alvo">Executar assim mesmo</span></div></div></div><h3>Libere</h3><p>Mais informações › Executar assim mesmo.</p></div>
+          <div class="p4 revela"><span class="n">4</span><div class="mini mock-abrir"><img src="assets/pokebola.svg" alt="" /><span class="botao pequeno" style="pointer-events:none">Começar</span></div><h3>Pronto</h3><p>Instale, abra e entre nas suas contas.</p></div>
+        </div>
         <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.0: <code>22195533229ccda9d14f44534b97f8ab80877f75e845827fa64ee105f22be914</code><br />Portátil 1.0.0: <code>61d7f7b2bf609ac2aaaa3bf00b5f07b57dc2fd32a24f2b09a07fec606137e409</code></p></details>
       </div>
     </section>
@@ -563,7 +553,7 @@
         <div class="cab centro revela">
           <span class="rotulo">Créditos</span>
           <h2>Gostou? Apoie o projeto</h2>
-          <p>O PokePocket é grátis e continua grátis. Se ele te ajuda, uma doação mantém as melhorias chegando.</p>
+          <p>É grátis e continua grátis. Se ajudar, uma doação mantém as melhorias chegando.</p>
         </div>
         <div class="creditos">
           <div class="cartao-autor revela">
