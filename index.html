@@ -185,6 +185,50 @@
     .hash { margin-top: 12px; font-size: 13px; color: var(--apagado); word-break: break-all; }
     .hash code { color: var(--suave); }
 
+    .trilha-inst { list-style: none; position: relative; display: grid; gap: 22px; margin-top: 46px; }
+    .trilha-inst::before { content: ""; position: absolute; left: 31px; top: 30px; bottom: 30px; width: 4px; border-radius: 2px; background: repeating-linear-gradient(180deg, var(--ouro) 0 10px, transparent 10px 18px); opacity: 0.55; }
+    .etapa { position: relative; display: grid; grid-template-columns: 66px 1fr 1.05fr; gap: 24px; align-items: center; padding: 24px 26px 24px 0; border-radius: 24px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
+    .etapa > .n { position: relative; z-index: 1; justify-self: center; display: grid; place-items: center; width: 62px; height: 62px; margin-left: 26px; border-radius: 50%; font-family: var(--display); font-size: 30px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc), 0 0 0 6px var(--fundo); }
+    .etapa .txt { padding-left: 18px; }
+    .etapa h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; }
+    .etapa p { margin-top: 6px; color: var(--suave); font-size: 16px; }
+    .etapa p b { color: #fff; }
+    .mock { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 150px; padding: 18px; border-radius: 16px; background: #0f0a0d; border: 1px solid rgba(255, 255, 255, 0.06); }
+    .alvo { position: relative; display: inline-block; padding: 7px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; color: #fff; background: #0067c0; box-shadow: 0 0 0 3px #ffd34d, 0 0 22px rgba(255, 211, 77, 0.7); animation: pisca 1.6s ease-in-out infinite; }
+    @keyframes pisca { 50% { box-shadow: 0 0 0 5px #ffd34d, 0 0 34px rgba(255, 211, 77, 0.9); } }
+    .cinza, .cinza-b { display: inline-block; padding: 7px 14px; border-radius: 6px; font-weight: 800; font-size: 14px; color: #ccc; background: #3a3a3a; }
+    .nav-barra { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 440px; padding: 12px 14px; border-radius: 12px; background: #2b2b2b; font-family: system-ui, sans-serif; }
+    .nav-barra > div { flex: 1; min-width: 0; }
+    .nav-barra b { display: block; font-size: 14px; color: #fff; }
+    .nav-barra small { font-size: 12px; color: #f8b4b4; }
+    .nav-ico { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; color: #2b2b2b; background: #fbbf24; }
+    .mock-smart { flex-wrap: nowrap; gap: 8px; }
+    .smart { width: 196px; flex: none; min-height: 150px; display: flex; flex-direction: column; padding: 14px; border-radius: 4px; background: #0b6bc8; color: #fff; font-family: "Segoe UI", system-ui, sans-serif; }
+    .smart b { font-size: 14px; font-weight: 600; }
+    .smart p { margin-top: 6px; font-size: 11px; line-height: 1.35; color: #d6e8fa; }
+    .smart .link { align-self: flex-start; margin-top: 8px; font-size: 12px; text-decoration: underline; color: #fff; }
+    .alvo-link { padding: 2px 6px; border-radius: 4px; box-shadow: 0 0 0 3px #ffd34d, 0 0 18px rgba(255, 211, 77, 0.8); animation: pisca 1.6s ease-in-out infinite; }
+    .smart-rodape { display: flex; justify-content: flex-end; gap: 6px; margin-top: auto; padding-top: 12px; }
+    .smart-rodape span { white-space: nowrap; font-size: 10px !important; padding: 6px 7px !important; }
+    .smart-rodape .alvo { background: #fff; color: #0b3a6b; font-size: 11px; padding: 6px 8px; }
+    .smart-rodape .cinza-b { background: transparent; border: 1px solid #fff; color: #fff; font-size: 11px; padding: 5px 8px; }
+    .seta-mock { font-family: var(--display); font-size: 34px; color: var(--ouro); }
+    .mock-wizard { flex-direction: column; }
+    .wiz { width: 100%; max-width: 360px; border-radius: 8px; overflow: hidden; background: #f3f3f3; font-family: system-ui, sans-serif; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4); }
+    .wiz-topo { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #ddd; }
+    .wiz-topo img { width: 22px; height: 22px; }
+    .wiz-corpo { display: grid; gap: 7px; padding: 14px; }
+    .wiz-corpo i { height: 8px; border-radius: 4px; background: #d4d4d4; }
+    .wiz-botoes { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 12px; background: #e9e9e9; }
+    .wiz-ordem { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-family: var(--display); font-size: 15px; color: var(--ouro); }
+    .wiz-ordem span { padding: 4px 10px; border-radius: 8px; color: var(--tinta); background: rgba(255, 255, 255, 0.08); }
+    .mock-abrir { flex-direction: column; gap: 8px; background: radial-gradient(60% 80% at 50% 30%, #3d1f2c, #0f0a0d 75%); }
+    .mock-abrir img { width: 54px; }
+    .mock-abrir b { font-weight: 900; font-size: 30px; letter-spacing: -0.02em; }
+    .mock-abrir .p { background: linear-gradient(100deg, #e2a93f, #ffe9a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .verificar { margin-top: 26px; }
+    .verificar p { padding: 0 22px 14px; color: var(--suave); font-size: 15px; }
+    .verificar code { color: var(--tinta); }
     .faq { max-width: 840px; margin: 40px auto 0; display: grid; gap: 12px; }
     details { border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
     summary { cursor: pointer; list-style: none; padding: 18px 22px; font-weight: 900; font-size: 18px; display: flex; justify-content: space-between; gap: 16px; }
@@ -238,6 +282,8 @@
       .soma { grid-template-columns: 1fr; }
       .contas { grid-column: auto; }
       .seta { transform: rotate(90deg); text-align: center; }
+      .etapa { grid-template-columns: 66px 1fr; }
+      .etapa .mock { grid-column: 1 / -1; margin-left: 26px; }
       .linha-g { flex-direction: column; }
       .linha-g figure { width: 100%; }
     }
@@ -456,15 +502,41 @@
       <div class="envolve">
         <div class="cab centro revela">
           <span class="rotulo">Instalar</span>
-          <h2>Pronto em 3 passos</h2>
+          <h2>Como instalar, passo a passo</h2>
+          <p>Leva menos de 2 minutos. O Windows pode mostrar um aviso porque o programa é novo: é normal e está explicado no passo 3.</p>
         </div>
-        <div class="instalar">
-          <div class="inst placa revela"><span class="n">1</span><h3>Baixe</h3><p>Instalador para deixar no PC, ou a versão portátil para rodar direto, sem instalar.</p></div>
-          <div class="inst placa revela"><span class="n">2</span><h3>Instale</h3><p>Abra o arquivo, aceite os termos e escolha a pasta. Ele cria o atalho na área de trabalho.</p></div>
-          <div class="inst placa revela"><span class="n">3</span><h3>Entre nas contas</h3><p>Abra o PokePocket, entre nas suas contas do Pokéidle e ligue o que quiser no automático.</p></div>
-        </div>
-        <div class="aviso revela"><b>O Windows avisou "O Windows protegeu o computador"?</b> Isso aparece com programas novos, sem assinatura paga. Clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.</div>
-        <p class="hash">SHA-256 da versão 1.0.0 · instalador: <code>22195533229ccda9d14f44534b97f8ab80877f75e845827fa64ee105f22be914</code> · portátil: <code>61d7f7b2bf609ac2aaaa3bf00b5f07b57dc2fd32a24f2b09a07fec606137e409</code></p>
+        <ol class="trilha-inst">
+          <li class="etapa revela">
+            <span class="n">1</span>
+            <div class="txt"><h3>Escolha e baixe</h3><p><b>Instalador</b>: fica no PC, com atalho na área de trabalho. <b>Portátil</b>: um arquivo só, abre direto, sem instalar.</p></div>
+            <div class="mock mock-baixar"><a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-passo" data-goatcounter-title="baixar-instalador-passo">Instalador</a><a class="botao pequeno vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil-passo" data-goatcounter-title="baixar-portatil-passo">Portátil</a></div>
+          </li>
+          <li class="etapa revela">
+            <span class="n">2</span>
+            <div class="txt"><h3>Se o navegador perguntar, mantenha</h3><p>Chrome e Edge às vezes avisam que o arquivo "não costuma ser baixado". Clique em <b>Manter</b> (no Edge, fica no menu <b>…</b> do download).</p></div>
+            <div class="mock mock-nav"><div class="nav-barra"><span class="nav-ico">!</span><div><b>PokePocket-Setup.exe</b><small>não costuma ser baixado</small></div><span class="alvo">Manter</span><span class="cinza">Excluir</span></div></div>
+          </li>
+          <li class="etapa revela">
+            <span class="n">3</span>
+            <div class="txt"><h3>Passe pelo aviso azul do Windows</h3><p>Abra o arquivo baixado. Se aparecer <b>"O Windows protegeu o computador"</b>, clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>. O aviso aparece com todo programa novo que não tem assinatura paga.</p></div>
+            <div class="mock mock-smart">
+              <div class="smart"><b>O Windows protegeu o computador</b><p>O Microsoft Defender SmartScreen impediu a inicialização de um aplicativo não reconhecido.</p><span class="link alvo-link">Mais informações</span><div class="smart-rodape"><span class="cinza-b">Não executar</span></div></div>
+              <span class="seta-mock">→</span>
+              <div class="smart"><b>O Windows protegeu o computador</b><p>Aplicativo: PokePocket-Setup.exe<br />Fornecedor: Fornecedor desconhecido</p><div class="smart-rodape"><span class="alvo">Executar assim mesmo</span><span class="cinza-b">Não executar</span></div></div>
+            </div>
+          </li>
+          <li class="etapa revela">
+            <span class="n">4</span>
+            <div class="txt"><h3>Instale (só no instalador)</h3><p>Leia os termos e clique em <b>Concordo</b>, escolha a pasta (pode deixar a sugerida), clique em <b>Instalar</b> e depois em <b>Concluir</b>. Na portátil, pule esta etapa.</p></div>
+            <div class="mock mock-wizard"><div class="wiz"><div class="wiz-topo"><img src="assets/icone.png" alt="" />Instalação do PokePocket</div><div class="wiz-corpo"><i></i><i></i><i style="width:60%"></i></div><div class="wiz-botoes"><span class="cinza">Voltar</span><span class="alvo">Concordo</span></div></div><div class="wiz-ordem"><span>Concordo</span>›<span>Instalar</span>›<span>Concluir</span></div></div>
+          </li>
+          <li class="etapa revela">
+            <span class="n">5</span>
+            <div class="txt"><h3>Abra e comece</h3><p>Abra o <b>PokePocket</b> pelo atalho da área de trabalho, aceite os termos de uso, clique em <b>Começar</b> e entre nas suas contas do Pokéidle. Depois é só ligar o que quiser no automático.</p></div>
+            <div class="mock mock-abrir"><img src="assets/pokebola.svg" alt="" /><b><span class="p">Poke</span>Pocket</b><span class="botao pequeno" style="pointer-events:none">Começar</span></div>
+          </li>
+        </ol>
+        <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.0: <code>22195533229ccda9d14f44534b97f8ab80877f75e845827fa64ee105f22be914</code><br />Portátil 1.0.0: <code>61d7f7b2bf609ac2aaaa3bf00b5f07b57dc2fd32a24f2b09a07fec606137e409</code></p></details>
       </div>
     </section>
 
