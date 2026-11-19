@@ -157,9 +157,11 @@
     .gema { display: inline-block; width: 38px; height: 38px; background: linear-gradient(135deg, #fbcfe8, #ec4899 50%, #9d174d); clip-path: polygon(25% 0, 75% 0, 100% 35%, 50% 100%, 0 35%); }
     .pix { image-rendering: pixelated; }
 
-    .galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; align-items: start; }
+    .galeria { display: grid; gap: 18px; margin-top: 46px; }
+    .linha-g { display: flex; gap: 18px; align-items: flex-start; }
+    .linha-g figure { min-width: 0; }
     .galeria figure { padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
-    .galeria img { width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: #0d0709; border-radius: 10px; }
+    .galeria img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.08); }
     .galeria figcaption { padding: 10px 4px 2px; font-weight: 800; font-size: 15px; color: var(--suave); }
 
     .seguranca { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 46px; }
@@ -203,11 +205,13 @@
       .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
       .ciclo { grid-template-columns: 1fr; }
       .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
-      .duas, .duas.inv, .avaliar, .extras, .galeria, .instalar { grid-template-columns: 1fr; }
+      .duas, .duas.inv, .avaliar, .extras, .instalar { grid-template-columns: 1fr; }
       .duas.inv .midia { order: 0; }
       .soma { grid-template-columns: 1fr; }
       .contas { grid-column: auto; }
       .seta { transform: rotate(90deg); text-align: center; }
+      .linha-g { flex-direction: column; }
+      .linha-g figure { width: 100%; }
     }
   </style>
 </head>
@@ -388,12 +392,17 @@
           <p>Telas reais do PokePocket, com dados de demonstração.</p>
         </div>
         <div class="galeria">
-          <figure class="revela"><img src="assets/prints/contas.png" alt="Equipe com as quatro contas" loading="lazy" /><figcaption>As 4 contas lado a lado</figcaption></figure>
-          <figure class="revela"><img src="assets/prints/ganhos.png" alt="Resumo de ganhos" loading="lazy" /><figcaption>Resumo de ganhos</figcaption></figure>
-          <figure class="revela"><img src="assets/prints/lives.png" alt="Lives da Twitch e da Kick" loading="lazy" /><figcaption>Lives e bônus</figcaption></figure>
-          <figure class="revela"><img src="assets/prints/ficha.png" alt="Ficha do pokémon" loading="lazy" /><figcaption>Ficha com o score</figcaption></figure>
-          <figure class="revela"><img src="assets/prints/simular.png" alt="Simulador" loading="lazy" /><figcaption>Simulador de PvP e PvE</figcaption></figure>
-          <figure class="revela"><img src="assets/prints/capturas.png" alt="Capturas" loading="lazy" /><figcaption>Melhores capturas</figcaption></figure>
+          <div class="linha-g">
+            <figure class="revela" style="flex:1.802"><img src="assets/prints/contas.png" alt="Equipe com as quatro contas" loading="lazy" /><figcaption>As 4 contas lado a lado</figcaption></figure>
+            <figure class="revela" style="flex:0.924"><img src="assets/prints/ficha.png" alt="Ficha do pokémon com o score" loading="lazy" /><figcaption>Ficha com o score</figcaption></figure>
+          </div>
+          <div class="linha-g">
+            <figure class="revela" style="flex:1.995"><img src="assets/prints/lives.png" alt="Lives da Twitch e da Kick" loading="lazy" /><figcaption>Lives e bônus</figcaption></figure>
+            <figure class="revela" style="flex:2.410"><img src="assets/prints/capturas.png" alt="Melhores capturas" loading="lazy" /><figcaption>Melhores capturas</figcaption></figure>
+          </div>
+          <div class="linha-g">
+            <figure class="revela" style="flex:1"><img src="assets/prints/ganhos.png" alt="Resumo de ganhos" loading="lazy" /><figcaption>Resumo de ganhos das 4 contas</figcaption></figure>
+          </div>
         </div>
       </div>
     </section>
