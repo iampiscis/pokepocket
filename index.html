@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PokePocket · seu Pokéidle no automático</title>
+  <meta name="description" content="Painel grátis para Pokéidle no Windows: hunt e troca de hunt no automático, Top Catch, compras de itens, lives da Twitch e da Kick, score PvP exclusivo e precificador. Até 4 contas num lugar só." />
+  <meta property="og:title" content="PokePocket · seu Pokéidle no automático" />
+  <meta property="og:description" content="Hunt, Top Catch, compras e lives rodando sozinhos nas 4 contas. Grátis, no seu PC." />
+  <meta property="og:image" content="assets/capa.jpg" />
+  <link rel="icon" href="assets/icone.png" />
+  <style>
+    @font-face { font-family: "Lilita"; src: url("assets/fontes/lilita.woff2") format("woff2"); font-display: swap; }
+    @font-face { font-family: "Nunito"; src: url("assets/fontes/nunito.woff2") format("woff2"); font-weight: 200 1000; font-display: swap; }
+    :root {
+      --fundo: #0b0608; --fundo-2: #150b10; --tinta: #fff6ef; --suave: #e6c9b9; --apagado: #a88e86;
+      --ouro: #ffd34d; --ouro-2: #e2a93f; --ouro-esc: #7d5313; --linha: #3b1208;
+      --madeira: #bd6951; --madeira-esc: #914850; --madeira-luz: #df824c; --friso: #f1d3b7; --base: #722c3f; --vao: #2b1a22;
+      --roxo: #a78bfa; --verde: #4ade80; --rosa: #ec4899; --azul: #7dd3fc;
+      --display: "Lilita", "Arial Black", sans-serif; --texto: "Nunito", system-ui, sans-serif;
+      --raio: 22px; --largura: 1180px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--fundo); color: var(--tinta); font-family: var(--texto); font-size: 18px; line-height: 1.55; overflow-x: hidden; }
+    img, video { display: block; max-width: 100%; }
+    a { color: inherit; }
+    .ceu { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 45% at 50% 0%, #3d1f2c 0%, transparent 70%), radial-gradient(30% 25% at 82% 30%, rgba(255, 120, 180, 0.08), transparent 70%), radial-gradient(30% 30% at 15% 70%, rgba(120, 160, 255, 0.07), transparent 70%), var(--fundo); }
+    .ceu::before, .ceu::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(1.4px 1.4px at 10% 20%, #fff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 30% 65%, #cfd8ff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 55% 35%, #fff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 72% 80%, #fff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 88% 12%, #ffe9c4 50%, transparent 51%); background-size: 240px 240px; opacity: 0.55; animation: deriva 60s linear infinite; }
+    .ceu::after { background-image: radial-gradient(2.4px 2.4px at 20% 30%, #fff 50%, transparent 51%), radial-gradient(2.4px 2.4px at 65% 15%, #ffe9a3 50%, transparent 51%), radial-gradient(2.4px 2.4px at 80% 60%, #cfe3ff 50%, transparent 51%); background-size: 520px 520px; opacity: 0.7; animation-duration: 90s; }
+    @keyframes deriva { to { background-position: 0 600px; } }
+    .envolve { width: min(var(--largura), calc(100% - 40px)); margin: 0 auto; }
+
+    .topo { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(12px); background: rgba(11, 6, 8, 0.72); border-bottom: 1px solid rgba(255, 233, 163, 0.08); }
+    .topo .envolve { display: flex; align-items: center; gap: 28px; height: 72px; }
+    .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 24px; letter-spacing: -0.02em; }
+    .marca img { width: 34px; height: 34px; }
+    .marca .p { background: linear-gradient(100deg, #e2a93f, #ffe9a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .menu { display: flex; gap: 22px; margin-left: auto; }
+    .menu a { text-decoration: none; color: var(--suave); font-weight: 700; font-size: 15px; }
+    .menu a:hover { color: var(--ouro); }
+    .botao { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 26px; border: 2px solid var(--ouro-esc); border-radius: 16px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); color: #2a1a12; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; box-shadow: 0 5px 0 var(--ouro-esc), 0 0 30px rgba(255, 233, 163, 0.35); transition: transform 0.15s, box-shadow 0.15s; }
+    .botao:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ouro-esc), 0 0 40px rgba(255, 233, 163, 0.5); }
+    .botao:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ouro-esc); }
+    .botao.pequeno { padding: 10px 18px; font-size: 14px; border-radius: 12px; }
+    .botao.vazado { background: rgba(255, 255, 255, 0.04); color: var(--tinta); border-color: rgba(255, 233, 163, 0.3); box-shadow: none; }
+    .botao svg { width: 22px; height: 22px; }
+
+    .heroi { position: relative; padding: 80px 0 40px; text-align: center; }
+    .heroi .raios { position: absolute; left: 50%; top: 40px; width: 900px; height: 900px; margin-left: -450px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 233, 163, 0.07) 0deg 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 15%, transparent 65%); mask: radial-gradient(circle, #000 15%, transparent 65%); animation: gira 80s linear infinite; z-index: -1; }
+    @keyframes gira { to { transform: rotate(360deg); } }
+    .heroi .bola { width: 110px; margin: 0 auto 18px; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.6)); animation: flutua 4s ease-in-out infinite; }
+    @keyframes flutua { 50% { transform: translateY(-10px) rotate(-4deg); } }
+    .selos { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 22px; }
+    .selos span { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 800; color: var(--suave); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 233, 163, 0.14); }
+    .selos i { width: 8px; height: 8px; border-radius: 50%; background: var(--ouro); box-shadow: 0 0 10px var(--ouro); }
+    h1 { font-family: var(--texto); font-weight: 900; font-size: clamp(42px, 6.2vw, 84px); line-height: 1.02; letter-spacing: -0.03em; max-width: 920px; margin: 0 auto; text-shadow: 0 6px 0 #1b1216; }
+    h1 em { font-style: normal; background: linear-gradient(100deg, #e2a93f 0%, #ffe9a3 40%, #fff 50%, #ffe9a3 60%, #e2a93f 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: reluz 5s ease-in-out infinite; text-shadow: none; filter: drop-shadow(0 6px 0 #1b1216); }
+    @keyframes reluz { 0%, 60% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+    .heroi p.lide { max-width: 680px; margin: 22px auto 0; color: var(--suave); font-size: 20px; }
+    .acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 34px; }
+    .nota { margin-top: 16px; color: var(--apagado); font-size: 14px; font-weight: 700; }
+    .nota a { color: var(--suave); }
+    .tela { margin: 56px auto 0; max-width: 1040px; padding: 14px; border-radius: 26px; background: linear-gradient(var(--madeira-esc) 0 10px, var(--madeira) 10px calc(100% - 14px), var(--madeira-luz) calc(100% - 14px) calc(100% - 7px), var(--madeira) calc(100% - 7px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 40px 90px rgba(0, 0, 0, 0.6); }
+    .tela video, .tela img { width: 100%; border-radius: 14px; box-shadow: 0 0 0 3px #480e1e; background: #000; }
+
+    .numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 70px auto 0; }
+    .numero { padding: 24px 16px; text-align: center; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.6), rgba(43, 26, 34, 0.6)); border: 1px solid rgba(255, 233, 163, 0.1); }
+    .numero b { display: block; font-family: var(--display); font-weight: 400; font-size: 54px; line-height: 1; color: var(--ouro); text-shadow: 0 4px 0 var(--linha); }
+    .numero span { display: block; margin-top: 8px; font-weight: 800; font-size: 15px; color: var(--suave); }
+
+    section.bloco { padding: 110px 0 20px; }
+    .rotulo { display: inline-block; padding: 5px 14px; border-radius: 999px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
+    h2 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: clamp(36px, 4.6vw, 60px); line-height: 1.02; text-transform: uppercase; letter-spacing: 0.01em; background: linear-gradient(180deg, #fffbe0 0%, #ffe066 40%, #ffb020 65%, #e8650f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 5px 0 var(--linha)); }
+    .cab { max-width: 760px; }
+    .cab.centro { margin: 0 auto; text-align: center; }
+    .cab p { margin-top: 14px; color: var(--suave); font-size: 19px; }
+
+    .placa { position: relative; border-radius: var(--raio); padding: 26px; background: linear-gradient(var(--madeira-esc) 0 12px, var(--madeira) 12px calc(100% - 16px), var(--madeira-luz) calc(100% - 16px) calc(100% - 8px), var(--madeira) calc(100% - 8px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 30px 60px rgba(0, 0, 0, 0.5); }
+    .vao { border-radius: 16px; background: var(--vao); box-shadow: inset 0 0 0 3px #480e1e, 0 3px 0 #e7a86d; }
+    .ciclo { display: grid; grid-template-columns: 1fr 340px 1fr; grid-template-rows: auto auto; gap: 26px 30px; align-items: center; margin-top: 50px; }
+    .no { display: grid; grid-template-columns: 70px 1fr; gap: 16px; align-items: center; padding: 20px 22px; }
+    .no .ico { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 18px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); font-family: var(--display); font-size: 32px; color: #2a1a12; }
+    .no .ico img { width: 46px; height: 46px; image-rendering: pixelated; }
+    .no h3 { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.05; text-transform: uppercase; }
+    .no p { font-size: 15px; color: var(--suave); margin-top: 4px; }
+    .centro-ciclo { grid-column: 2; grid-row: 1 / span 2; position: relative; display: grid; place-items: center; aspect-ratio: 1; }
+    .centro-ciclo .anel { position: absolute; inset: 0; border-radius: 50%; border: 3px dashed rgba(255, 211, 77, 0.45); animation: gira 40s linear infinite; }
+    .centro-ciclo .anel::before, .centro-ciclo .anel::after { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--ouro); box-shadow: 0 0 16px var(--ouro); top: -10px; left: calc(50% - 9px); }
+    .centro-ciclo .anel::after { top: auto; bottom: -10px; }
+    .centro-ciclo .miolo { width: 72%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; text-align: center; background: radial-gradient(circle, rgba(255, 233, 163, 0.25), rgba(255, 90, 95, 0.08) 60%, transparent 72%); }
+    .centro-ciclo img { width: 120px; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.6)); }
+    .centro-ciclo b { display: block; margin-top: 10px; font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; color: var(--ouro); }
+    .centro-ciclo small { color: var(--suave); font-weight: 800; font-size: 14px; }
+
+    .duas h2 { font-size: clamp(32px, 3.4vw, 46px); }
+    .duas { display: grid; grid-template-columns: 1.05fr 1fr; gap: 50px; align-items: center; }
+    .duas.inv { grid-template-columns: 1fr 1.05fr; }
+    .duas.inv .midia { order: -1; }
+    .midia { padding: 12px; border-radius: 22px; background: linear-gradient(var(--madeira-esc) 0 8px, var(--madeira) 8px); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 5px var(--friso), 0 6px 0 var(--base), 0 24px 50px rgba(0, 0, 0, 0.55); }
+    .midia img { border-radius: 12px; box-shadow: 0 0 0 3px #480e1e; }
+    .fluxo { display: grid; gap: 14px; margin-top: 30px; }
+    .passo { position: relative; display: grid; grid-template-columns: 54px 1fr; gap: 16px; align-items: start; padding: 16px 18px; }
+    .passo .n { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; font-family: var(--display); font-size: 26px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
+    .passo b { display: block; font-family: var(--display); font-weight: 400; font-size: 22px; text-transform: uppercase; }
+    .passo span { font-size: 15px; color: var(--suave); }
+    .passo + .passo::before { content: ""; position: absolute; left: 44px; top: -16px; width: 3px; height: 18px; background: repeating-linear-gradient(180deg, var(--ouro) 0 4px, transparent 4px 8px); }
+    .criterios { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .criterios span { padding: 4px 12px; border-radius: 10px; font-family: var(--display); font-size: 15px; color: #fff; }
+
+    .escada { display: flex; align-items: flex-end; gap: 14px; height: 230px; margin-top: 30px; padding: 0 6px; }
+    .degrau { flex: 1; display: grid; align-content: end; justify-items: center; gap: 8px; }
+    .degrau .barra { width: 100%; border-radius: 14px 14px 6px 6px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: inset 0 0 0 3px var(--ouro-esc), 0 4px 0 var(--ouro-esc); display: grid; place-items: start center; padding-top: 10px; font-family: var(--display); font-size: 30px; color: #2a1a12; }
+    .degrau small { font-weight: 800; font-size: 13px; color: var(--suave); text-align: center; }
+
+    .avaliar { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 50px; }
+    .avaliar .placa h3 { font-family: var(--display); font-weight: 400; font-size: 32px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
+    .avaliar .placa > p { margin-top: 6px; color: #fff3df; opacity: 0.9; font-weight: 700; }
+    .medidores { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+    .medidor { padding: 18px 10px 16px; text-align: center; }
+    .medidor svg { width: 100%; max-width: 220px; height: auto; overflow: visible; }
+    .medidor .v { margin-top: -54px; font-family: var(--display); font-size: 52px; line-height: 1; }
+    .medidor small { display: block; margin-top: 6px; font-family: var(--display); font-size: 16px; letter-spacing: 0.06em; color: #e9d5ff; }
+    .formula { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 14px; font-family: var(--display); font-size: 15px; text-transform: uppercase; }
+    .formula span { padding: 6px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); }
+    .formula i { font-style: normal; color: var(--ouro); font-size: 26px; }
+    .precos { display: grid; gap: 12px; margin-top: 20px; }
+    .preco { display: grid; grid-template-columns: 140px 1fr 110px; align-items: center; gap: 14px; padding: 14px 18px; }
+    .preco b { font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; }
+    .preco .trilho { height: 14px; border-radius: 7px; background: #1a0d12; overflow: hidden; }
+    .preco .trilho i { display: block; height: 100%; border-radius: 7px; background: linear-gradient(90deg, #f9a8d4, #ec4899); }
+    .preco strong { text-align: right; font-family: var(--display); font-weight: 400; font-size: 24px; color: #fbcfe8; }
+    .preco.meio { box-shadow: inset 0 0 0 3px #f472b6, 0 0 24px rgba(236, 72, 153, 0.35); }
+    .credito { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 16px; border-radius: 999px; font-weight: 900; font-size: 14px; text-decoration: none; color: #fff; background: linear-gradient(180deg, #f472b6, #be185d); box-shadow: inset 0 0 0 2px #4a0d3a, 0 4px 0 #4a0d3a; }
+
+    .soma { display: grid; grid-template-columns: 1fr 1fr auto 1.3fr; gap: 18px; align-items: center; margin-top: 50px; }
+    .contas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; grid-column: 1 / span 2; }
+    .conta { padding: 16px; text-align: center; }
+    .conta b { display: block; font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; color: var(--suave); }
+    .conta strong { display: block; font-family: var(--display); font-weight: 400; font-size: 28px; color: #c4b5fd; }
+    .conta span { font-family: var(--display); font-size: 18px; color: var(--ouro); }
+    .seta { font-family: var(--display); font-size: 70px; color: var(--ouro); text-shadow: 0 0 24px rgba(255, 211, 77, 0.6); }
+    .total { text-align: center; }
+    .total h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
+    .total .grande { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .total .grande div { padding: 16px 8px; }
+    .total .grande small { display: block; font-family: var(--display); font-size: 15px; letter-spacing: 0.05em; color: var(--friso); text-transform: uppercase; }
+    .total .grande strong { font-family: var(--display); font-weight: 400; font-size: 42px; line-height: 1.1; }
+
+    .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 50px; }
+    .extra { padding: 26px 22px; text-align: center; transition: transform 0.2s; }
+    .extra:hover { transform: translateY(-4px); }
+    .extra .ico { display: flex; align-items: center; justify-content: center; gap: 8px; height: 72px; }
+    .extra h3 { margin-top: 10px; font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; }
+    .extra p { margin-top: 6px; color: var(--suave); font-size: 15px; }
+    .moeda { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-family: var(--display); font-size: 24px; color: #7a4a00; background: radial-gradient(circle at 40% 35%, #fff3b0, #f5b70a 60%, #a86a00); box-shadow: inset 0 0 0 3px #d99a08; }
+    .gema { display: inline-block; width: 38px; height: 38px; background: linear-gradient(135deg, #fbcfe8, #ec4899 50%, #9d174d); clip-path: polygon(25% 0, 75% 0, 100% 35%, 50% 100%, 0 35%); }
+    .pix { image-rendering: pixelated; }
+
+    .galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; align-items: start; }
+    .galeria figure { padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
+    .galeria img { width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: #0d0709; border-radius: 10px; }
+    .galeria figcaption { padding: 10px 4px 2px; font-weight: 800; font-size: 15px; color: var(--suave); }
+
+    .seguranca { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 46px; }
+    .seg { padding: 22px; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.55), rgba(43, 26, 34, 0.55)); border: 1px solid rgba(255, 233, 163, 0.1); }
+    .seg .ico { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px; background: rgba(74, 222, 128, 0.12); color: var(--verde); }
+    .seg .ico svg { width: 30px; height: 30px; }
+    .seg h3 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: 21px; text-transform: uppercase; }
+    .seg p { margin-top: 6px; font-size: 15px; color: var(--suave); }
+
+    .instalar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; counter-reset: p; }
+    .inst { position: relative; padding: 30px 24px 26px; }
+    .inst .n { position: absolute; top: -22px; left: 24px; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; font-family: var(--display); font-size: 26px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
+    .inst h3 { font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
+    .inst p { margin-top: 8px; color: #fff3df; font-weight: 700; font-size: 15px; }
+    .aviso { margin-top: 22px; padding: 16px 20px; border-radius: 16px; background: rgba(125, 211, 252, 0.07); border: 1px solid rgba(125, 211, 252, 0.25); color: #d6eefe; font-size: 15px; }
+    .aviso b { color: #fff; }
+    .hash { margin-top: 12px; font-size: 13px; color: var(--apagado); word-break: break-all; }
+    .hash code { color: var(--suave); }
+
+    .faq { max-width: 840px; margin: 40px auto 0; display: grid; gap: 12px; }
+    details { border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
+    summary { cursor: pointer; list-style: none; padding: 18px 22px; font-weight: 900; font-size: 18px; display: flex; justify-content: space-between; gap: 16px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; font-family: var(--display); font-size: 26px; line-height: 1; color: var(--ouro); transition: transform 0.2s; }
+    details[open] summary::after { transform: rotate(45deg); }
+    details p { padding: 0 22px 20px; color: var(--suave); font-size: 16px; }
+
+    .final { margin: 120px 0 0; padding: 70px 20px; text-align: center; border-top: 1px solid rgba(255, 233, 163, 0.08); background: radial-gradient(50% 80% at 50% 0%, rgba(255, 233, 163, 0.08), transparent 70%); }
+    .final .assinatura { display: inline-flex; align-items: flex-end; gap: 10px; margin-top: 22px; }
+    .final .assinatura em { font-style: italic; font-weight: 900; font-size: 22px; color: var(--suave); padding-bottom: 4px; }
+    .final .assinatura b { position: relative; font-family: var(--display); font-weight: 400; font-size: 40px; letter-spacing: 0.03em; text-transform: uppercase; background: linear-gradient(100deg, #e2a93f, #ffe066 50%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 var(--linha)); }
+    .final .assinatura svg { position: absolute; left: -12px; top: -16px; width: 30px; transform: rotate(-20deg); }
+    .rodape { margin-top: 26px; color: var(--apagado); font-size: 14px; }
+    .rodape a { color: var(--suave); }
+
+    .revela { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .revela.ok { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .revela { opacity: 1; transform: none; } }
+    @media (max-width: 980px) {
+      .menu { display: none; }
+      .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
+      .ciclo { grid-template-columns: 1fr; }
+      .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
+      .duas, .duas.inv, .avaliar, .extras, .galeria, .instalar { grid-template-columns: 1fr; }
+      .duas.inv .midia { order: 0; }
+      .soma { grid-template-columns: 1fr; }
+      .contas { grid-column: auto; }
+      .seta { transform: rotate(90deg); text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ceu" aria-hidden="true"></div>
+
+  <header class="topo">
+    <div class="envolve">
+      <a class="marca" href="#"><img src="assets/icone.png" alt="" /><span><span class="p">Poke</span>Pocket</span></a>
+      <nav class="menu" aria-label="Seções">
+        <a href="#automatico">No automático</a>
+        <a href="#avaliar">Score e preço</a>
+        <a href="#contas">4 contas</a>
+        <a href="#seguranca">Segurança</a>
+        <a href="#instalar">Instalar</a>
+        <a href="#duvidas">Dúvidas</a>
+      </nav>
+      <a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe">Baixar</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="heroi">
+      <div class="raios" aria-hidden="true"></div>
+      <div class="envolve">
+        <img class="bola" src="assets/pokebola.svg" alt="" />
+        <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Twitch e Kick</span><span><i></i>Windows</span></div>
+        <h1>Seu Pokéidle no <em>automático</em>.</h1>
+        <p class="lide">Ele não só mostra os números: ele joga por você. Troca de hunt, faz Top Catch, repõe pokébolas e poções e resgata os bônus das lives, nas 4 contas ao mesmo tempo.</p>
+        <div class="acoes">
+          <a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zm8.5-1.2L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zm8.5 0H21V21l-9.5-1.3z"/></svg>Baixar para Windows</a>
+          <a class="botao vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 7h4M12 17h.01"/></svg>Versão portátil</a>
+        </div>
+        <p class="nota">Grátis · sem cadastro e sem licença · Windows 10 e 11 · versão 1.0.0 · a portátil roda sem instalar · <a href="#video">ver o vídeo</a> · <a href="https://github.com/iampiscis/pokepocket/releases">todas as versões</a></p>
+        <div class="tela revela" id="video">
+          <video src="assets/pokepocket.mp4" poster="assets/capa.jpg" controls preload="none" playsinline></video>
+        </div>
+        <div class="numeros revela">
+          <div class="numero"><b>4</b><span>contas num painel só</span></div>
+          <div class="numero"><b>4</b><span>critérios para escolher a hunt</span></div>
+          <div class="numero"><b>2</b><span>lives por conta, ao mesmo tempo</span></div>
+          <div class="numero"><b>0</b><span>cliques para repor os itens</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="automatico">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Não só mostra. Faz.</span>
+          <h2>Um ciclo que roda sozinho</h2>
+          <p>Enquanto você faz outra coisa, cada conta caça, troca de rota, captura o que falta, repõe a mochila e farma pontos nas lives.</p>
+        </div>
+        <div class="ciclo revela">
+          <div class="no placa"><div class="ico"><img src="assets/itens/metagross.png" alt="" style="width:58px;height:auto" /></div><div><h3>Hunt automática</h3><p>Caça sem parar e troca de rota quando a conta fica forte.</p></div></div>
+          <div class="centro-ciclo"><div class="anel"></div><div class="miolo"><div><img src="assets/pokebola.svg" alt="" /><b>No automático</b><small>nas 4 contas</small></div></div></div>
+          <div class="no placa"><div class="ico"><img src="assets/itens/ball-ultra.png" alt="" style="width:42px;height:42px" /></div><div><h3>Top Catch</h3><p>Pula de hunt em hunt atrás das espécies que faltam na semana.</p></div></div>
+          <div class="no placa"><div class="ico"><span class="gema" style="width:34px;height:34px"></span></div><div><h3>Lives e bônus</h3><p>Twitch e Kick farmando pontos e resgatando bônus sozinhas.</p></div></div>
+          <div class="no placa"><div class="ico"><img src="assets/itens/hyper_potion.png" alt="" style="width:30px;height:48px" /></div><div><h3>Compras</h3><p>Repõe pokébolas, poções e revives antes de acabar.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="envolve duas">
+        <div class="revela">
+          <span class="rotulo">Troca de hunt</span>
+          <h2>Você escolhe o critério. Ele escolhe a rota.</h2>
+          <div class="fluxo">
+            <div class="passo vao"><span class="n">1</span><div><b>Escolha o objetivo</b><span>O que importa pra você agora.</span><div class="criterios"><span style="background:#7c3aed">XP</span><span style="background:#b7791f">Coins</span><span style="background:linear-gradient(90deg,#7c3aed 50%,#b7791f 50%)">Equilíbrio</span><span style="background:#0369a1">Drops</span></div></div></div>
+            <div class="passo vao"><span class="n">2</span><div><b>Ele mede cada rota</b><span>XP por hora, coins já tirando as poções e o quanto cada hunt solta das pedras e itens que você quer.</span></div></div>
+            <div class="passo vao"><span class="n">3</span><div><b>Troca sozinho</b><span>Vai para a melhor hunt e troca de novo quando a conta sobe de nível.</span></div></div>
+          </div>
+        </div>
+        <div class="midia revela"><img src="assets/cenas/troca.jpg" alt="Tela de troca de hunt com os quatro critérios e as rotas" loading="lazy" /></div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="envolve duas inv">
+        <div class="revela">
+          <span class="rotulo">Top Catch</span>
+          <h2>Sobe no ranking da semana sozinho</h2>
+          <div class="cab"><p>O modo Top Catch percorre hunts seguras com as espécies que ainda faltam na semana, captura a primeira de cada uma e já vai para a próxima.</p></div>
+          <div class="escada">
+            <div class="degrau"><div class="barra" style="height:60px">#48</div><small>começo</small></div>
+            <div class="degrau"><div class="barra" style="height:110px">#21</div><small>+1 espécie</small></div>
+            <div class="degrau"><div class="barra" style="height:160px">#9</div><small>+2 espécies</small></div>
+            <div class="degrau"><div class="barra" style="height:210px">#3</div><small>+3 espécies</small></div>
+          </div>
+        </div>
+        <div class="midia revela"><img src="assets/cenas/topcatch.jpg" alt="Top Catch preenchendo as espécies da semana e subindo no ranking" loading="lazy" /></div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="envolve duas">
+        <div class="revela">
+          <span class="rotulo">Compras e lives</span>
+          <h2>Nunca falta pokébola. Nunca perde bônus.</h2>
+          <div class="fluxo">
+            <div class="passo vao"><span class="n">✓</span><div><b>Mochila sempre cheia</b><span>Quando o estoque baixa, compra Ultra Ball, Hyper Potion e Max Revive em toda conta.</span></div></div>
+            <div class="passo vao"><span class="n">✓</span><div><b>Até 2 lives por conta</b><span>Twitch e Kick ao mesmo tempo, com os pontos por hora de cada canal.</span></div></div>
+            <div class="passo vao"><span class="n">✓</span><div><b>Resgate de bônus automático</b><span>Capture, Lure e XP trocados por pontos na ordem que você definir.</span></div></div>
+          </div>
+        </div>
+        <div class="midia revela"><img src="assets/cenas/lives.jpg" alt="Lives simultâneas com resgate de bônus automático" loading="lazy" /></div>
+      </div>
+    </section>
+
+    <section class="bloco" id="avaliar">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Exclusivo</span>
+          <h2>Quão forte ele fica? Quanto ele vale?</h2>
+          <p>Um score próprio, pensado no meta do PvP, e o preço sugerido de cada pokémon, direto na ficha.</p>
+        </div>
+        <div class="avaliar">
+          <div class="placa revela">
+            <h3>Score PvP e PvE</h3>
+            <p>Um número de 0 a 1.000 que diz o quanto o pokémon rende de verdade.</p>
+            <div class="medidores">
+              <div class="medidor vao"><svg viewBox="0 0 220 130"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ef4444"/><stop offset=".45" stop-color="#facc15"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="18" stroke-linecap="round"/><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="url(#g)" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/></svg><div class="v">960</div><small>Score PvP</small></div>
+              <div class="medidor vao"><svg viewBox="0 0 220 130"><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="18" stroke-linecap="round"/><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="url(#g)" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="88.3 100"/></svg><div class="v">883</div><small>Score PvE</small></div>
+            </div>
+            <div class="formula vao"><span>Ataque real em 60 s</span><i>+</i><span>Resistência ao meta</span><i>=</i><span style="color:var(--verde)">Score</span></div>
+          </div>
+          <div class="placa revela">
+            <h3>Precificador integrado</h3>
+            <p>O projeto do Brião dentro do painel, ajustado pelas vendas parecidas no Mercado.</p>
+            <div class="precos">
+              <div class="preco vao"><b>Rápido</b><div class="trilho"><i style="width:80%"></i></div><strong>5.800</strong></div>
+              <div class="preco vao meio"><b>Na média</b><div class="trilho"><i style="width:90%"></i></div><strong>6.500</strong></div>
+              <div class="preco vao"><b>Conservador</b><div class="trilho"><i style="width:100%"></i></div><strong>7.200</strong></div>
+            </div>
+            <a class="credito" href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">♥ Precificador by briaoAle</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="contas">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Tudo num lugar só</span>
+          <h2>4 contas, um resumo</h2>
+          <p>XP, coins e capturas de cada conta somados ao vivo, sem trocar de aba.</p>
+        </div>
+        <div class="soma revela">
+          <div class="contas">
+            <div class="conta vao"><b>Conta 1</b><strong>1,42 bi</strong><span>41,8 mi coins</span></div>
+            <div class="conta vao"><b>Conta 2</b><strong>1,31 bi</strong><span>38,6 mi coins</span></div>
+            <div class="conta vao"><b>Conta 3</b><strong>1,22 bi</strong><span>35,2 mi coins</span></div>
+            <div class="conta vao"><b>Conta 4</b><strong>1,17 bi</strong><span>33,9 mi coins</span></div>
+          </div>
+          <div class="seta" aria-hidden="true">›</div>
+          <div class="total placa">
+            <h3>Total por hora</h3>
+            <div class="grande"><div class="vao"><small>XP</small><strong style="color:#c4b5fd">5,1 bi</strong></div><div class="vao"><small>Coins</small><strong style="color:var(--ouro)">149,5 mi</strong></div></div>
+          </div>
+        </div>
+        <div class="extras">
+          <div class="extra vao revela"><div class="ico"><span class="moeda">C</span><span class="gema"></span><img src="assets/pokebola.svg" alt="" style="width:42px" /></div><h3>Transferências</h3><p>Coins, gemas e pokémons entre as suas contas.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z" fill="#ffd34d" stroke="#7d5313" stroke-width="1.4" stroke-linejoin="round"/></svg></div><h3>Filtros específicos</h3><p>Nota, score, nível, shiny e mais, para achar o que importa.</p></div>
+          <div class="extra vao revela"><div class="ico"><span style="display:grid;place-items:center;width:60px;height:60px;border-radius:16px;font-family:var(--display);font-size:30px;background:linear-gradient(180deg,#f472b6,#db2777);box-shadow:0 5px 0 #831843">S+</span></div><h3>Tier PvP diário</h3><p>Atualizado todo dia com o meta do ranqueado.</p></div>
+          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/salamence.png" alt="" style="width:76px;height:auto" /><span style="font-family:var(--display);font-size:34px;color:var(--ouro)">24h</span></div><h3>Shinies do servidor</h3><p>Tudo o que saiu no jogo nas últimas 24 horas.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 48 32" width="90" height="60"><polyline points="2,26 12,18 20,22 30,9 38,13 46,4" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="4" r="3.5" fill="#bbf7d0"/></svg></div><h3>Mercado com histórico</h3><p>Preços e tendências de cada item.</p></div>
+          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/hyper_potion.png" alt="" style="width:34px;height:54px" /><img class="pix" src="assets/itens/ball-ultra.png" alt="" style="width:50px;height:50px" /><img class="pix" src="assets/itens/max_revive.png" alt="" style="width:36px;height:50px" /></div><h3>Mochila das 4 contas</h3><p>Todos os itens num lugar só.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Por dentro</span>
+          <h2>O painel de verdade</h2>
+          <p>Telas reais do PokePocket, com dados de demonstração.</p>
+        </div>
+        <div class="galeria">
+          <figure class="revela"><img src="assets/prints/contas.png" alt="Equipe com as quatro contas" loading="lazy" /><figcaption>As 4 contas lado a lado</figcaption></figure>
+          <figure class="revela"><img src="assets/prints/ganhos.png" alt="Resumo de ganhos" loading="lazy" /><figcaption>Resumo de ganhos</figcaption></figure>
+          <figure class="revela"><img src="assets/prints/lives.png" alt="Lives da Twitch e da Kick" loading="lazy" /><figcaption>Lives e bônus</figcaption></figure>
+          <figure class="revela"><img src="assets/prints/ficha.png" alt="Ficha do pokémon" loading="lazy" /><figcaption>Ficha com o score</figcaption></figure>
+          <figure class="revela"><img src="assets/prints/simular.png" alt="Simulador" loading="lazy" /><figcaption>Simulador de PvP e PvE</figcaption></figure>
+          <figure class="revela"><img src="assets/prints/capturas.png" alt="Capturas" loading="lazy" /><figcaption>Melhores capturas</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="seguranca">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Segurança</span>
+          <h2>Seu jogo, seu computador</h2>
+        </div>
+        <div class="seguranca">
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Roda no seu PC</h3><p>O painel funciona no seu computador, sem servidor do PokePocket no meio.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><h3>Logins com você</h3><p>As contas ficam salvas só no seu computador.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><h3>Sem cadastro</h3><p>Nada de conta, licença ou assinatura. Instalou, usou.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div><h3>Termos claros</h3><p>Os termos de uso aparecem antes de começar, linha a linha.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="instalar">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Instalar</span>
+          <h2>Pronto em 3 passos</h2>
+        </div>
+        <div class="instalar">
+          <div class="inst placa revela"><span class="n">1</span><h3>Baixe</h3><p>Instalador para deixar no PC, ou a versão portátil para rodar direto, sem instalar.</p></div>
+          <div class="inst placa revela"><span class="n">2</span><h3>Instale</h3><p>Abra o arquivo, aceite os termos e escolha a pasta. Ele cria o atalho na área de trabalho.</p></div>
+          <div class="inst placa revela"><span class="n">3</span><h3>Entre nas contas</h3><p>Abra o PokePocket, entre nas suas contas do Pokéidle e ligue o que quiser no automático.</p></div>
+        </div>
+        <div class="aviso revela"><b>O Windows avisou "O Windows protegeu o computador"?</b> Isso aparece com programas novos, sem assinatura paga. Clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.</div>
+        <p class="hash">SHA-256 do instalador 1.0.0: <code>8f3ddb0481d218e4d87cfe7caff33078640ad10e34dc9e08ea1aa5437bbc512d</code></p>
+      </div>
+    </section>
+
+    <section class="bloco" id="duvidas">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Dúvidas</span>
+          <h2>Perguntas rápidas</h2>
+        </div>
+        <div class="faq">
+          <details><summary>É grátis mesmo?</summary><p>Sim. Sem assinatura, sem licença e sem cadastro.</p></details>
+          <details><summary>Quantas contas posso usar?</summary><p>Até 4 contas do Pokéidle, todas no mesmo painel, com o resumo de ganhos somado.</p></details>
+          <details><summary>Preciso deixar o computador ligado?</summary><p>Sim. O PokePocket roda no seu PC, então a hunt, as compras e as lives seguem enquanto ele estiver aberto.</p></details>
+          <details><summary>Qual a diferença entre o instalador e a portátil?</summary><p>O instalador coloca o PokePocket no PC com atalho na área de trabalho. A portátil é um arquivo só: abre direto, sem instalar, e dá para levar num pendrive.</p></details>
+          <details><summary>Funciona no celular?</summary><p>Esta versão é para Windows 10 e 11.</p></details>
+          <details><summary>É oficial do Pokéidle?</summary><p>Não. É um projeto de fã, sem vínculo com o Pokéidle.</p></details>
+          <details><summary>De onde vêm os preços sugeridos?</summary><p>Do Precificador do Brião (briaoAle), integrado ao painel e ajustado pelas vendas parecidas no Mercado.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <img src="assets/pokebola.svg" alt="" style="width:84px;margin:0 auto 18px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))" />
+      <h2 style="margin:0 auto">Bora deixar no automático?</h2>
+      <div class="acoes"><a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe">Baixar para Windows</a></div>
+      <div class="assinatura"><em>by</em><b><svg viewBox="0 0 64 40"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Piscis</b></div>
+      <p class="rodape">Projeto de fã, sem vínculo com o Pokéidle · Precificador por <a href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">briaoAle</a> (MIT) · <a href="https://github.com/iampiscis/pokepocket/releases">Versões</a></p>
+    </section>
+  </main>
+
+  <script>
+    const obs = new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) { i.target.classList.add('ok'); obs.unobserve(i.target) } }), { threshold: 0.12 });
+    document.querySelectorAll('.revela').forEach((e) => obs.observe(e));
+  </script>
+</body>
+</html>
