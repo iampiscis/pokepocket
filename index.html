@@ -46,7 +46,7 @@
     .botao.vazado { background: rgba(255, 255, 255, 0.04); color: var(--tinta); border-color: rgba(255, 233, 163, 0.3); box-shadow: none; }
     .botao svg { width: 22px; height: 22px; }
 
-    .heroi { position: relative; padding: 80px 0 40px; text-align: center; }
+    .heroi { position: relative; padding: 56px 0 20px; text-align: center; }
     .heroi .raios { position: absolute; left: 50%; top: 40px; width: 900px; height: 900px; margin-left: -450px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 233, 163, 0.07) 0deg 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 15%, transparent 65%); mask: radial-gradient(circle, #000 15%, transparent 65%); animation: gira 80s linear infinite; z-index: -1; }
     @keyframes gira { to { transform: rotate(360deg); } }
     .heroi .bola { width: 110px; margin: 0 auto 18px; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.6)); animation: flutua 4s ease-in-out infinite; }
@@ -65,15 +65,15 @@
     .contador-dl b { font-family: var(--display); font-weight: 400; font-size: 26px; color: #fff; line-height: 1; }
     .nota { margin-top: 16px; color: var(--apagado); font-size: 14px; font-weight: 700; }
     .nota a { color: var(--suave); }
-    .tela { margin: 56px auto 0; max-width: 1040px; padding: 14px; border-radius: 26px; background: linear-gradient(var(--madeira-esc) 0 10px, var(--madeira) 10px calc(100% - 14px), var(--madeira-luz) calc(100% - 14px) calc(100% - 7px), var(--madeira) calc(100% - 7px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 40px 90px rgba(0, 0, 0, 0.6); }
+    .tela { margin: 40px auto 0; max-width: 1040px; padding: 14px; border-radius: 26px; background: linear-gradient(var(--madeira-esc) 0 10px, var(--madeira) 10px calc(100% - 14px), var(--madeira-luz) calc(100% - 14px) calc(100% - 7px), var(--madeira) calc(100% - 7px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 40px 90px rgba(0, 0, 0, 0.6); }
     .tela video, .tela img { width: 100%; border-radius: 14px; box-shadow: 0 0 0 3px #480e1e; background: #000; }
 
-    .numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 70px auto 0; }
+    .numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 44px auto 0; }
     .numero { padding: 24px 16px; text-align: center; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.6), rgba(43, 26, 34, 0.6)); border: 1px solid rgba(255, 233, 163, 0.1); }
     .numero b { display: block; font-family: var(--display); font-weight: 400; font-size: 54px; line-height: 1; color: var(--ouro); text-shadow: 0 4px 0 var(--linha); }
     .numero span { display: block; margin-top: 8px; font-weight: 800; font-size: 15px; color: var(--suave); }
 
-    section.bloco { padding: 110px 0 20px; }
+    section.bloco { padding: 76px 0 10px; }
     .rotulo { display: inline-block; padding: 5px 14px; border-radius: 999px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
     h2 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: clamp(36px, 4.6vw, 60px); line-height: 1.02; text-transform: uppercase; letter-spacing: 0.01em; background: linear-gradient(180deg, #fffbe0 0%, #ffe066 40%, #ffb020 65%, #e8650f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 5px 0 var(--linha)); }
     .cab { max-width: 760px; }
@@ -117,7 +117,13 @@
     .degrau .barra { width: 100%; border-radius: 14px 14px 6px 6px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: inset 0 0 0 3px var(--ouro-esc), 0 4px 0 var(--ouro-esc); display: grid; place-items: start center; padding-top: 10px; font-family: var(--display); font-size: 30px; color: #2a1a12; }
     .degrau small { font-weight: 800; font-size: 13px; color: var(--suave); text-align: center; }
 
-    .avaliar { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 50px; }
+    .auto4 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 34px; }
+    .auto { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: center; padding: 14px; border-radius: 22px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
+    .auto img { width: 100%; border-radius: 12px; box-shadow: 0 0 0 3px #480e1e, 0 0 0 5px rgba(241, 211, 183, 0.5); }
+    .auto h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; background: linear-gradient(180deg, #fffbe0, #ffd34d 60%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .auto p { margin-top: 6px; font-size: 15px; color: var(--suave); }
+    .auto p b { color: #fff; }
+    .avaliar { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 34px; }
     .avaliar .placa h3 { font-family: var(--display); font-weight: 400; font-size: 32px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
     .avaliar .placa > p { margin-top: 6px; color: #fff3df; opacity: 0.9; font-weight: 700; }
     .medidores { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
@@ -137,7 +143,7 @@
     .preco.meio { box-shadow: inset 0 0 0 3px #f472b6, 0 0 24px rgba(236, 72, 153, 0.35); }
     .credito { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 16px; border-radius: 999px; font-weight: 900; font-size: 14px; text-decoration: none; color: #fff; background: linear-gradient(180deg, #f472b6, #be185d); box-shadow: inset 0 0 0 2px #4a0d3a, 0 4px 0 #4a0d3a; }
 
-    .soma { display: grid; grid-template-columns: 1fr 1fr auto 1.3fr; gap: 18px; align-items: center; margin-top: 50px; }
+    .soma { display: grid; grid-template-columns: 1fr 1fr auto 1.3fr; gap: 18px; align-items: center; margin-top: 34px; }
     .contas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; grid-column: 1 / span 2; }
     .conta { padding: 16px; text-align: center; }
     .conta b { display: block; font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; color: var(--suave); }
@@ -151,10 +157,10 @@
     .total .grande small { display: block; font-family: var(--display); font-size: 15px; letter-spacing: 0.05em; color: var(--friso); text-transform: uppercase; }
     .total .grande strong { font-family: var(--display); font-weight: 400; font-size: 42px; line-height: 1.1; }
 
-    .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 50px; }
-    .extra { padding: 26px 22px; text-align: center; transition: transform 0.2s; }
+    .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
+    .extra { padding: 16px 18px; text-align: center; transition: transform 0.2s; }
     .extra:hover { transform: translateY(-4px); }
-    .extra .ico { display: flex; align-items: center; justify-content: center; gap: 8px; height: 72px; }
+    .extra .ico { display: flex; align-items: center; justify-content: center; gap: 8px; height: 56px; }
     .extra h3 { margin-top: 10px; font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; }
     .extra p { margin-top: 6px; color: var(--suave); font-size: 15px; }
     .moeda { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-family: var(--display); font-size: 24px; color: #7a4a00; background: radial-gradient(circle at 40% 35%, #fff3b0, #f5b70a 60%, #a86a00); box-shadow: inset 0 0 0 3px #d99a08; }
@@ -168,8 +174,8 @@
     .galeria img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.08); }
     .galeria figcaption { padding: 10px 4px 2px; font-weight: 800; font-size: 15px; color: var(--suave); }
 
-    .seguranca { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 46px; }
-    .seg { padding: 22px; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.55), rgba(43, 26, 34, 0.55)); border: 1px solid rgba(255, 233, 163, 0.1); }
+    .seguranca { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+    .seg { padding: 18px; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.55), rgba(43, 26, 34, 0.55)); border: 1px solid rgba(255, 233, 163, 0.1); }
     .seg .ico { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px; background: rgba(74, 222, 128, 0.12); color: var(--verde); }
     .seg .ico svg { width: 30px; height: 30px; }
     .seg h3 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: 21px; text-transform: uppercase; }
@@ -226,7 +232,7 @@
     .mock-abrir img { width: 54px; }
     .mock-abrir b { font-weight: 900; font-size: 30px; letter-spacing: -0.02em; }
     .mock-abrir .p { background: linear-gradient(100deg, #e2a93f, #ffe9a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .passos4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+    .passos4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 38px; }
     .p4 { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 34px 16px 20px; border-radius: 20px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
     .p4 > .n { position: absolute; top: -20px; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-family: var(--display); font-size: 22px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
     .p4 .mini { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 118px; padding: 10px; border-radius: 14px; background: #0f0a0d; border: 1px solid rgba(255, 255, 255, 0.06); }
@@ -245,7 +251,7 @@
     .verificar { margin-top: 26px; }
     .verificar p { padding: 0 22px 14px; color: var(--suave); font-size: 15px; }
     .verificar code { color: var(--tinta); }
-    .faq { max-width: 840px; margin: 40px auto 0; display: grid; gap: 12px; }
+    .faq { max-width: 840px; margin: 28px auto 0; display: grid; gap: 10px; }
     details { border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
     summary { cursor: pointer; list-style: none; padding: 18px 22px; font-weight: 900; font-size: 18px; display: flex; justify-content: space-between; gap: 16px; }
     summary::-webkit-details-marker { display: none; }
@@ -253,7 +259,7 @@
     details[open] summary::after { transform: rotate(45deg); }
     details p { padding: 0 22px 20px; color: var(--suave); font-size: 16px; }
 
-    .creditos { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 46px; align-items: stretch; }
+    .creditos { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 30px; align-items: stretch; }
     .cartao-autor { display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: linear-gradient(180deg, #2a2328, #151114); border: 2px solid #c08a3e; box-shadow: 0 0 0 4px rgba(192, 138, 62, 0.15), 0 30px 60px rgba(0, 0, 0, 0.5); }
     .palco-autor { position: relative; flex: 1; min-height: 240px; display: grid; align-items: end; background: radial-gradient(60% 90% at 50% 0%, rgba(255, 250, 220, 0.16), transparent 70%), linear-gradient(180deg, #3a3236, #1c1719); }
     .luz-palco { position: absolute; left: 50%; top: -20px; width: 320px; height: 300px; margin-left: -160px; background: linear-gradient(180deg, rgba(255, 250, 220, 0.18), rgba(255, 240, 200, 0.06)); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
@@ -277,7 +283,7 @@
     .copiar { width: 100%; margin-top: 14px; cursor: pointer; font-family: var(--texto); font-size: 17px; text-transform: none; letter-spacing: 0.01em; }
     .copiar.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); border-color: #0b5323; box-shadow: 0 5px 0 #0b5323; }
     .alerta-rede { margin-top: 12px; font-size: 14px; font-weight: 700; color: #fbbf24; text-align: center; }
-    .final { margin: 120px 0 0; padding: 70px 20px; text-align: center; border-top: 1px solid rgba(255, 233, 163, 0.08); background: radial-gradient(50% 80% at 50% 0%, rgba(255, 233, 163, 0.08), transparent 70%); }
+    .final { margin: 70px 0 0; padding: 40px 20px 34px; text-align: center; border-top: 1px solid rgba(255, 233, 163, 0.08); background: radial-gradient(50% 80% at 50% 0%, rgba(255, 233, 163, 0.08), transparent 70%); }
     .final .assinatura { display: inline-flex; align-items: flex-end; gap: 10px; margin-top: 22px; }
     .final .assinatura em { font-style: italic; font-weight: 900; font-size: 22px; color: var(--suave); padding-bottom: 4px; }
     .final .assinatura b { position: relative; font-family: var(--display); font-weight: 400; font-size: 40px; letter-spacing: 0.03em; text-transform: uppercase; background: linear-gradient(100deg, #e2a93f, #ffe066 50%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 var(--linha)); }
@@ -293,7 +299,7 @@
       .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
       .ciclo { grid-template-columns: 1fr; }
       .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
-      .duas, .duas.inv, .avaliar, .extras, .instalar, .creditos { grid-template-columns: 1fr; }
+      .duas, .duas.inv, .avaliar, .extras, .instalar, .creditos, .auto4, .auto { grid-template-columns: 1fr; }
       .duas.inv .midia { order: 0; }
       .soma { grid-template-columns: 1fr; }
       .contas { grid-column: auto; }
@@ -314,7 +320,6 @@
         <a href="#automatico">No automático</a>
         <a href="#avaliar">Score e preço</a>
         <a href="#contas">4 contas</a>
-        <a href="#seguranca">Segurança</a>
         <a href="#instalar">Instalar</a>
         <a href="#duvidas">Dúvidas</a>
         <a href="#apoie">Apoie</a>
@@ -353,63 +358,14 @@
       <div class="envolve">
         <div class="cab centro revela">
           <span class="rotulo">Não só mostra. Faz.</span>
-          <h2>Um ciclo que roda sozinho</h2>
-          <p>Caça, troca de rota, captura, repõe a mochila e farma nas lives, sozinho.</p>
+          <h2>No automático, nas 4 contas</h2>
         </div>
-        <div class="ciclo revela">
-          <div class="no placa"><div class="ico"><img src="assets/itens/metagross.png" alt="" style="width:58px;height:auto" /></div><div><h3>Hunt automática</h3><p>Caça sem parar e troca de rota quando a conta fica forte.</p></div></div>
-          <div class="centro-ciclo"><div class="anel"></div><div class="miolo"><div><img src="assets/pokebola.svg" alt="" /><b>No automático</b><small>nas 4 contas</small></div></div></div>
-          <div class="no placa"><div class="ico"><img src="assets/itens/ball-ultra.png" alt="" style="width:42px;height:42px" /></div><div><h3>Top Catch</h3><p>Pula de hunt em hunt atrás das espécies que faltam na semana.</p></div></div>
-          <div class="no placa"><div class="ico"><span class="gema" style="width:34px;height:34px"></span></div><div><h3>Lives e bônus</h3><p>Twitch e Kick farmando pontos e resgatando bônus sozinhas.</p></div></div>
-          <div class="no placa"><div class="ico"><img src="assets/itens/hyper_potion.png" alt="" style="width:30px;height:48px" /></div><div><h3>Compras</h3><p>Repõe pokébolas, poções e revives antes de acabar.</p></div></div>
+        <div class="auto4">
+          <div class="auto revela"><img src="assets/cenas/troca.jpg" alt="Troca de hunt pelos critérios" loading="lazy" /><div><h3>Troca de hunt</h3><p>Você escolhe <b>XP</b>, <b>Coins</b>, <b>Equilíbrio</b> ou <b>Drops</b>; ele vai para a melhor rota e troca quando a conta sobe.</p></div></div>
+          <div class="auto revela"><img src="assets/cenas/topcatch.jpg" alt="Top Catch subindo no ranking" loading="lazy" /><div><h3>Top Catch</h3><p>Pula de hunt em hunt atrás das espécies que faltam na semana e sobe no ranking.</p></div></div>
+          <div class="auto revela"><img src="assets/cenas/compras.jpg" alt="Compras automáticas de itens" loading="lazy" /><div><h3>Compras</h3><p>Repõe pokébolas, poções e revives antes de acabar, em toda conta.</p></div></div>
+          <div class="auto revela"><img src="assets/cenas/lives.jpg" alt="Lives simultâneas com resgate de bônus" loading="lazy" /><div><h3>Lives e bônus</h3><p>Até 2 lives por conta na Twitch e na Kick, com resgate de bônus automático.</p></div></div>
         </div>
-      </div>
-    </section>
-
-    <section class="bloco">
-      <div class="envolve duas">
-        <div class="revela">
-          <span class="rotulo">Troca de hunt</span>
-          <h2>Você escolhe o critério. Ele escolhe a rota.</h2>
-          <div class="fluxo">
-            <div class="passo vao"><span class="n">1</span><div><b>Escolha o objetivo</b><span>O que importa pra você agora.</span><div class="criterios"><span style="background:#7c3aed">XP</span><span style="background:#b7791f">Coins</span><span style="background:linear-gradient(90deg,#7c3aed 50%,#b7791f 50%)">Equilíbrio</span><span style="background:#0369a1">Drops</span></div></div></div>
-            <div class="passo vao"><span class="n">2</span><div><b>Ele mede cada rota</b><span>XP por hora, coins já tirando as poções e o quanto cada hunt solta das pedras e itens que você quer.</span></div></div>
-            <div class="passo vao"><span class="n">3</span><div><b>Troca sozinho</b><span>Vai para a melhor hunt e troca de novo quando a conta sobe de nível.</span></div></div>
-          </div>
-        </div>
-        <div class="midia revela"><img src="assets/cenas/troca.jpg" alt="Tela de troca de hunt com os quatro critérios e as rotas" loading="lazy" /></div>
-      </div>
-    </section>
-
-    <section class="bloco">
-      <div class="envolve duas inv">
-        <div class="revela">
-          <span class="rotulo">Top Catch</span>
-          <h2>Sobe no ranking da semana sozinho</h2>
-          <div class="cab"><p>O modo Top Catch percorre hunts seguras com as espécies que ainda faltam na semana, captura a primeira de cada uma e já vai para a próxima.</p></div>
-          <div class="escada">
-            <div class="degrau"><div class="barra" style="height:60px">#48</div><small>começo</small></div>
-            <div class="degrau"><div class="barra" style="height:110px">#21</div><small>+1 espécie</small></div>
-            <div class="degrau"><div class="barra" style="height:160px">#9</div><small>+2 espécies</small></div>
-            <div class="degrau"><div class="barra" style="height:210px">#3</div><small>+3 espécies</small></div>
-          </div>
-        </div>
-        <div class="midia revela"><img src="assets/cenas/topcatch.jpg" alt="Top Catch preenchendo as espécies da semana e subindo no ranking" loading="lazy" /></div>
-      </div>
-    </section>
-
-    <section class="bloco">
-      <div class="envolve duas">
-        <div class="revela">
-          <span class="rotulo">Compras e lives</span>
-          <h2>Nunca falta pokébola. Nunca perde bônus.</h2>
-          <div class="fluxo">
-            <div class="passo vao"><span class="n">✓</span><div><b>Mochila sempre cheia</b><span>Quando o estoque baixa, compra Ultra Ball, Hyper Potion e Max Revive em toda conta.</span></div></div>
-            <div class="passo vao"><span class="n">✓</span><div><b>Até 2 lives por conta</b><span>Twitch e Kick ao mesmo tempo, com os pontos por hora de cada canal.</span></div></div>
-            <div class="passo vao"><span class="n">✓</span><div><b>Resgate de bônus automático</b><span>Capture, Lure e XP trocados por pontos na ordem que você definir.</span></div></div>
-          </div>
-        </div>
-        <div class="midia revela"><img src="assets/cenas/lives.jpg" alt="Lives simultâneas com resgate de bônus automático" loading="lazy" /></div>
       </div>
     </section>
 
@@ -475,28 +431,6 @@
       </div>
     </section>
 
-    <section class="bloco">
-      <div class="envolve">
-        <div class="cab centro revela">
-          <span class="rotulo">Por dentro</span>
-          <h2>O painel de verdade</h2>
-          <p>Telas reais do PokePocket, com dados de demonstração.</p>
-        </div>
-        <div class="galeria">
-          <div class="linha-g">
-            <figure class="revela" style="flex:1.802"><img src="assets/prints/contas.png" alt="Equipe com as quatro contas" loading="lazy" /><figcaption>As 4 contas lado a lado</figcaption></figure>
-            <figure class="revela" style="flex:0.924"><img src="assets/prints/ficha.png" alt="Ficha do pokémon com o score" loading="lazy" /><figcaption>Ficha com o score</figcaption></figure>
-          </div>
-          <div class="linha-g">
-            <figure class="revela" style="flex:1.995"><img src="assets/prints/lives.png" alt="Lives da Twitch e da Kick" loading="lazy" /><figcaption>Lives e bônus</figcaption></figure>
-            <figure class="revela" style="flex:2.410"><img src="assets/prints/capturas.png" alt="Melhores capturas" loading="lazy" /><figcaption>Melhores capturas</figcaption></figure>
-          </div>
-          <div class="linha-g">
-            <figure class="revela" style="flex:1"><img src="assets/prints/ganhos.png" alt="Resumo de ganhos" loading="lazy" /><figcaption>Resumo de ganhos das 4 contas</figcaption></figure>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="bloco" id="seguranca">
       <div class="envolve">
@@ -538,12 +472,10 @@
         </div>
         <div class="faq">
           <details><summary>É grátis mesmo?</summary><p>Sim. Sem assinatura, sem licença e sem cadastro.</p></details>
-          <details><summary>Quantas contas posso usar?</summary><p>Até 4 contas do Pokéidle, todas no mesmo painel, com o resumo de ganhos somado.</p></details>
           <details><summary>Preciso deixar o computador ligado?</summary><p>Sim. O PokePocket roda no seu PC, então a hunt, as compras e as lives seguem enquanto ele estiver aberto.</p></details>
           <details><summary>Qual a diferença entre o instalador e a portátil?</summary><p>O instalador coloca o PokePocket no PC com atalho na área de trabalho. A portátil é um arquivo só: abre direto, sem instalar, e dá para levar num pendrive.</p></details>
           <details><summary>Funciona no celular?</summary><p>Esta versão é para Windows 10 e 11.</p></details>
           <details><summary>É oficial do Pokéidle?</summary><p>Não. É um projeto de fã, sem vínculo com o Pokéidle.</p></details>
-          <details><summary>De onde vêm os preços sugeridos?</summary><p>Do Precificador do Brião (briaoAle), integrado ao painel e ajustado pelas vendas parecidas no Mercado.</p></details>
         </div>
       </div>
     </section>
@@ -589,8 +521,6 @@
     </section>
 
     <section class="final">
-      <img src="assets/pokebola.svg" alt="" style="width:84px;margin:0 auto 18px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))" />
-      <h2 style="margin:0 auto">Bora deixar no automático?</h2>
       <div class="acoes"><a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-final" data-goatcounter-title="baixar-instalador-final">Baixar para Windows</a></div>
       <div class="assinatura"><em>by</em><b><svg viewBox="0 0 64 40"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Piscis</b></div>
       <p class="rodape">Projeto de fã, sem vínculo com o Pokéidle · Precificador por <a href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">briaoAle</a> (MIT) · <a href="https://github.com/iampiscis/pokepocket/releases">Versões</a><br />Esta página conta visitas e downloads de forma anônima (GoatCounter): sem cookies e sem guardar o seu IP.</p>
