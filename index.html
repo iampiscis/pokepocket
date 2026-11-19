@@ -189,6 +189,30 @@
     details[open] summary::after { transform: rotate(45deg); }
     details p { padding: 0 22px 20px; color: var(--suave); font-size: 16px; }
 
+    .creditos { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 46px; align-items: stretch; }
+    .cartao-autor { display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: linear-gradient(180deg, #2a2328, #151114); border: 2px solid #c08a3e; box-shadow: 0 0 0 4px rgba(192, 138, 62, 0.15), 0 30px 60px rgba(0, 0, 0, 0.5); }
+    .palco-autor { position: relative; flex: 1; min-height: 240px; display: grid; align-items: end; background: radial-gradient(60% 90% at 50% 0%, rgba(255, 250, 220, 0.16), transparent 70%), linear-gradient(180deg, #3a3236, #1c1719); }
+    .luz-palco { position: absolute; left: 50%; top: -20px; width: 320px; height: 300px; margin-left: -160px; background: linear-gradient(180deg, rgba(255, 250, 220, 0.18), rgba(255, 240, 200, 0.06)); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+    .nota-musical { position: absolute; font-size: 34px; color: rgba(255, 246, 239, 0.45); animation: nota 2.4s ease-in-out infinite; }
+    @keyframes nota { 0%, 100% { transform: translateY(0) rotate(-8deg); opacity: 0.3; } 50% { transform: translateY(-14px) rotate(8deg); opacity: 0.8; } }
+    .dancam { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: 22px; padding: 0 20px 26px; }
+    .dancam img { filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.35)); animation: danca 0.94s ease-in-out infinite; transform-origin: 50% 100%; }
+    @keyframes danca { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-16px) rotate(6deg); } }
+    .autor { padding: 22px 20px 28px; text-align: center; background: #151114; border-top: 1px solid rgba(192, 138, 62, 0.35); }
+    .autor small { display: block; font-weight: 900; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--suave); }
+    .autor b { position: relative; display: inline-block; margin-top: 4px; font-family: var(--texto); font-weight: 900; font-size: 52px; line-height: 1.05; color: #fff; text-shadow: 0 4px 0 #000; }
+    .autor b svg { position: absolute; left: -18px; top: -14px; width: 34px; transform: rotate(-20deg); }
+    .autor span { display: block; margin-top: 6px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ouro); }
+    .cartao-doar { padding: 28px; border-radius: 24px; background: linear-gradient(180deg, #2e1a2b, #1b1019); border: 2px solid #db2777; box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.12), 0 30px 60px rgba(0, 0, 0, 0.5); }
+    .cartao-doar h3 { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 30px; color: #f9a8d4; }
+    .cartao-doar h3 .gema { width: 30px; height: 30px; }
+    .passos-doar { list-style: none; display: grid; gap: 12px; margin-top: 18px; }
+    .passos-doar li { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 17px; }
+    .passos-doar li span { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-weight: 900; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 3px 0 var(--ouro-esc); }
+    .carteira { display: block; margin-top: 20px; padding: 16px; border-radius: 14px; border: 2px dashed rgba(244, 114, 182, 0.4); background: rgba(0, 0, 0, 0.3); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; text-align: center; word-break: break-all; color: #fff; }
+    .copiar { width: 100%; margin-top: 14px; cursor: pointer; font-family: var(--texto); font-size: 17px; text-transform: none; letter-spacing: 0.01em; }
+    .copiar.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); border-color: #0b5323; box-shadow: 0 5px 0 #0b5323; }
+    .alerta-rede { margin-top: 12px; font-size: 14px; font-weight: 700; color: #fbbf24; text-align: center; }
     .final { margin: 120px 0 0; padding: 70px 20px; text-align: center; border-top: 1px solid rgba(255, 233, 163, 0.08); background: radial-gradient(50% 80% at 50% 0%, rgba(255, 233, 163, 0.08), transparent 70%); }
     .final .assinatura { display: inline-flex; align-items: flex-end; gap: 10px; margin-top: 22px; }
     .final .assinatura em { font-style: italic; font-weight: 900; font-size: 22px; color: var(--suave); padding-bottom: 4px; }
@@ -205,7 +229,7 @@
       .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
       .ciclo { grid-template-columns: 1fr; }
       .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
-      .duas, .duas.inv, .avaliar, .extras, .instalar { grid-template-columns: 1fr; }
+      .duas, .duas.inv, .avaliar, .extras, .instalar, .creditos { grid-template-columns: 1fr; }
       .duas.inv .midia { order: 0; }
       .soma { grid-template-columns: 1fr; }
       .contas { grid-column: auto; }
@@ -228,6 +252,7 @@
         <a href="#seguranca">Segurança</a>
         <a href="#instalar">Instalar</a>
         <a href="#duvidas">Dúvidas</a>
+        <a href="#apoie">Apoie</a>
       </nav>
       <a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe">Baixar</a>
     </div>
@@ -456,6 +481,46 @@
       </div>
     </section>
 
+    <section class="bloco" id="apoie">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Créditos</span>
+          <h2>Gostou? Apoie o projeto</h2>
+          <p>O PokePocket é grátis e continua grátis. Se ele te ajuda, uma doação mantém as melhorias chegando.</p>
+        </div>
+        <div class="creditos">
+          <div class="cartao-autor revela">
+            <div class="palco-autor">
+              <div class="luz-palco"></div>
+              <span class="nota-musical" style="left:18%;top:22%">♪</span><span class="nota-musical" style="left:74%;top:16%;animation-delay:.8s">♫</span><span class="nota-musical" style="left:52%;top:30%;animation-delay:1.6s">♪</span>
+              <div class="dancam">
+                <img class="pix" src="assets/itens/bulbasaur.png" alt="" style="width:92px" />
+                <img class="pix" src="assets/itens/charmander.png" alt="" style="width:100px;animation-delay:.15s" />
+                <img class="pix" src="assets/itens/squirtle.png" alt="" style="width:88px;animation-delay:.3s" />
+                <img class="pix" src="assets/itens/pikachu.png" alt="" style="width:116px;animation-delay:.45s" />
+              </div>
+            </div>
+            <div class="autor">
+              <small>Feito com carinho por</small>
+              <b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Piscis</b>
+              <span>Criador e dev do PokePocket</span>
+            </div>
+          </div>
+          <div class="cartao-doar revela">
+            <h3><span class="gema"></span>Apoie o projeto</h3>
+            <ol class="passos-doar">
+              <li><span>1</span>Copie o endereço abaixo.</li>
+              <li><span>2</span>Envie USDT pela rede Solana (SPL).</li>
+              <li><span>3</span>Sua doação mantém as melhorias e o PokePocket sempre gratuito.</li>
+            </ol>
+            <code class="carteira" id="carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
+            <button type="button" class="botao copiar" id="copiar">Copiar endereço</button>
+            <p class="alerta-rede">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="final">
       <img src="assets/pokebola.svg" alt="" style="width:84px;margin:0 auto 18px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))" />
       <h2 style="margin:0 auto">Bora deixar no automático?</h2>
@@ -468,6 +533,13 @@
   <script>
     const obs = new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) { i.target.classList.add('ok'); obs.unobserve(i.target) } }), { threshold: 0.12 });
     document.querySelectorAll('.revela').forEach((e) => obs.observe(e));
+    const copiar = document.getElementById('copiar');
+    copiar.addEventListener('click', async () => {
+      const txt = document.getElementById('carteira').textContent.trim();
+      try { await navigator.clipboard.writeText(txt); } catch { const r = document.createRange(); r.selectNodeContents(document.getElementById('carteira')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges(); }
+      copiar.textContent = 'Endereço copiado ✓'; copiar.classList.add('ok');
+      setTimeout(() => { copiar.textContent = 'Copiar endereço'; copiar.classList.remove('ok'); }, 2500);
+    });
   </script>
 </body>
 </html>
