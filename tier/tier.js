@@ -106,10 +106,27 @@ function cartao(p) {
       nomesTipos ? el('span', { class: 'so-leitor', text: nomesTipos }) : null
     ]),
     score != null ? el('b', { class: 'poke-val', text: fmt.format(score) }) : null,
-    el('span', { class: 'poke-esc' }, [tipos.length ? el('span', { class: 'pontos', 'aria-hidden': 'true' }, tipos.map((t) => el('i', { style: `--c:${COR_TIPO[t] || '#777'}` }))) : null, score != null ? escala(score) : null]),
-    el('span', { class: 'poke-uso' }, uso)
+    tipos.length ? el('span', { class: 'pontos', 'aria-hidden': 'true' }, tipos.map((t) => el('i', { style: `--c:${COR_TIPO[t] || '#777'}` }))) : null,
+    el('span', { class: 'poke-uso' }, uso),
+    el('span', { class: 'poke-esc' }, [score != null ? escala(score) : null])
   ])
 }
+
+const PASSOS_NOME = ['n1', 'n2', 'n3']
+
+function ajustarNomes() {
+  const nomes = [...document.querySelectorAll('#faixas .poke-nome, #fora-faixas .poke-nome')]
+  nomes.forEach((n) => n.classList.remove(...PASSOS_NOME))
+  let fila = nomes
+  for (const passo of PASSOS_NOME) {
+    fila = fila.filter((n) => n.scrollWidth > n.clientWidth + 1)
+    if (!fila.length) break
+    fila.forEach((n) => { n.classList.remove(...PASSOS_NOME); n.classList.add(passo) })
+  }
+}
+
+let esperaNomes = 0
+addEventListener('resize', () => { clearTimeout(esperaNomes); esperaNomes = setTimeout(ajustarNomes, 150) })
 
 function filtrar(itens) {
   const q = normalizar(estado.busca)
@@ -213,6 +230,7 @@ function pintar() {
   }
   $('fora-faixas').replaceChildren(...foraFaixas)
   $('fora').hidden = !foraFaixas.length
+  ajustarNomes()
   $('vazio').hidden = faixas.length + foraFaixas.length > 0
 }
 

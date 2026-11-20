@@ -26,6 +26,10 @@ jobs:
       - name: Coletar ranqueado e recalcular
         run: node ferramentas/atualizar-meta.mjs
 
+      - name: Gerar prévia do tier
+        continue-on-error: true
+        run: node ferramentas/previa-tier.mjs
+
       - name: Esperar até 12h de Brasília
         if: github.event_name == 'schedule'
         run: |
@@ -39,7 +43,7 @@ jobs:
 
       - name: Publicar se mudou
         run: |
-          git add -A calculadora/meta-pvp.json tier/tier.json tier/dados
+          git add -A calculadora/meta-pvp.json tier/tier.json tier/dados assets/previa-tier.png tier/index.html
           if git diff --cached --quiet; then
             echo "nada mudou"
             exit 0
