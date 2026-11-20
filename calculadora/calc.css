@@ -269,6 +269,38 @@ select option { background: #1c1016; color: var(--tinta); }
 .rodape { margin-top: 26px; color: var(--apagado); font-size: 14px; }
 .rodape a { color: var(--suave); }
 
+
+.botao { position: relative; overflow: hidden; isolation: isolate; }
+.botao::before { content: ""; position: absolute; inset: -2px; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.65) 50%, transparent 65%); transform: translateX(-120%); pointer-events: none; }
+.botao:hover::before, .botao:focus-visible::before { transform: translateX(120%); transition: transform 0.6s ease; }
+.botao.vazado::before { background: linear-gradient(105deg, transparent 35%, rgba(255, 233, 163, 0.18) 50%, transparent 65%); }
+.botao svg { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.botao:hover svg { transform: scale(1.12) rotate(-6deg); }
+.final .botao:not(.vazado)::after, .compartilhar .botao:not(.vazado)::after { content: ""; position: absolute; inset: -2px; z-index: -1; background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.5) 50%, transparent 60%); transform: translateX(-120%); animation: lampejo 5s ease-in-out 1.5s infinite; pointer-events: none; }
+@keyframes lampejo { 0%, 78% { transform: translateX(-120%); } 92%, 100% { transform: translateX(120%); } }
+.botao.pulou { animation: pulo 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes pulo { 0% { transform: scale(1); } 35% { transform: scale(0.94); } 70% { transform: scale(1.05); } 100% { transform: scale(1); } }
+.botao.ok svg { transform: scale(1.15); }
+.copiar.pequeno { flex: none; }
+.cab-cartao .copiar { margin-left: 2px; width: 42px; height: 42px; padding: 0; border-radius: 12px; }
+.cab-cartao .copiar span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cab-cartao .copiar svg { width: 20px; height: 20px; }
+.sim-mini[hidden] + .copiar { margin-left: auto; }
+
+.chip, .seg button, .abas button, .forma, .passo, .info, .botao-leve, .resultados button, .credito { transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s; }
+.chip:hover, .forma:hover, .botao-leve:hover, .credito:hover { transform: translateY(-2px); }
+.seg button:hover, .abas button:hover { transform: translateY(-1px); }
+.chip:active, .forma:active, .seg button:active, .abas button:active, .botao-leve:active, .credito:active, .resultados button:active { transform: scale(0.95); transition-duration: 0.08s; }
+.passo:active { transform: scale(0.82); transition-duration: 0.06s; }
+.info:hover { transform: rotate(-10deg) scale(1.08); }
+.resultados button:hover { transform: translateX(3px); }
+.chip[aria-pressed="true"], .forma[aria-pressed="true"], .seg button[aria-pressed="true"], .abas button[aria-selected="true"] { animation: escolheu 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes escolheu { 0% { transform: scale(0.9); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.chip.shiny[aria-pressed="true"] svg { animation: faisca 0.5s ease-out; }
+@keyframes faisca { 0% { transform: scale(0.6) rotate(-40deg); } 60% { transform: scale(1.35) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+.regua { transition: filter 0.2s; }
+.regua:hover { filter: drop-shadow(0 0 6px rgba(255, 211, 77, 0.45)); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

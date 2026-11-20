@@ -480,6 +480,7 @@ async function calcular() {
   const erro = rh?.erro || rs?.erro || (!rh || !rs ? 'Não consegui calcular este pokémon.' : '')
   if (erro) {
     st.res = null
+    $('copiar-topo').hidden = true
     $('erro-res').textContent = erro
     $('erro-res').hidden = false
     $('resultado').hidden = true
@@ -488,6 +489,7 @@ async function calcular() {
   $('erro-res').hidden = true
   st.res = { h: rh, s: rs }
   $('resultado').hidden = false
+  $('copiar-topo').hidden = false
   if (st.ui.notaHoje) st.ui.notaHoje.textContent = ehNum(rh.nota) ? fmt1.format(rh.nota) : '—'
   pintarSimMini()
   pintarScore()
@@ -791,30 +793,52 @@ function trocarAba(qual) {
 }
 
 let timerLink = 0
-async function copiarLink() {
-  const bt = $('copiar-link')
-  const aviso = $('link-ok')
-  if (st.hoje) gravarEstado()
-  const url = location.href
-  let ok = false
+async function copiarTexto(texto) {
   try {
-    await navigator.clipboard.writeText(url)
-    ok = true
+    await navigator.clipboard.writeText(texto)
+    return true
   } catch {
     const campo = el('textarea', { style: 'position:fixed;left:-9999px;top:0', readonly: true })
-    campo.value = url
+    campo.value = texto
     document.body.append(campo)
     campo.select()
+    let ok = false
     try { ok = document.execCommand('copy') } catch {}
     campo.remove()
+    return ok
   }
+}
+
+async function textoResumo() {
+  const s = st.res?.s
+  if (!s) return location.href
+  const partes = [`${s.nome}${st.sim.shiny ? ' shiny' : ''} · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
+  if (ehNum(s.score?.pvp)) partes.push(`Score PvP ${fmt.format(s.score.pvp)} (${faixaDe(s.score.pvp)[1]})`)
+  if (ehNum(s.score?.pve)) partes.push(`Score PvE ${fmt.format(s.score.pve)} (${faixaDe(s.score.pve)[1]})`)
+  if (ehNum(s.nota)) partes.push(`Nota ${fmt1.format(s.nota)}/10`)
+  try {
+    const p = await precoDe(pkDe(st.sim), s)
+    if (ehNum(p?.gemas?.justo)) partes.push(`Justo ${gemas(p.gemas.justo)} gemas`)
+  } catch {}
+  return `${partes.join(' · ')}\n${location.href}`
+}
+
+async function copiar(bt, comResumo) {
+  if (st.hoje) gravarEstado()
+  const ok = await copiarTexto(comResumo ? await textoResumo() : location.href)
+  const aviso = $('link-ok')
   aviso.className = `link-ok${ok ? '' : ' erro'}`
-  aviso.textContent = ok ? 'Link copiado' : 'Copie o endereço na barra do navegador'
-  bt.classList.toggle('ok', ok)
+  aviso.textContent = ok ? (comResumo ? 'Resumo e link copiados' : 'Link copiado') : 'Copie o endereço na barra do navegador'
+  for (const b of document.querySelectorAll('.copiar')) b.classList.remove('ok')
+  if (ok) {
+    bt.classList.remove('pulou')
+    void bt.offsetWidth
+    bt.classList.add('ok', 'pulou')
+  }
   clearTimeout(timerLink)
   timerLink = setTimeout(() => {
     aviso.textContent = ''
-    bt.classList.remove('ok')
+    for (const b of document.querySelectorAll('.copiar')) b.classList.remove('ok', 'pulou')
   }, 2500)
 }
 
@@ -872,7 +896,9 @@ function ligarEventos() {
     b.setAttribute('aria-expanded', String(abrir))
     $('explica').hidden = !abrir
   })
-  $('copiar-link').addEventListener('click', copiarLink)
+  $('copiar-link').addEventListener('click', (e) => copiar(e.currentTarget, false))
+  $('copiar-topo').addEventListener('click', (e) => copiar(e.currentTarget, false))
+  $('copiar-resumo').addEventListener('click', (e) => copiar(e.currentTarget, true))
   window.addEventListener('hashchange', () => {
     const h = location.hash.replace(/^#/, '')
     if (!st.pronto || !h || h === st.ultimoHash) return

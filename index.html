@@ -31,22 +31,98 @@
     @keyframes deriva { to { background-position: 0 600px; } }
     .envolve { width: min(var(--largura), calc(100% - 40px)); margin: 0 auto; }
 
-    .topo { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(12px); background: rgba(11, 6, 8, 0.72); border-bottom: 1px solid rgba(255, 233, 163, 0.08); }
-    .topo .envolve { display: flex; align-items: center; gap: 28px; height: 72px; }
-    .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 24px; letter-spacing: -0.02em; }
-    .marca img { width: 34px; height: 34px; }
+    .topo { position: sticky; top: 0; z-index: 20; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
+    .topo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 211, 77, 0.28) 25%, rgba(255, 211, 77, 0.28) 75%, transparent); }
+    .topo .envolve { position: relative; display: flex; align-items: center; gap: 16px; height: 72px; }
+    .topo a:focus-visible, .topo button:focus-visible { outline: 2px solid var(--ouro); outline-offset: 3px; }
+    .marca { flex: none; display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 24px; letter-spacing: -0.02em; white-space: nowrap; }
+    .marca img { width: 34px; height: 34px; transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
+    .marca:hover img { transform: rotate(-14deg); }
     .marca .p { background: linear-gradient(100deg, #e2a93f, #ffe9a3); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .menu { display: flex; gap: 22px; margin-left: auto; }
-    .menu a { text-decoration: none; color: var(--suave); font-weight: 700; font-size: 15px; }
-    .menu a:hover { color: var(--ouro); }
+    .secoes { position: relative; display: flex; align-items: center; gap: 2px; margin: 0 auto; padding: 5px; border-radius: 999px; background: rgba(21, 11, 16, 0.62); border: 1px solid rgba(255, 233, 163, 0.14); box-shadow: inset 0 1px 0 rgba(255, 246, 239, 0.05), 0 10px 26px rgba(0, 0, 0, 0.28); }
+    .secoes a { position: relative; z-index: 1; padding: 7px 14px; border-radius: 999px; font-size: 14px; font-weight: 800; color: var(--suave); text-decoration: none; white-space: nowrap; transition: color 0.2s; }
+    .secoes a::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: rgba(255, 233, 163, 0.07); opacity: 0; transition: opacity 0.25s; }
+    .secoes a:hover { color: var(--tinta); }
+    .secoes a:hover::before { opacity: 1; }
+    .secoes a.ativo { color: var(--ouro); }
+    .secoes a.ativo::before { opacity: 1; background: linear-gradient(180deg, rgba(255, 233, 163, 0.14), rgba(255, 233, 163, 0.04)); box-shadow: inset 0 0 0 1px rgba(255, 211, 77, 0.2); }
+    .marcador { position: absolute; left: 0; bottom: 3px; z-index: 2; width: 18px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, #e2a93f, #ffe9a3); box-shadow: 0 0 10px rgba(255, 211, 77, 0.85); opacity: 0; pointer-events: none; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s; }
+    .acoes-topo { flex: none; display: flex; align-items: center; gap: 10px; }
+    .destino { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; font-weight: 900; font-size: 14px; color: #fff3df; background: linear-gradient(180deg, rgba(255, 233, 163, 0.13), rgba(255, 233, 163, 0.03)); border: 1px solid rgba(255, 211, 77, 0.38); transition: transform 0.2s; }
+    .destino::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; box-shadow: 0 0 22px rgba(255, 211, 77, 0.35); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+    .destino:hover { transform: translateY(-1px); }
+    .destino:hover::after { opacity: 1; }
+    .destino svg { flex: none; width: 18px; height: 18px; color: var(--ouro); }
+    .selo-novo { padding: 2px 7px 1px; border-radius: 999px; font-family: var(--display); font-size: 11px; line-height: 1.3; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc); }
+    .coracao { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #f9a8d4; background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(244, 114, 182, 0.28); }
+    .coracao svg { width: 18px; height: 18px; transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+    .coracao:hover svg, .coracao.ativo svg { transform: scale(1.2); }
+    .coracao.ativo { background: rgba(236, 72, 153, 0.2); border-color: rgba(244, 114, 182, 0.55); }
+    .abre-menu { display: none; place-items: center; flex: none; width: 40px; height: 40px; padding: 0; border-radius: 12px; cursor: pointer; color: var(--tinta); background: rgba(21, 11, 16, 0.62); border: 1px solid rgba(255, 233, 163, 0.2); }
+    .abre-menu svg { width: 20px; height: 20px; overflow: visible; }
+    .abre-menu path { transform-box: fill-box; transform-origin: center; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
+    .abre-menu[aria-expanded="true"] { color: var(--ouro); border-color: rgba(255, 211, 77, 0.45); }
+    .abre-menu[aria-expanded="true"] .l1 { transform: translateY(5px) rotate(45deg); }
+    .abre-menu[aria-expanded="true"] .l2 { opacity: 0; }
+    .abre-menu[aria-expanded="true"] .l3 { transform: translateY(-5px) rotate(-45deg); }
+    .painel { position: absolute; top: calc(100% + 10px); right: 0; width: min(340px, calc(100vw - 32px)); padding: 10px; border-radius: 20px; background: linear-gradient(180deg, #28161f, #150b10); border: 1px solid rgba(255, 233, 163, 0.16); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 246, 239, 0.05); transform-origin: top right; opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.98); transition: opacity 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s 0.25s; }
+    .painel.aberto { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+    .painel nav { display: grid; gap: 2px; }
+    .painel a { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 12px; text-decoration: none; white-space: nowrap; font-weight: 800; font-size: 16px; color: var(--suave); }
+    .painel a:hover { color: var(--tinta); background: rgba(255, 233, 163, 0.06); }
+    .painel .ic { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: var(--ouro); background: rgba(255, 233, 163, 0.07); }
+    .painel .ic svg { width: 18px; height: 18px; }
+    .painel nav a.ativo { color: var(--tinta); background: rgba(255, 233, 163, 0.09); }
+    .painel nav a.ativo .ic { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
+    .painel-pe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 233, 163, 0.1); }
+    .painel-pe a { justify-content: center; gap: 8px; padding: 10px; font-size: 15px; border: 1px solid rgba(255, 211, 77, 0.3); color: #fff3df; background: rgba(255, 233, 163, 0.06); }
+    .painel-pe a svg { flex: none; width: 18px; height: 18px; color: var(--ouro); }
+    .painel-pe .apoio { border-color: rgba(244, 114, 182, 0.3); background: rgba(236, 72, 153, 0.07); }
+    .painel-pe .apoio svg { color: #f9a8d4; }
     .botao { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 26px; border: 2px solid var(--ouro-esc); border-radius: 16px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); color: #2a1a12; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; box-shadow: 0 5px 0 var(--ouro-esc), 0 0 30px rgba(255, 233, 163, 0.35); transition: transform 0.15s, box-shadow 0.15s; }
     .botao:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ouro-esc), 0 0 40px rgba(255, 233, 163, 0.5); }
     .botao:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ouro-esc); }
     .botao.pequeno { padding: 10px 18px; font-size: 14px; border-radius: 12px; }
     .botao.vazado { background: rgba(255, 255, 255, 0.04); color: var(--tinta); border-color: rgba(255, 233, 163, 0.3); box-shadow: none; }
     .botao svg { width: 22px; height: 22px; }
+    .topo .baixar { gap: 8px; white-space: nowrap; }
+    .topo .baixar svg { width: 17px; height: 17px; }
+    @media (max-width: 1120px) {
+      .topo .envolve { gap: 10px; }
+      .secoes a { padding: 7px 10px; font-size: 13.5px; }
+      .acoes-topo { gap: 8px; }
+    }
+    @media (min-width: 981px) and (max-width: 1120px) {
+      .destino { padding-right: 14px; }
+      .destino .selo-novo { position: absolute; top: -2px; right: -2px; width: 11px; height: 11px; padding: 0; font-size: 0; border-radius: 50%; box-shadow: 0 0 0 2px var(--fundo), 0 0 10px rgba(255, 211, 77, 0.8); }
+      .topo .baixar svg { display: none; }
+    }
+    @media (min-width: 981px) { .painel { display: none; } }
+    @media (max-width: 980px) {
+      .secoes, .acoes-topo .coracao { display: none; }
+      .acoes-topo { margin-left: auto; }
+      .abre-menu { display: grid; }
+    }
+    @media (max-width: 560px) {
+      .marca { font-size: 21px; gap: 8px; }
+      .marca img { width: 30px; height: 30px; }
+      .acoes-topo { gap: 8px; }
+      .destino { width: 40px; padding: 0; justify-content: center; }
+      .destino .rot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      .destino .selo-novo { position: absolute; top: -2px; right: -2px; width: 11px; height: 11px; padding: 0; font-size: 0; border-radius: 50%; box-shadow: 0 0 0 2px var(--fundo), 0 0 10px rgba(255, 211, 77, 0.8); }
+      .topo .baixar { padding: 9px 13px; font-size: 13px; }
+    }
+    @media (max-width: 400px) {
+      .topo .envolve { width: calc(100% - 32px); gap: 8px; }
+      .marca { font-size: 19px; gap: 7px; }
+      .marca img { width: 28px; height: 28px; }
+      .acoes-topo { gap: 6px; }
+      .topo .baixar svg { display: none; }
+    }
+    @media (max-width: 359px) { .acoes-topo .destino { display: none; } }
 
-    .heroi { position: relative; padding: 56px 0 20px; text-align: center; }
+    main { overflow-x: clip; }
+    .heroi { position: relative; overflow-x: clip; padding: 56px 0 20px; text-align: center; }
     .heroi .raios { position: absolute; left: 50%; top: 40px; width: 900px; height: 900px; margin-left: -450px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 233, 163, 0.07) 0deg 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 15%, transparent 65%); mask: radial-gradient(circle, #000 15%, transparent 65%); animation: gira 80s linear infinite; z-index: -1; }
     @keyframes gira { to { transform: rotate(360deg); } }
     .heroi .bola { width: 110px; margin: 0 auto 18px; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.6)); animation: flutua 4s ease-in-out infinite; }
@@ -295,7 +371,6 @@
     .revela.ok { opacity: 1; transform: none; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .revela { opacity: 1; transform: none; } }
     @media (max-width: 980px) {
-      .menu { display: none; }
       .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
       .ciclo { grid-template-columns: 1fr; }
       .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
@@ -316,16 +391,33 @@
   <header class="topo">
     <div class="envolve">
       <a class="marca" href="#"><img src="assets/icone.png" alt="" /><span><span class="p">Poke</span>Pocket</span></a>
-      <nav class="menu" aria-label="Seções">
-        <a href="#automatico">No automático</a>
-        <a href="#avaliar">Score e preço</a>
-        <a href="#contas">4 contas</a>
-        <a href="#instalar">Instalar</a>
-        <a href="#duvidas">Dúvidas</a>
-        <a href="#apoie">Apoie</a>
-        <a href="calculadora/" data-goatcounter-click="calculadora-topo" data-goatcounter-title="calculadora-topo">Calculadora</a>
+      <nav class="secoes" aria-label="Seções">
+        <span class="marcador" aria-hidden="true"></span>
+        <a href="#automatico" data-secao="automatico">No automático</a>
+        <a href="#avaliar" data-secao="avaliar">Score e preço</a>
+        <a href="#contas" data-secao="contas">4 contas</a>
+        <a href="#instalar" data-secao="instalar">Instalar</a>
+        <a href="#duvidas" data-secao="duvidas">Dúvidas</a>
       </nav>
-      <a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-topo" data-goatcounter-title="baixar-instalador-topo">Baixar</a>
+      <div class="acoes-topo">
+        <a class="destino" href="calculadora/" data-goatcounter-click="calculadora-topo" data-goatcounter-title="calculadora-topo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/></svg><span class="rot">Calculadora</span><span class="selo-novo">novo</span></a>
+        <a class="coracao" href="#apoie" data-secao="apoie" aria-label="Apoie o projeto" title="Apoie"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></a>
+        <button class="abre-menu" type="button" aria-expanded="false" aria-controls="painel-secoes" aria-label="Abrir seções"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg></button>
+        <a class="botao pequeno baixar" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-topo" data-goatcounter-title="baixar-instalador-topo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Baixar</a>
+      </div>
+      <div class="painel" id="painel-secoes">
+        <nav aria-label="Seções">
+          <a href="#automatico" data-secao="automatico"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-3.9M4 4v4h4M4 13a8 8 0 0 0 14.9 3.9M20 20v-4h-4"/></svg></span>No automático</a>
+          <a href="#avaliar" data-secao="avaliar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/></svg></span>Score e preço</a>
+          <a href="#contas" data-secao="contas"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.8a3.2 3.2 0 0 1 0 6.4M17.5 13.8c2.1.6 3.5 2.6 3.5 5.2"/></svg></span>4 contas</a>
+          <a href="#instalar" data-secao="instalar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span>Instalar</a>
+          <a href="#duvidas" data-secao="duvidas"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.8M12 17.2h.01"/></svg></span>Dúvidas</a>
+        </nav>
+        <div class="painel-pe">
+          <a href="calculadora/" data-goatcounter-click="calculadora-menu" data-goatcounter-title="calculadora-menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/></svg>Calculadora</a>
+          <a class="apoio" href="#apoie" data-secao="apoie"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>Apoie</a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -529,7 +621,39 @@
   </main>
 
   <script>
-    const obs = new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) { i.target.classList.add('ok'); obs.unobserve(i.target) } }), { threshold: 0.12 });
+    (() => {
+      const secoes = document.querySelector('.secoes');
+      const marcador = secoes.querySelector('.marcador');
+      const links = [...document.querySelectorAll('.topo [data-secao]')];
+      const botao = document.querySelector('.abre-menu');
+      const painel = document.getElementById('painel-secoes');
+      let atual = null;
+      const posiciona = () => {
+        const a = secoes.querySelector('a.ativo');
+        if (!a || !secoes.offsetWidth) { marcador.style.opacity = '0'; return; }
+        const x = `translateX(${a.offsetLeft + (a.offsetWidth - marcador.offsetWidth) / 2}px)`;
+        if (marcador.style.opacity !== '1') { marcador.style.transition = 'none'; marcador.style.transform = x; marcador.offsetWidth; marcador.style.transition = ''; marcador.style.opacity = '1'; }
+        else marcador.style.transform = x;
+      };
+      const ativa = (id) => {
+        if (id === atual) return;
+        atual = id;
+        links.forEach((a) => { const on = a.dataset.secao === id; a.classList.toggle('ativo', on); if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+        posiciona();
+      };
+      const espia = new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) ativa(i.target.id) }), { rootMargin: '-40% 0px -59% 0px' });
+      document.querySelectorAll('main > section').forEach((s) => espia.observe(s));
+      addEventListener('resize', posiciona);
+      if (document.fonts) document.fonts.ready.then(posiciona);
+      const abre = (v) => { botao.setAttribute('aria-expanded', String(v)); botao.setAttribute('aria-label', v ? 'Fechar seções' : 'Abrir seções'); painel.classList.toggle('aberto', v); };
+      const aberto = () => botao.getAttribute('aria-expanded') === 'true';
+      botao.addEventListener('click', () => abre(!aberto()));
+      painel.addEventListener('click', (e) => { if (e.target.closest('a')) abre(false) });
+      document.addEventListener('click', (e) => { if (aberto() && !painel.contains(e.target) && !botao.contains(e.target)) abre(false) });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && aberto()) { abre(false); botao.focus() } });
+      matchMedia('(min-width: 981px)').addEventListener('change', (m) => { if (m.matches) abre(false) });
+    })();
+    const obs =new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) { i.target.classList.add('ok'); obs.unobserve(i.target) } }), { threshold: 0.12 });
     document.querySelectorAll('.revela').forEach((e) => obs.observe(e));
     const copiar = document.getElementById('copiar');
     copiar.addEventListener('click', async () => {
