@@ -1401,5 +1401,5 @@ async function iniciar() {
 }
 
 ligarEventos()
-$('carga-tentar').addEventListener('click', iniciar)
+$('carga-tentar').addEventListener('click', () => location.reload())
 iniciar()

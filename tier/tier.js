@@ -530,5 +530,5 @@ async function iniciar() {
 
 lerHash()
 montarFiltros()
-$('carga-tentar').addEventListener('click', iniciar)
+$('carga-tentar').addEventListener('click', () => location.reload())
 iniciar()
