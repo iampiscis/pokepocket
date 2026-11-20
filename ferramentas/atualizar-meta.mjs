@@ -19,7 +19,7 @@ const IV_MEDIO = { hp: 21, atk: 21, def: 21, spAtk: 21, spDef: 21, speed: 21 }
 const QUALIDADE_MEDIA = 1.28
 const PADRAO = { potencia: 1, quality: 1.1, shiny: true, ivs: { hp: 20, atk: 20, def: 20, spAtk: 20, spDef: 20, speed: 20 } }
 const TIERS = [['S+', 0.04], ['S', 0.08], ['S-', 0.18], ['A+', 0.23], ['A', 0.32], ['A-', 0.41], ['B+', 0.51], ['B', 0.6], ['B-', 0.69], ['C', 0.85], ['D', 1]]
-const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos. Faixas pelas formas shiny usadas nos times do top ${TOPO} do ranqueado, com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
+const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos, e sem a versão comum de quem tem mega. Faixas pelas formas shiny usadas nos times do top ${TOPO} do ranqueado, com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
 const HORA = 3600000
 const DIA = 24 * HORA
 const JANELAS = { dia: { idade: 20 * HORA, dias: 1 }, semana: { idade: 7 * DIA - 4 * HORA, dias: 7 }, mes: { idade: 30 * DIA - 4 * HORA, dias: 30 } }
@@ -648,6 +648,7 @@ function tierDaJanela(c, linhas, meta, baldes) {
   for (const id of candidatos) {
     const esp = c.especies.get(id)
     if (!esp?.name || c.m.mistico.ehLendarioOuMitico(id) || c.m.outland.isOutlandPokeId(id)) continue
+    if (!c.m.megas.isMegaPokeId(id) && c.m.megas.megasDaEspecie(id).length) continue
     const lk = looksDe(c, esp)
     if (lk.lookShiny == null) continue
     const r = melhorForcaPvp(c.gi, meta, pokemonBase(PADRAO), esp, nivel)
