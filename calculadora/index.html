@@ -48,7 +48,10 @@
           <div id="visor-msg" class="visor-msg"><img src="../assets/pokebola.svg" alt="" /><span id="visor-msg-txt">Cole a ficha ou um print, ou busque uma espécie.</span></div>
           <div id="visor-id" class="visor-id" hidden></div>
           <div id="visor-cels" class="visor-cels" hidden></div>
-          <button type="button" id="copiar-topo" class="botao pequeno copiar visor-copiar" title="Copiar link do resultado" aria-label="Copiar link do resultado" data-goatcounter-click="calc-copiar-link-topo" data-goatcounter-title="calc-copiar-link-topo" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Copiar link</span></button>
+          <div class="visor-acoes">
+            <button type="button" id="novo-calculo-topo" class="botao pequeno vazado visor-novo" title="Novo cálculo" aria-label="Novo cálculo" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3.5H7A2.5 2.5 0 0 0 4.5 6v12A2.5 2.5 0 0 0 7 20.5h10a2.5 2.5 0 0 0 2.5-2.5V9z"/><path d="M14 3.5V9h5.5M12 11.5v6M9 14.5h6"/></svg><span>Novo cálculo</span></button>
+            <button type="button" id="copiar-topo" class="botao pequeno copiar visor-copiar" title="Copiar link do resultado" aria-label="Copiar link do resultado" data-goatcounter-click="calc-copiar-link-topo" data-goatcounter-title="calc-copiar-link-topo" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Copiar link</span></button>
+          </div>
         </section>
 
         <div class="bancada">
@@ -62,7 +65,7 @@
               </div>
               <div id="identidade" class="identidade" hidden></div>
               <div id="novo" class="novo" hidden>
-                <span class="novo-rot">Novo pokémon <small>Ctrl+V em qualquer lugar</small></span>
+                <div class="novo-topo"><span class="novo-rot">Novo pokémon <small>ou Ctrl+V</small></span><button type="button" id="novo-calculo" class="botao-leve novo-calc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3.5H7A2.5 2.5 0 0 0 4.5 6v12A2.5 2.5 0 0 0 7 20.5h10a2.5 2.5 0 0 0 2.5-2.5V9z"/><path d="M14 3.5V9h5.5M12 11.5v6M9 14.5h6"/></svg>Novo cálculo</button></div>
                 <label class="novo-colar">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/><path d="M12 10v6M9 13l3 3 3-3"/></svg>
                   <input id="novo-colar" class="campo" type="text" autocomplete="off" spellcheck="false" placeholder="Cole ficha ou print" title="Cole a ficha ou um print (Ctrl+V)" aria-label="Cole a ficha ou um print" />

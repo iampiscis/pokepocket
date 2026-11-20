@@ -407,11 +407,15 @@ function opcoesSoma(t) {
   return out
 }
 
+const NUM_NIVEL = '(\\d{1,3}(?:[.,]\\s?\\d{3})+|\\d{1,5})'
+const numeroNivel = (t) => Number(String(t).replace(/[.,\s]/g, ''))
+
 function nivelDeTexto(t) {
-  const m = /N\s*[VYR¥]\s*\.?\s*(\d{1,3})/i.exec(digitos(t).replace(/^.*?(N)/i, 'N'))
-  if (m) return Number(m[1])
-  const n = /(\d{1,3})\s*$/.exec(digitos(t))
-  return n ? Number(n[1]) : null
+  const s = digitos(t)
+  const m = new RegExp('N\\s*[VYRW¥]\\s*\\.?\\s*' + NUM_NIVEL, 'i').exec(s.replace(/^.*?(N)/i, 'N'))
+  if (m) return numeroNivel(m[1])
+  const n = new RegExp(NUM_NIVEL + '\\s*$').exec(s)
+  return n ? numeroNivel(n[1]) : null
 }
 
 function notaDeTexto(t) {
@@ -599,27 +603,27 @@ function comoEspecie(r) {
 }
 
 function identificarEspecie(candidatos, numero, especiePorNome, buscarEspecies) {
-  if (numero && buscarEspecies) {
-    try {
-      const e = comoEspecie(buscarEspecies(String(numero), 1)?.[0])
-      if (e && e.speciesId === numero && (!candidatos.length || candidatos.some((c) => distancia(normalizarNome(c), normalizarNome(e.nome || '')) <= 2))) return { ...e, certeza: 1 }
-    } catch {}
-  }
   for (const c of candidatos) {
     const n = normalizarNome(c)
     if (n.length < 3) continue
-    if (especiePorNome) {
-      try {
-        const e = comoEspecie(especiePorNome(c))
-        if (e) return { ...e, certeza: 1 }
-      } catch {}
-    }
     if (buscarEspecies) {
       try {
         const exata = (buscarEspecies(n, 5) || []).map(comoEspecie).find((e) => e && normalizarNome(e.nome || '') === n)
         if (exata) return { ...exata, certeza: 1 }
       } catch {}
     }
+    if (especiePorNome) {
+      try {
+        const e = comoEspecie(especiePorNome(c))
+        if (e && normalizarNome(e.nome || '') === n) return { ...e, certeza: 1 }
+      } catch {}
+    }
+  }
+  if (numero && buscarEspecies) {
+    try {
+      const e = comoEspecie(buscarEspecies(String(numero), 1)?.[0])
+      if (e && e.speciesId === numero && (!candidatos.length || candidatos.some((c) => distancia(normalizarNome(c), normalizarNome(e.nome || '')) <= 2))) return { ...e, certeza: 1 }
+    } catch {}
   }
   if (!buscarEspecies) return null
   let melhor = null
@@ -627,9 +631,10 @@ function identificarEspecie(candidatos, numero, especiePorNome, buscarEspecies) 
     const n = normalizarNome(c)
     if (n.length < 4) continue
     const vistos = new Map()
-    for (const pref of [n.slice(0, 3), n.slice(0, 2), n.slice(1, 4), n.slice(-3)]) {
+    const buscas = [n.slice(0, 3), n.slice(0, 2), n.slice(1, 4), n.slice(-3), ...n.split(' ').filter((w) => w.length >= 4)]
+    for (const q of buscas) {
       try {
-        for (const r of buscarEspecies(pref, 80) || []) {
+        for (const r of buscarEspecies(q, 80) || []) {
           const e = comoEspecie(r)
           if (e?.nome && !vistos.has(e.speciesId)) vistos.set(e.speciesId, e)
         }
@@ -638,26 +643,60 @@ function identificarEspecie(candidatos, numero, especiePorNome, buscarEspecies) 
     for (const e of vistos.values()) {
       const alvo = normalizarNome(e.nome)
       const d = distancia(n, alvo)
-      if (d <= Math.max(1, Math.floor(alvo.length / 4)) && (!melhor || d < melhor.d)) melhor = { ...e, d, certeza: 1 - d / alvo.length }
+      if (d > Math.max(1, Math.floor(alvo.length / 4))) continue
+      const rel = d / alvo.length
+      if (!melhor || rel < melhor.rel || (rel === melhor.rel && alvo.length > melhor.tam)) melhor = { ...e, rel, tam: alvo.length, certeza: 1 - rel }
     }
   }
   if (!melhor) return null
-  const { d, ...e } = melhor
+  const { rel, tam, ...e } = melhor
   return e
 }
 
 function candidatosNome(linhas, limiteY) {
-  const out = []
+  const grupos = []
   const topo = linhas.filter((l) => limiteY == null || l.y1 <= limiteY).sort((a, b) => altura(b) - altura(a) || a.y0 - b.y0)
   for (const l of topo) {
-    const limpo = l.t.replace(/^[^A-Za-zÀ-ÿ]+/, '').replace(/\bshiny\b/i, '').replace(/\s*[·•»|].*$/, '').trim()
-    if (!limpo || /\d/.test(limpo) || /^(POTENCIA|QUALIDADE|IV SOMADO|NV)$/i.test(semAcento(limpo))) continue
-    const palavras = limpo.split(/\s+/).filter((p) => /^[A-Za-zÀ-ÿ.'-]{2,}$/.test(p))
-    if (!palavras.length) continue
-    out.push(palavras.join(' '))
-    if (palavras.length > 1) for (const p of palavras) out.push(p)
+    const limpo = l.t.replace(/\s*[·•»|].*$/, '')
+    if (/^(POTENCIA|QUALIDADE|IV SOMADO)$/i.test(semAcento(limpo).trim())) continue
+    const palavras = limpo.split(/\s+/)
+      .map((p) => p.replace(/^[^A-Za-zÀ-ÿ]+|[^A-Za-zÀ-ÿ.'-]+$/g, ''))
+      .filter((p) => /^[A-Za-zÀ-ÿ.'-]{2,}$/.test(p) || /^[A-Z]$/.test(p))
+      .filter((p) => !/^shiny$/i.test(p))
+    for (let n = Math.min(4, palavras.length); n >= 1; n--) {
+      for (let i = 0; i + n <= palavras.length; i++) {
+        const t = palavras.slice(i, i + n).join(' ')
+        if (t.replace(/[^A-Za-zÀ-ÿ]/g, '').length >= 3) grupos.push({ t, n })
+      }
+    }
   }
-  return out
+  const vistos = new Set()
+  return grupos
+    .sort((a, b) => b.n - a.n || b.t.length - a.t.length)
+    .map((g) => g.t)
+    .filter((t) => !vistos.has(t.toLowerCase()) && vistos.add(t.toLowerCase()))
+}
+
+const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
+
+function lerChips(texto) {
+  const k = chave(texto)
+  const tokens = k.split(/[^A-Z0-9:]+/).filter(Boolean)
+  const shiny = tokens.some((t) => t.length >= 4 && distancia(t.replace(/[^A-Z]/g, ''), 'SHINY') <= 1)
+  const aoe = tokens.some((t) => { const x = t.replace(/[^A-Z0]/g, '').replace(/0/g, 'O'); return x.length >= 2 && x.length <= 4 && distancia(x, 'AOE') <= 1 && x.startsWith('A') })
+  let elemental = null
+  const re = /(?:^|[^A-Z])E\s*[:;.,]?\s*([A-Z]{3,9})/g
+  for (let m; (m = re.exec(k)) && !elemental;) {
+    const w = m[1]
+    let melhor = null
+    for (const tipo of TIPOS) {
+      const d = distancia(w, tipo)
+      const lim = tipo.length <= 3 ? 0 : 1
+      if (d <= lim && (!melhor || d < melhor.d)) melhor = { tipo, d }
+    }
+    if (melhor) elemental = melhor.tipo
+  }
+  return { shiny, aoe, elemental }
 }
 
 async function executar(imagem, opcoes) {
@@ -688,14 +727,14 @@ async function executar(imagem, opcoes) {
   let feitos = 0
   const ctx = { worker, origem, passo: () => avisar(0.75 + Math.min(0.23, ++feitos * 0.02), 'Conferindo os números') }
 
-  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {} }
+  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmAoe: false }
   const avisos = []
 
   const cartoes = localizarCartoes(linhas, W)
   const limiteTopo = cartoes ? cartoes.topo : H * 0.3
   const topoCartoes = cartoes ? cartoes.topo : null
   const nvPalavra = palavras
-    .filter((p) => p.y1 <= limiteTopo && /(^|[^A-Z])N[VYR¥]\d*$/.test(p.k.replace(/[^A-Z0-9¥]/g, '')))
+    .filter((p) => p.y1 <= limiteTopo && /(^|[^A-Z])N[VYRW¥][\d.,]*$/.test(p.k.replace(/[^A-Z0-9¥.,]/g, '')))
     .sort((a, b) => a.y0 - b.y0)[0]
   const aStats = ancora(palavras, /^ATUAI/) || ancora(palavras, /^STATS$/, (p) => p.y0 > limiteTopo)
   const ancoraNota = palavras
@@ -706,14 +745,14 @@ async function executar(imagem, opcoes) {
   if (cartoes) for (let i = 0; i < 3; i++) { const c = caixaValorCartao(cartoes, i); itens[i] = { caixa: c, h: c.h } }
   if (nvPalavra) {
     const h = altura(nvPalavra)
-    itens[3] = { caixa: { x0: nvPalavra.x0 - h * 0.6, x1: nvPalavra.x0 + h * 5, y0: nvPalavra.y0 - h * 0.45, y1: nvPalavra.y1 + h * 0.45 }, h }
+    itens[3] = { caixa: { x0: nvPalavra.x0 - h * 0.6, x1: nvPalavra.x0 + h * 7, y0: nvPalavra.y0 - h * 0.45, y1: nvPalavra.y1 + h * 0.45 }, h }
   }
   if (ancoraNota) {
     const lw = ancoraNota.x1 - ancoraNota.x0
     itens[4] = { caixa: { x0: ancoraNota.x0 - lw * 4.2, x1: ancoraNota.x0 - lw * 0.05, y0: ancoraNota.y1 - lw * 1.3, y1: ancoraNota.y1 + lw * 0.12 }, h: lw * 0.8 }
   }
   const leitores = [lerPotenciaTexto, lerQualidadeTexto, (t) => opcoesSoma(t)[0] ?? null, nivelDeTexto, notaDeTexto]
-  const listas = ['P12345', '0123456789,.', '0123456789/', 'Nv0123456789 ', '0123456789,./']
+  const listas = ['P12345', '0123456789,.', '0123456789/', 'Nv0123456789., ', '0123456789,./']
   const brutos = itens.some(Boolean) ? await lerPilha(ctx, itens, 'PNv0123456789,./ ', 0, { ampliarAntes: true }) : itens.map(() => '')
   const lidos = brutos.map((t, i) => (itens[i] ? leitores[i](t) : null))
   const daPilha = [...brutos]
@@ -730,16 +769,17 @@ async function executar(imagem, opcoes) {
   ficha.nota = lidos[4]
   const nivelLinha = linhas
     .filter((l) => l.y1 <= limiteTopo && !/CONTA|PRECISA/.test(l.k))
-    .map((l) => /\bN[VYR¥]\s*\.?\s*(\d{1,3})\b/.exec(digitos(l.k).replace(/N1/g, 'NV')))
+    .map((l) => new RegExp('\\bN[VYRW¥]\\s*\\.?\\s*' + NUM_NIVEL + '\\b').exec(digitos(l.k).replace(/N1/g, 'NV')))
     .find(Boolean)
-  const nivelTopo = nivelLinha ? Number(nivelLinha[1]) : null
+  const nivelTopo = nivelLinha ? numeroNivel(nivelLinha[1]) : null
   const conta = /CONTA\s+C\S{2,4}\s+N\S?\s*(\d{1,3})\b/.exec(digitos(linhas.map((l) => l.k).join('\n')).replace(/C0NTA/g, 'CONTA'))
   const nivelConta = conta ? Number(conta[1]) : null
-  const valido = (v) => v != null && v >= 1 && v <= 200
+  const valido = (v) => v != null && v >= 1 && v <= 20000
   const decidirNivel = (badge, topo) => {
-    if (valido(badge) && badge === topo) return badge
-    if (valido(nivelConta) && nivelConta < 150 && (nivelConta === badge || nivelConta === topo)) return nivelConta
-    return [badge, topo].find(valido) ?? (valido(nivelConta) && nivelConta < 150 ? nivelConta : null)
+    if (valido(nivelConta) && nivelConta < 150) return nivelConta
+    const ok = (v) => valido(v) && (!valido(nivelConta) || v >= nivelConta)
+    if (ok(badge) && badge === topo) return badge
+    return [badge, topo].find(ok) ?? null
   }
   ficha.level = decidirNivel(nivelRecorte, nivelTopo)
 
@@ -748,28 +788,39 @@ async function executar(imagem, opcoes) {
   const ehShiny = (p) => /SHINY/.test(p.k) || distancia(p.k.replace(/[^A-Z]/g, ''), 'SHINY') <= 1
   ficha.shiny = palavras.some((p) => p.y1 <= limiteTopo && ehShiny(p))
   const numero = Number(/#\s*(\d{1,4})\s+[A-Za-z]/.exec(g.texto)?.[1]) || null
-  let cand = candidatosNome(linhas, limiteTopo)
-  let esp = identificarEspecie(cand, numero, especiePorNome, buscarEspecies)
-  const nivelSeguro = valido(nivelRecorte) && (nivelRecorte === nivelTopo || nivelRecorte === nivelConta)
-  if (cartoes && (!esp || !nivelSeguro)) {
+  const nivelSeguro = (valido(nivelConta) && nivelConta < 150) || (valido(nivelRecorte) && nivelRecorte === nivelTopo)
+  let cabecalho = []
+  if (cartoes) {
     const c = cartoes
     const caixa = { x0: c.x[0] - c.h * 1.5, x1: c.x[1] + c.passo * 0.9, y0: Math.max(0, c.topo - c.passo * 1.15), y1: c.topo - c.h * 0.3 }
     const esc = limitar(30 / c.h, 1, 6)
     const tela = realcar(origem, caixa.x0, caixa.y0, caixa.x1 - caixa.x0, caixa.y1 - caixa.y0, esc, Math.max(4, Math.round(c.h * 2)), 16, { ampliarAntes: true })
     const d = await reconhecer(worker, tela, '6')
     ctx.passo()
-    const ls = linhasDe(d.lines, esc, caixa.x0 - 16 / esc, caixa.y0 - 16 / esc)
-    if (!esp) {
-      const extra = candidatosNome(ls, null)
-      esp = identificarEspecie(extra, numero, especiePorNome, buscarEspecies)
-      if (esp) cand = extra
-      if (!ficha.shiny) ficha.shiny = ls.some((l) => l.palavras.some(ehShiny))
-    }
+    cabecalho = linhasDe(d.lines, esc, caixa.x0 - 16 / esc, caixa.y0 - 16 / esc)
+    if (!ficha.shiny) ficha.shiny = cabecalho.some((l) => l.palavras.some(ehShiny))
     if (!nivelSeguro) {
-      const m = ls.map((l) => /\bN\s*[VYR¥W]\s*\.?\s*(\d{1,3})\b/.exec(digitos(l.k))).find(Boolean)
-      if (m) ficha.level = decidirNivel(Number(m[1]), nivelRecorte ?? nivelTopo)
+      const m = cabecalho
+        .map((l) => new RegExp('\\bN\\s*[VYRW¥]\\s*\\.?\\s*' + NUM_NIVEL + '\\b').exec(digitos(l.k)) || new RegExp('^[^A-Za-z0-9]*[A-Za-z¥]{1,3}\\s*\\.?\\s*' + NUM_NIVEL + '[^A-Za-z0-9]*$').exec(l.t))
+        .find(Boolean)
+      if (m) ficha.level = decidirNivel(numeroNivel(m[1]), nivelRecorte ?? nivelTopo)
     }
+    const caixaChips = { x0: c.x[0] - c.h, x1: c.x[1] + c.passo, y0: c.topo - c.h * 4.6, y1: c.topo - c.h * 1.4 }
+    const escChips = limitar(28 / c.h, 1, 6)
+    const raioChips = Math.max(3, Math.round(c.h * 0.8))
+    const telaChips = realcar(origem, caixaChips.x0, caixaChips.y0, caixaChips.x1 - caixaChips.x0, caixaChips.y1 - caixaChips.y0, escChips, raioChips, 16, { ampliarAntes: true })
+    let textoChips = ''
+    for (const psm of ['7', '11']) {
+      textoChips += ' ' + (await reconhecer(worker, telaChips, psm)).text
+      ctx.passo()
+    }
+    const chips = lerChips(textoChips)
+    if (chips.shiny) ficha.shiny = true
+    ficha.tmElemental = chips.elemental
+    ficha.tmAoe = chips.aoe
   }
+  const cand = candidatosNome([...linhas.filter((l) => l.y1 <= limiteTopo), ...cabecalho], null)
+  const esp = identificarEspecie(cand, numero, especiePorNome, buscarEspecies)
   if (esp) {
     ficha.speciesId = esp.speciesId
     ficha.nome = esp.nome

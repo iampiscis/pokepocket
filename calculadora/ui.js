@@ -230,6 +230,11 @@ function codificar() {
   if (h.shiny) p.set('s', '1')
   p.set('iv', lista(h.ivs))
   if (somaRefino(h.refino)) p.set('r', lista(h.refino))
+  if (h.tmElemental) {
+    p.set('hz', h.tmElemental.toLowerCase())
+    if (h.tmFisico) p.set('hzf', '1')
+    if (h.tmAoe) p.set('hza', '1')
+  }
   if (s.speciesId !== h.speciesId) p.set('f', s.speciesId)
   p.set('sn', s.level)
   if (s.potencia !== h.potencia) p.set('sp', s.potencia)
@@ -251,7 +256,7 @@ function decodificar(txt) {
     const a = String(v || '').split('.').map(Number)
     return Object.fromEntries(STATS.map(([k], i) => [k, a[i] || 0]))
   }
-  const hoje = { speciesId: sid, level: Number(p.get('n')) || 100, potencia: Number(p.get('p')) || 1, quality: Number(p.get('q')) || 1, shiny: p.get('s') === '1', ivs: lista(p.get('iv')), refino: lista(p.get('r')) }
+  const hoje = { speciesId: sid, level: Number(p.get('n')) || 100, potencia: Number(p.get('p')) || 1, quality: Number(p.get('q')) || 1, shiny: p.get('s') === '1', ivs: lista(p.get('iv')), refino: lista(p.get('r')), tmElemental: p.get('hz') ? p.get('hz').toUpperCase() : null, tmFisico: p.get('hzf') === '1', tmAoe: p.get('hza') === '1' }
   const sim = {
     ...hoje,
     speciesId: Number(p.get('f')) || sid,
@@ -268,7 +273,7 @@ function decodificar(txt) {
 
 function gravarEstado() {
   if (!st.hoje) return
-  const cod = codificar()
+  const cod = `k=${codificarCompacto({ hoje: st.hoje, sim: st.sim })}`
   st.ultimoHash = cod
   try { history.replaceState(null, '', `#${cod}`) } catch {}
 }
@@ -400,7 +405,7 @@ function pintarIdentidade() {
       dado('Qual', fmt2.format(h.quality), null, { style: `--vc:${corQual(h.quality)}`, class: 'cor-cel' }),
       (st.ui.notaHojeCel = dado('Nota', '', st.ui.notaHoje, { class: 'cor-cel' }))
     ]),
-    el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}` })]),
+    el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}${h.tmElemental ? ` · Z-\u2060Move ${nomeTipo(h.tmElemental)}${h.tmAoe ? ' em área' : ''}` : ''}` })]),
     el('div', { class: 'id-ivs' }, STATS.map(([k, rot]) => dado(rot, fmt.format(h.ivs[k]), null, { class: `cor-cel${h.ivs[k] >= 27 ? ' brilho' : ''}`, style: `--vc:${corIv(h.ivs[k])}` })))
   )
   pintarNotaHoje()
@@ -414,7 +419,7 @@ function pintarNotaHoje() {
   if (st.ui.notaHojeCel) {
     const f = ehNum(n) ? faixaNota(n) : null
     st.ui.notaHojeCel.style.setProperty('--vc', f ? f[2] : 'var(--tinta)')
-    st.ui.notaHojeCel.title = f ? f[1] : ''
+    st.ui.notaHojeCel.setAttribute('aria-label', f ? `Nota ${f[1]}` : 'Nota')
   }
 }
 
@@ -539,6 +544,41 @@ async function calcular() {
   pintarPreco(seq, pkH, rh, pkS, rs)
 }
 
+function limparTudo() {
+  clearTimeout(st.timer)
+  st.seq++
+  st.hoje = null
+  st.sim = null
+  st.res = null
+  st.formas = []
+  st.ultimoHash = ''
+  try { history.replaceState(null, '', location.pathname + location.search) } catch {}
+  $('calc').classList.remove('calculando')
+  $('visor').hidden = true
+  $('detalhes').hidden = true
+  $('cartao-sim').hidden = true
+  $('controles').replaceChildren()
+  $('identidade').hidden = true
+  montarEditorHoje()
+  limparConferir()
+  statusFicha('')
+  $('ficha').value = ''
+  abrirEntrada(true)
+  trocarAba('colar')
+}
+
+function novoCalculo() {
+  const anterior = st.hoje ? { hoje: pkDe(st.hoje), sim: pkDe(st.sim), nome: st.nomeHoje } : null
+  limparTudo()
+  $('ficha').focus()
+  if (anterior) {
+    mostrarToast(`Cálculo de ${anterior.nome} limpo`, () => {
+      definirHoje(anterior.hoje, anterior.sim, true)
+      statusFicha('')
+    })
+  }
+}
+
 function mensagemVisor(txt, erro = false) {
   $('visor-msg-txt').textContent = txt
   $('visor-msg').classList.toggle('erro', erro)
@@ -547,6 +587,7 @@ function mensagemVisor(txt, erro = false) {
   $('visor-id').hidden = true
   $('visor-cels').hidden = true
   $('copiar-topo').hidden = true
+  $('novo-calculo-topo').hidden = !st.hoje
 }
 
 const faixaDe = (v) => [...FAIXAS].reverse().find(([de]) => v >= de) || FAIXAS[0]
@@ -561,7 +602,7 @@ function escalaScore(valor) {
     const ate = FAIXAS[i + 1]?.[0] ?? 1000
     const cheio = v == null ? 0 : Math.max(0, Math.min(1, (v - de) / (ate - de)))
     const aqui = v != null && v >= de && (v < ate || ate === 1000)
-    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}`, title: nome }, [
+    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}` }, [
       el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
       aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
     ])
@@ -574,7 +615,7 @@ function escalaNota(nota) {
   const segs = FAIXAS_NOTA.map(([, nome, cor], i) => {
     const cheio = n == null ? 0 : Math.max(0, Math.min(1, n - i))
     const aqui = n != null && n >= i && (n < i + 1 || i === 9)
-    return el('span', { class: 'esc-f', style: `flex-grow:1;--c:${cor}`, title: nome }, [
+    return el('span', { class: 'esc-f', style: `flex-grow:1;--c:${cor}` }, [
       el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
       aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
     ])
@@ -583,7 +624,7 @@ function escalaNota(nota) {
 }
 
 function vCel({ id = null, classe = '', icone, rotulo, valor, barra = null, pe = [], dica = '' }) {
-  return el('div', { class: `v-cel ${classe}`.trim(), id, title: dica || null }, [
+  return el('div', { class: `v-cel ${classe}`.trim(), id, role: 'group', 'aria-label': dica || null }, [
     el('span', { class: 'v-rot' }, [ico(icone, 13, 'ico-v'), ...[].concat(rotulo).map((r, i) => el('span', { class: i ? 'longo' : null, text: r }))]),
     valor,
     barra || el('span', { class: 'escala vazia', 'aria-hidden': 'true' }),
@@ -654,6 +695,7 @@ function pintarVisor() {
   $('visor-id').hidden = false
   $('visor-cels').hidden = false
   $('copiar-topo').hidden = false
+  $('novo-calculo-topo').hidden = false
 }
 
 function textoForma(v) {
@@ -1181,6 +1223,8 @@ function ligarEventos() {
   $('novo-colar').addEventListener('paste', (e) => aoColar(e))
   $('novo-colar').addEventListener('input', () => { $('novo-colar').value = '' })
   $('novo-buscar').addEventListener('click', abrirBusca)
+  $('novo-calculo').addEventListener('click', novoCalculo)
+  $('novo-calculo-topo').addEventListener('click', novoCalculo)
   $('novo-imagem').addEventListener('click', () => $('arquivo-print').click())
   $('zona-print').addEventListener('click', () => $('arquivo-print').click())
   for (const id of ['zona-print', 'novo-imagem', 'novo-colar']) {

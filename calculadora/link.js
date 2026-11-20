@@ -1,4 +1,4 @@
-const VERSAO = 1
+const VERSAO = 2
 const CHAVES = ['hp', 'atk', 'def', 'spAtk', 'spDef', 'speed']
 const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
@@ -89,6 +89,8 @@ export function codificarCompacto({ hoje, sim }, resumo = null) {
   if (outra) escrever(b, sim.speciesId)
   if (rs) CHAVES.forEach((k) => escrever(b, inteiro(sim.refino[k], 0, 1e6)))
   escrever(b, sim.tmElemental ? TIPOS.indexOf(String(sim.tmElemental).toUpperCase()) + 1 : 0)
+  escrever(b, hoje.tmElemental ? TIPOS.indexOf(String(hoje.tmElemental).toUpperCase()) + 1 : 0)
+  escrever(b, (hoje.tmFisico ? 1 : 0) | (hoje.tmAoe ? 2 : 0))
   if (resumo) {
     const nome = new TextEncoder().encode(String(resumo.nome || '').slice(0, 40))
     escrever(b, nome.length)
@@ -106,7 +108,8 @@ export function decodificarCompacto(token) {
   const txt = String(token || '').trim()
   if (!txt || txt.length > 200) throw new Error('link inválido')
   const r = leitor(deBase64(txt))
-  if (r.num() !== VERSAO) throw new Error('versão de link desconhecida')
+  const versao = r.num()
+  if (versao !== 1 && versao !== 2) throw new Error('versão de link desconhecida')
   const flags = r.num()
   const hoje = { speciesId: r.num(), level: r.num() }
   const pot = r.num()
@@ -129,6 +132,16 @@ export function decodificarCompacto(token) {
   sim.tmElemental = tm > 0 && tm <= TIPOS.length ? TIPOS[tm - 1] : null
   sim.tmFisico = !!(flags & 32)
   sim.tmAoe = !!(flags & 64)
+  hoje.tmElemental = null
+  hoje.tmFisico = false
+  hoje.tmAoe = false
+  if (versao >= 2) {
+    const ht = r.num()
+    const hf = r.num()
+    hoje.tmElemental = ht > 0 && ht <= TIPOS.length ? TIPOS[ht - 1] : null
+    hoje.tmFisico = !!(hf & 1)
+    hoje.tmAoe = !!(hf & 2)
+  }
   let resumo = null
   if (flags & 128) {
     const nome = r.texto()
