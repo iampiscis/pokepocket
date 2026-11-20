@@ -1126,6 +1126,7 @@ async function imagemPrevia(s, resumo) {
     poderPvp: ehNum(s.pvp) ? s.pvp : null,
     poderPve: ehNum(s.pve) ? s.pve : null,
     justo: resumo.justo,
+    vendas: resumo.vendas ?? null,
     sprite: png ? { url: new URL(png.url, location.href).href, x: 0, y: 0, w: png.w, h: png.h } : null
   })
 }
@@ -1160,9 +1161,11 @@ async function dadosCompartilhar() {
   const s = st.res?.s
   if (!s) return { linha: '', link: location.href }
   let justo = null
+  let vendas = null
   try {
     const p = await precoDe(pkDe(st.sim), s)
     if (ehNum(p?.gemas?.justo)) justo = Math.round(p.gemas.justo)
+    if (Number(p?.vendasFamilia) > 0) vendas = Number(p.vendasFamilia)
   } catch {}
   const faixaTxt = (v) => (ehNum(v) ? ` · ${faixaDe(Number(v))[1]}` : '')
   const linhas = [`**${s.nome}${st.sim.shiny ? ' shiny' : ''}** · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
@@ -1172,7 +1175,7 @@ async function dadosCompartilhar() {
   if (justo != null) linhas.push(`💎 Preço justo ${gemas(justo)} gemas`)
   const resumo = { nome: s.nome, pvp: ehNum(s.score?.pvp) ? s.score.pvp : null, pve: ehNum(s.score?.pve) ? s.score.pve : null, nota: ehNum(s.nota) ? s.nota : null, justo }
   let link = location.href
-  try { link = await linkCurto(s, resumo) } catch {}
+  try { link = await linkCurto(s, { ...resumo, vendas }) } catch {}
   return { linha: linhas.join('\n'), link }
 }
 

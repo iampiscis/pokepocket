@@ -453,12 +453,24 @@ function colunaDireita(c, d, gema) {
   }
 }
 
-function rodape(c) {
+function rodape(c, d) {
   const y = 588
   c.fillStyle = 'rgba(255, 233, 163, 0.12)'
   c.fillRect(500, y - 26, 660, 1.5)
   const w = texto(c, 'Calculadora PokePocket', 500, y + 6, { fonte: `24px ${DISPLAY}`, cor: '#ffd34d' })
-  texto(c, 'by Piscis', 500 + w + 14, y + 5, { fonte: `800 20px ${TEXTO}`, cor: '#a88e86' })
+  const fim = 500 + w + 14 + texto(c, 'by Piscis', 500 + w + 14, y + 5, { fonte: `800 20px ${TEXTO}`, cor: '#a88e86' })
+  const n = Number(d.vendas)
+  const opcoes = n > 0 ? [`Valores simulados · preço com base em ${fmt.format(n)} vendas`, `Valores simulados · ${fmt.format(n)} vendas`] : ['Valores simulados']
+  const livre = 1160 - fim - 24
+  for (const t of opcoes) {
+    for (let tam = 16; tam >= 13; tam--) {
+      c.font = `700 ${tam}px ${TEXTO}`
+      if (c.measureText(t).width <= livre) {
+        texto(c, t, 1160, y + 4, { fonte: `700 ${tam}px ${TEXTO}`, cor: 'rgba(168, 142, 134, 0.75)', alinha: 'right' })
+        return
+      }
+    }
+  }
 }
 
 function quantizar(c, passo) {
@@ -482,7 +494,7 @@ export async function desenharCartao(d = {}) {
   fundo(c, { x: 245, y: baseEsquerda(d) - 150, r: 290 })
   colunaEsquerda(c, d, sp, bola)
   colunaDireita(c, d, gema)
-  rodape(c)
+  rodape(c, d)
   quantizar(c, 4)
   return new Promise((ok, falha) => tela.toBlob((b) => (b ? ok(b) : falha(new Error('Falha ao gerar a imagem'))), 'image/png'))
 }
