@@ -460,3 +460,5 @@ details[open] .det-seta { transform: rotate(180deg); }
   .id-ivs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .final .botao { padding: 13px 18px; font-size: 15px; }
 }
+
+.visor[hidden] { display: none !important; }

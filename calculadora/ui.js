@@ -543,6 +543,7 @@ function mensagemVisor(txt, erro = false) {
   $('visor-msg-txt').textContent = txt
   $('visor-msg').classList.toggle('erro', erro)
   $('visor-msg').hidden = false
+  $('visor').hidden = false
   $('visor-id').hidden = true
   $('visor-cels').hidden = true
   $('copiar-topo').hidden = true
@@ -649,6 +650,7 @@ function pintarVisor() {
     celPreco('…')
   )
   $('visor-msg').hidden = true
+  $('visor').hidden = false
   $('visor-id').hidden = false
   $('visor-cels').hidden = false
   $('copiar-topo').hidden = false
