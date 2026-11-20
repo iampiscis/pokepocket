@@ -33,7 +33,7 @@ button { cursor: pointer; }
 .botao.vazado:hover { border-color: var(--ouro); box-shadow: none; }
 .botao svg { width: 22px; height: 22px; flex: none; }
 .botao.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); color: #0b2a14; border-color: #0b5323; }
-.topo { position: sticky; top: 0; z-index: 20; line-height: 1.55; view-transition-name: topo; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
+.topo { position: sticky; top: 0; z-index: 20; line-height: 1.55; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
 .topo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 211, 77, 0.28) 25%, rgba(255, 211, 77, 0.28) 75%, transparent); }
 .topo .envolve { position: relative; width: min(1280px, calc(100% - 40px)); display: flex; align-items: center; gap: 16px; height: 72px; }
 .topo a:focus-visible, .topo button:focus-visible { outline: 2px solid var(--ouro); outline-offset: 3px; }
@@ -140,13 +140,9 @@ button { cursor: pointer; }
   .destino .rot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .destino .selo-novo { position: absolute; top: -2px; right: -2px; width: 11px; height: 11px; padding: 0; font-size: 0; border-radius: 50%; box-shadow: 0 0 0 2px var(--fundo), 0 0 10px rgba(255, 211, 77, 0.8); }
 }
-@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }
-::view-transition-group(root), ::view-transition-group(topo) { animation-duration: 0.25s; }
-::view-transition-old(root) { animation: 0.25s ease both sai; }
-::view-transition-new(root) { animation: 0.25s ease both entra; }
 @keyframes sai { to { opacity: 0; } }
 @keyframes entra { from { opacity: 0; } }
-.sem-vt main { animation: entra 0.3s ease backwards; }
+.sem-vt main { animation: entra 0.18s ease-out backwards; }
 
 .abre { padding: 12px 0 10px; text-align: center; }
 .rotulo { display: inline-block; padding: 3px 12px; border-radius: 999px; font-family: var(--display); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
