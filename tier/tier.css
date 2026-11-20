@@ -28,11 +28,14 @@
 .limpa-tipos { padding: 1px 9px; border: 0; border-radius: 999px; background: transparent; color: var(--suave); font-weight: 800; font-size: 12px; text-decoration: underline; }
 
 .info-linha { display: flex; align-items: center; gap: 8px; padding: 0 4px; }
-.info-linha p { flex: 1 1 auto; min-width: 0; font-size: 12.5px; font-weight: 700; color: var(--apagado); }
-#periodo { color: var(--suave); font-weight: 800; }
-.regra:not(:empty)::before { content: " · "; }
-.parcial { display: inline-block; margin-left: 6px; padding: 0 8px; border-radius: 999px; font-size: 11.5px; font-weight: 900; color: #2a1a12; background: #fde68a; white-space: nowrap; }
-.info-linha .info { width: 22px; height: 22px; font-size: 13px; }
+.indicadores { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+.ind { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 800; color: #fff3df; white-space: nowrap; background: rgba(21, 11, 16, 0.55); border: 1px solid rgba(255, 233, 163, 0.12); }
+.ind svg { flex: none; width: 15px; height: 15px; color: var(--ouro); }
+.ind-shiny svg { color: #f9a8d4; }
+.ind-shiny span { background: linear-gradient(100deg, #fbcfe8, #f9a8d4 50%, #d8b4fe); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.parcial { margin-left: 2px; padding: 0 7px; border-radius: 999px; font-style: normal; font-size: 11.5px; font-weight: 900; line-height: 1.5; color: #2a1a12; background: #fde68a; }
+.explica small { font-size: 12px; color: var(--apagado); }
+.info-linha .info { width: 26px; height: 26px; font-size: 14px; }
 .tier > .explica { margin: 0; }
 
 .faixas { display: grid; gap: 6px; }
@@ -89,6 +92,15 @@
   .ordem { flex: 1 1 auto; }
   .barra .seg button { flex: 1 1 auto; }
 }
+@media (max-width: 520px) {
+  .info-linha { flex-wrap: wrap; gap: 4px; padding: 0; }
+  .indicadores { display: contents; }
+  .info-linha .info { width: 25px; height: 25px; font-size: 13px; }
+  .ind { gap: 4px; height: 25px; padding: 0 7px 0 6px; font-size: 11.5px; }
+  .ind svg { width: 13px; height: 13px; }
+  .parcial { padding: 0 5px; font-size: 10.5px; }
+}
+@media (max-width: 359px) { .ind svg { display: none; } .ind { padding: 0 7px; } }
 @media (prefers-reduced-motion: reduce) { .poke, .chip-tipo, .poke-img img { transition: none; } }
 .abre h1 .shiny { background: linear-gradient(100deg, #fbcfe8, #ec4899 45%, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
 

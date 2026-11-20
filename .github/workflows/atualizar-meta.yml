@@ -2,7 +2,7 @@ name: Atualizar meta PvP e tier
 
 on:
   schedule:
-    - cron: '47 9 * * *'
+    - cron: '30 14 * * *'
   workflow_dispatch:
 
 permissions:
@@ -25,6 +25,17 @@ jobs:
 
       - name: Coletar ranqueado e recalcular
         run: node ferramentas/atualizar-meta.mjs
+
+      - name: Esperar até 12h de Brasília
+        if: github.event_name == 'schedule'
+        run: |
+          alvo=$(date -u -d "$(date -u +%Y-%m-%d) 15:00:00" +%s)
+          agora=$(date -u +%s)
+          espera=$(( alvo - agora - 45 ))
+          if [ "$espera" -gt 0 ]; then
+            echo "publicando às 12h em $(( espera / 60 )) min"
+            sleep "$espera"
+          fi
 
       - name: Publicar se mudou
         run: |

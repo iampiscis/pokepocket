@@ -19,7 +19,7 @@ const IV_MEDIO = { hp: 21, atk: 21, def: 21, spAtk: 21, spDef: 21, speed: 21 }
 const QUALIDADE_MEDIA = 1.28
 const PADRAO = { potencia: 1, quality: 1.1, shiny: true, ivs: { hp: 20, atk: 20, def: 20, spAtk: 20, spDef: 20, speed: 20 } }
 const TIERS = [['S+', 0.04], ['S', 0.08], ['S-', 0.18], ['A+', 0.23], ['A', 0.32], ['A-', 0.41], ['B+', 0.51], ['B', 0.6], ['B-', 0.69], ['C', 0.85], ['D', 1]]
-const REGRA = `Shinies na melhor forma da linha, qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos. Meta das partidas do top ${TOPO} do ranqueado.`
+const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos. Faixas pelas formas shiny usadas nos times do top ${TOPO} do ranqueado, com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
 const HORA = 3600000
 const DIA = 24 * HORA
 const JANELAS = { dia: { idade: 20 * HORA, dias: 1 }, semana: { idade: 7 * DIA - 4 * HORA, dias: 7 }, mes: { idade: 30 * DIA - 4 * HORA, dias: 30 } }
@@ -372,7 +372,7 @@ function montarPartidas(c, { listas, detalhes }, dentro) {
     const k = p.em + '|' + [j.nick, p.oponente.nick].sort().join('|')
     if (vistos.has(k)) continue
     vistos.add(k)
-    unicas.push({ venci: !!p.venci, ids: [p.eu, p.ele].map((L) => (L?.pks || []).map((x) => Number(x.id))) })
+    unicas.push({ venci: !!p.venci, ids: [p.eu, p.ele].map((L) => (L?.pks || []).filter((x) => x.shiny).map((x) => Number(x.id))) })
     const lados = [[p.eu, j.nick], [p.ele, p.oponente.nick]].map(([L, nick]) => (L?.pks || []).map((x) => cria(nick, x)))
     if (lados.some((L) => !L.length || L.some((x) => !x))) continue
     partidas.push({ venci: !!p.venci, lados })
@@ -396,23 +396,10 @@ function somarMeta(meta0, pks) {
   return { inc, def, invInc, defInv }
 }
 
-function origemDe(c) {
-  const mapa = new Map()
-  for (const e of c.especies.values()) {
-    if (c.m.megas.isMegaPokeId(e.pokeId)) continue
-    for (const mg of c.m.megas.megasDaEspecie(e.pokeId)) {
-      const id = c.m.megas.pokeIdDaMega(mg)
-      if (!mapa.has(id) || e.pokeId < mapa.get(id)) mapa.set(id, e.pokeId)
-    }
-  }
-  return (id) => mapa.get(id) ?? id
-}
-
 function montarBalde(c, ativo, bruta, de, ate) {
   const dentro = (em) => { const t = Date.parse(em); return t > de && t <= ate }
   const { partidas, unicas } = montarPartidas(c, bruta, dentro)
   const pks = partidas.flatMap((p) => p.lados.flat())
-  const origem = origemDe(c)
   const uso = {}
   const vit = {}
   const nicks = []
@@ -421,15 +408,14 @@ function montarBalde(c, ativo, bruta, de, ate) {
     const p = j.partidas.find((x) => dentro(x.em))
     if (!p) continue
     nicks.push(crypto.createHash('sha1').update(String(j.nick).toLowerCase()).digest('hex').slice(0, 10))
-    const ids = new Set((p.eu?.pks || []).map((x) => origem(Number(x.id))))
-    if (!ids.size) continue
+    if (!p.eu?.pks?.length) continue
     times++
-    for (const id of ids) uso[id] = (uso[id] || 0) + 1
+    for (const id of new Set(p.eu.pks.filter((x) => x.shiny).map((x) => Number(x.id)))) uso[id] = (uso[id] || 0) + 1
   }
   for (const u of unicas) {
     u.ids.forEach((lado, i) => {
       const venceu = i === 0 ? u.venci : !u.venci
-      for (const id of new Set(lado.map(origem))) {
+      for (const id of new Set(lado)) {
         const v = (vit[id] ||= [0, 0])
         v[0]++
         if (venceu) v[1]++
@@ -441,7 +427,7 @@ function montarBalde(c, ativo, bruta, de, ate) {
   for (let i = embaralhados.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [embaralhados[i], embaralhados[k]] = [embaralhados[k], embaralhados[i]] }
   return {
     balde: {
-      v: 1, de: new Date(de).toISOString(), ate: new Date(ate).toISOString(), temporada: bruta.temporada ?? null,
+      v: 2, de: new Date(de).toISOString(), ate: new Date(ate).toISOString(), temporada: bruta.temporada ?? null,
       versaoJogo: c.versao?.versaoJogo ?? null, partidas: unicas.length, completas: partidas.length, N: pks.length,
       soma: { inc: Object.fromEntries(TIPOS.map((t) => [t, soma.inc[t].map((x) => sig(x, 9))])), def: Object.fromEntries(TIPOS.map((t) => [t, soma.def[t].map((x) => sig(x, 9))])), invInc: sig(soma.invInc, 9), defInv: sig(soma.defInv, 9) },
       amostra: embaralhados.slice(0, AMOSTRA).map((o) => o.bruto),
@@ -463,7 +449,7 @@ function lerBaldes(c) {
   for (const n of nomes) {
     try {
       const b = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(PASTA_DADOS, n))).toString('utf8'))
-      if (b?.v !== 1 || !b.ate) continue
+      if (b?.v !== 2 || !b.ate) continue
       b.arquivo = n
       b.pks = null
       saida.push(b)
@@ -629,7 +615,8 @@ function prepararLinhas(c) {
     baseCache.set(fid, id)
     return id
   }
-  return { formas, baseDe }
+  const folhas = [...c.especies.values()].filter((e) => e?.name && !c.m.mistico.ehLendarioOuMitico(e.pokeId) && (c.m.megas.isMegaPokeId(e.pokeId) || formas.get(e.pokeId)?.length === 1))
+  return { formas, baseDe, folhas }
 }
 
 function cortarEmTiers(itens) {
@@ -649,41 +636,30 @@ function cortarEmTiers(itens) {
 
 function tierDaJanela(c, linhas, meta, baldes) {
   const nivel = c.gi.nivelNoGinasio(NIVEL_REFERENCIA)
-  const cache = new Map()
-  const forcaDe = (f) => {
-    if (!cache.has(f.pokeId)) cache.set(f.pokeId, melhorForcaPvp(c.gi, meta, pokemonBase(PADRAO), f, nivel))
-    return cache.get(f.pokeId)
-  }
-  const grupos = new Map()
-  for (const [id, formas] of linhas.formas) {
-    let r = null
-    for (const f of formas) {
-      const v = forcaDe(f)
-      if (v && (!r || v.forca > r.forca)) r = { ...v, esp: f }
-    }
-    if (!r || c.m.mistico.ehLendarioOuMitico(r.esp.pokeId)) continue
-    const g = grupos.get(r.esp.pokeId) || { r, membros: [] }
-    g.membros.push(id)
-    grupos.set(r.esp.pokeId, g)
-  }
   const times = baldes.reduce((t, b) => t + b.times, 0)
+  const uso = new Map()
+  const vit = new Map()
+  for (const b of baldes) {
+    for (const [id, k] of Object.entries(b.uso)) uso.set(Number(id), (uso.get(Number(id)) || 0) + k)
+    for (const [id, [n, w]] of Object.entries(b.vit)) { const v = vit.get(Number(id)) || [0, 0]; v[0] += n; v[1] += w; vit.set(Number(id), v) }
+  }
+  const candidatos = new Set([...uso.keys(), ...linhas.folhas.map((e) => e.pokeId)])
   const itens = []
-  for (const [fid, { r, membros }] of grupos) {
-    const score = scoreDaForca(meta, r.forca)
+  for (const id of candidatos) {
+    const esp = c.especies.get(id)
+    if (!esp?.name || c.m.mistico.ehLendarioOuMitico(id) || c.m.outland.isOutlandPokeId(id)) continue
+    const lk = looksDe(c, esp)
+    if (lk.lookShiny == null) continue
+    const r = melhorForcaPvp(c.gi, meta, pokemonBase(PADRAO), esp, nivel)
+    const score = r ? scoreDaForca(meta, r.forca) : null
     if (score == null) continue
-    let usam = 0, n = 0, w = 0
-    for (const b of baldes) for (const id of membros) {
-      usam += b.uso[id] || 0
-      const v = b.vit[id]
-      if (v) { n += v[0]; w += v[1] }
-    }
-    const bid = linhas.baseDe(fid)
-    const base = c.especies.get(bid)
-    const lk = looksDe(c, r.esp)
+    const usam = uso.get(id) || 0
+    const [n, w] = vit.get(id) || [0, 0]
+    const bid = linhas.baseDe(id)
     itens.push({
-      speciesId: fid, nome: r.esp.name, looktype: lk.lookShiny ?? lk.looktype ?? null, ...(lk.lookShiny != null && lk.looktype != null ? { lookNormal: lk.looktype } : {}), tipos: tiposDe(r.esp),
+      speciesId: id, nome: esp.name, looktype: lk.lookShiny, ...(lk.looktype != null ? { lookNormal: lk.looktype } : {}), tipos: tiposDe(esp),
       score, forca: r.forca, ataque: Math.round(r.ataque * 100) / 100, resistencia: Math.round(r.resistencia * 100) / 100,
-      base: { speciesId: bid, nome: base?.name ?? r.esp.name },
+      base: { speciesId: bid, nome: c.especies.get(bid)?.name ?? esp.name },
       uso: times ? Math.min(100, Math.round((1000 * usam) / times) / 10) : null,
       vitorias: n >= MIN_VITORIAS ? Math.round((1000 * w) / n) / 10 : null,
       n,

@@ -131,21 +131,48 @@ function dia(iso) {
   return Number.isNaN(d.getTime()) ? '' : fmtDia.format(d)
 }
 
+const ICO_IND = {
+  periodo: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  topo: '<path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M9.5 16.5h5v4h-5z"/>',
+  partidas: '<path d="M4 4l7.5 7.5M20 4l-7.5 7.5M4.5 15.5l4 4M19.5 15.5l-4 4M6 18l-2 2M18 18l2 2"/>',
+  jogadores: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.8a3.2 3.2 0 0 1 0 6.4M17.5 13.8c2.1.6 3.5 2.6 3.5 5.2"/>',
+  shiny: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'
+}
+
+function faixaDatas(de, ate) {
+  const a = new Date(de), b = new Date(ate)
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return ''
+  const [da, ma] = fmtDia.format(a).split('/'), [db, mb] = fmtDia.format(b).split('/')
+  if (da === db && ma === mb) return `${db}/${mb}`
+  return ma === mb ? `${da}-${db}/${mb}` : `${da}/${ma}-${db}/${mb}`
+}
+
+function indicador(icone, texto, extra = null, titulo = null) {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor')
+  s.setAttribute('stroke-width', '2.1'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true')
+  s.innerHTML = ICO_IND[icone]
+  return el('li', { class: `ind ind-${icone}`, title: titulo }, [s, el('span', { text: texto }), extra])
+}
+
 function pintarPeriodo(j) {
-  const partes = []
-  const de = dia(j.de), ate = dia(j.ate)
-  if (de && ate) partes.push(de === ate ? de : `${de} a ${ate}`)
-  const topo = j.topo ?? dados.topo
-  if (ehNum(topo)) partes.push(`top ${fmt.format(topo)}`)
-  if (ehNum(j.partidas)) partes.push(plural(j.partidas, 'partida', 'partidas'))
-  if (ehNum(j.jogadores)) partes.push(plural(j.jogadores, 'jogador', 'jogadores'))
-  const filhos = [partes.join(' · ')]
-  if (j.parcial) {
-    const t0 = new Date(j.de).getTime(), t1 = new Date(j.ate).getTime()
-    const n = ehNum(j.dias) ? Number(j.dias) : Number.isFinite(t1 - t0) ? Math.max(1, Math.round((t1 - t0) / 864e5)) : null
-    if (n) filhos.push(el('span', { class: 'parcial', text: `cobre ${plural(n, 'dia', 'dias')}` }))
+  const itens = []
+  const datas = faixaDatas(j.de, j.ate)
+  if (datas) {
+    let selo = null
+    if (j.parcial) {
+      const t0 = new Date(j.de).getTime(), t1 = new Date(j.ate).getTime()
+      const n = ehNum(j.dias) ? Number(j.dias) : Number.isFinite(t1 - t0) ? Math.max(1, Math.round((t1 - t0) / 864e5)) : null
+      if (n) selo = el('em', { class: 'parcial', text: plural(n, 'dia', 'dias'), title: 'A janela ainda não tem todos os dias' })
+    }
+    itens.push(indicador('periodo', datas, selo, 'Período'))
   }
-  $('periodo').replaceChildren(...filhos)
+  const topo = j.topo ?? dados.topo
+  if (ehNum(topo)) itens.push(indicador('topo', `Top ${fmt.format(topo)}`, null, 'Jogadores do topo do ranqueado'))
+  if (ehNum(j.partidas)) itens.push(indicador('partidas', plural(j.partidas, 'partida', 'partidas')))
+  if (ehNum(j.jogadores)) itens.push(indicador('jogadores', plural(j.jogadores, 'jogador', 'jogadores')))
+  itens.push(indicador('shiny', 'Shiny · Nv 100 padrão', null, 'Indivíduo padrão: qualidade 1,1, IV 20, P1, sem refino'))
+  $('indicadores').replaceChildren(...itens)
 }
 
 function pintar() {
@@ -453,9 +480,9 @@ function clicouCartao(e) {
 }
 
 function temporadaTxt(t) {
-  if (ehNum(t)) return `temporada ${t}`
+  if (ehNum(t)) return `Temporada ${t}`
   const d = dia(t)
-  return d ? `temporada de ${d}` : ''
+  return d ? `Temporada de ${d}` : ''
 }
 
 function pintarCabecalho() {
@@ -468,9 +495,17 @@ function pintarCabecalho() {
     $('atualizado').replaceChildren(...filhos)
     $('atualizado').hidden = false
   }
-  $('regra').textContent = [dados.regra, temporadaTxt(dados.temporada), dados.versaoJogo ? `jogo ${dados.versaoJogo}` : ''].filter(Boolean).join(' · ')
   const topo = dados.topo ?? janelasDe(dados).dia?.topo
-  if (ehNum(topo)) $('explica-topo').textContent = ` Base: os shiny do top ${fmt.format(topo)} do ranqueado.`
+  const versao = [temporadaTxt(dados.temporada), dados.versaoJogo ? `jogo ${dados.versaoJogo}` : ''].filter(Boolean).join(' · ')
+  const linhas = [
+    'Cada shiny no indivíduo padrão: nível 100, qualidade 1,1, IV 20, P1, sem refino.',
+    `Meta e uso vêm das partidas do ${ehNum(topo) ? `top ${fmt.format(topo)}` : 'topo'} do ranqueado. Sem lendários e míticos.`,
+    'Score de 0 a 1000, o mesmo da calculadora.'
+  ]
+  const nos = []
+  linhas.forEach((t, i) => { if (i) nos.push(el('br')); nos.push(t) })
+  if (versao) nos.push(el('br'), el('small', { text: versao }))
+  $('explica').replaceChildren(...nos)
 }
 
 async function iniciar() {
