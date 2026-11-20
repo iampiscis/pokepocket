@@ -1,0 +1,40 @@
+name: Atualizar dados do jogo
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-jogo
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Baixar módulos e catálogos
+        run: node ferramentas/atualizar-jogo.mjs
+
+      - name: Publicar se mudou
+        run: |
+          git add calculadora/jogo
+          if git diff --cached --quiet; then
+            echo "nada mudou"
+            exit 0
+          fi
+          versao=$(node -p "require('./calculadora/jogo/versao.json').versaoJogo || '?'")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: dados do jogo ${versao}"
+          git push origin HEAD:main
