@@ -1,6 +1,6 @@
 {
  "versaoJogo": "1.451.2",
- "atualizadoEm": "2026-11-20T11:30:14.905Z",
+ "atualizadoEm": "2026-11-20T12:14:08.525Z",
  "modulos": [
   "ajustes-especie-espelho.mjs",
   "cooldown-golpes.mjs",
@@ -64,6 +64,8 @@
   "sell-value.mjs": "53f0ac53ff751e83",
   "spawns-filtro.mjs": "e849e1c637ba3e81",
   "sprite-jogo.mjs": "1b46b3e112c6ce3c",
+  "sprites-manifestos.json": "b4adf176daadb434",
+  "sprites.json": "735d1effd6343949",
   "teto-captura.mjs": "7e74310e50da93f9",
   "tipo-efetividade.mjs": "55e1298488278c03",
   "tm-elemental.mjs": "1bf82e14234e5fd7"

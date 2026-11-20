@@ -308,6 +308,7 @@ function definirHoje(h, simSalvo = null) {
   st.sim = simSalvo ? normal({ ...simSalvo, ivs: st.hoje.ivs, quality: st.hoje.quality }) : padraoSim(st.hoje)
   if (!st.formas.some((f) => f.speciesId === st.sim.speciesId)) st.sim.speciesId = st.hoje.speciesId
   st.res = null
+  st.rolar = true
   montarEditorHoje()
   montarSimulacao()
   pintarIdentidade()
@@ -484,11 +485,19 @@ async function calcular() {
     $('erro-res').textContent = erro
     $('erro-res').hidden = false
     $('resultado').hidden = true
+    $('cartao-res').hidden = false
+    $('cartao-preco').hidden = true
     return
   }
   $('erro-res').hidden = true
   st.res = { h: rh, s: rs }
   $('resultado').hidden = false
+  $('cartao-res').hidden = false
+  $('cartao-preco').hidden = false
+  if (st.rolar) {
+    st.rolar = false
+    requestAnimationFrame(() => $('cartao-res').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }))
+  }
   $('copiar-topo').hidden = false
   if (st.ui.notaHoje) st.ui.notaHoje.textContent = ehNum(rh.nota) ? fmt1.format(rh.nota) : '—'
   pintarSimMini()
@@ -644,23 +653,22 @@ function pintarGolpe() {
 
 function pintarStats() {
   const { h, s } = st.res
-  const linhas = STATS.map(([k, rot]) => {
+  const celulas = STATS.map(([k, rot]) => {
     const a = Number(h.stats?.[k]) || 0
     const b = Number(s.stats?.[k]) || 0
     const p = variacao(a, b)
-    return el('div', { class: 'tabela-l' }, [
-      el('span', { text: rot }),
-      el('span', { text: grande(a) }),
+    return el('div', { class: 'stat-c', role: 'group', 'aria-label': `${rot}: hoje ${grande(a)}, simulado ${grande(b)}` }, [
+      el('small', { text: rot }),
       el('b', { text: grande(b) }),
-      el('span', { class: `delta ${p == null || p === 0 ? 'igual' : p > 0 ? 'sobe' : 'desce'}`, text: p == null || p === 0 ? '—' : textoVariacao(p) })
+      el('span', { class: 'stat-pe' }, [
+        el('span', { text: `hoje ${grande(a)}` }),
+        el('span', { class: `delta ${p == null || p === 0 ? 'igual' : p > 0 ? 'sobe' : 'desce'}`, text: p == null || p === 0 ? '—' : textoVariacao(p) })
+      ])
     ])
   })
   $('bloco-stats').replaceChildren(
     el('div', { class: 'bloco-cab' }, [ico('stats'), el('h3', { text: 'Atributos' }), el('span', { class: 'resumo', text: `Nv ${fmt.format(st.sim.level)}` })]),
-    el('div', { class: 'tabela', role: 'table', 'aria-label': 'Atributos de hoje e simulados' }, [
-      el('div', { class: 'tabela-l cab' }, [el('span', { text: '' }), el('span', { text: 'Hoje' }), el('span', { text: 'Simulado' }), el('span', { text: 'Δ' })]),
-      ...linhas
-    ])
+    el('div', { class: 'stats-linha' }, celulas)
   )
 }
 
@@ -809,23 +817,39 @@ async function copiarTexto(texto) {
   }
 }
 
-async function textoResumo() {
+const PREVIA = 'https://pokepocket.piscis.workers.dev/p'
+
+async function dadosCompartilhar() {
   const s = st.res?.s
-  if (!s) return location.href
+  if (!s) return { linha: '', link: location.href }
+  let justo = null
+  try {
+    const p = await precoDe(pkDe(st.sim), s)
+    if (ehNum(p?.gemas?.justo)) justo = Math.round(p.gemas.justo)
+  } catch {}
   const partes = [`${s.nome}${st.sim.shiny ? ' shiny' : ''} · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
   if (ehNum(s.score?.pvp)) partes.push(`Score PvP ${fmt.format(s.score.pvp)} (${faixaDe(s.score.pvp)[1]})`)
   if (ehNum(s.score?.pve)) partes.push(`Score PvE ${fmt.format(s.score.pve)} (${faixaDe(s.score.pve)[1]})`)
   if (ehNum(s.nota)) partes.push(`Nota ${fmt1.format(s.nota)}/10`)
-  try {
-    const p = await precoDe(pkDe(st.sim), s)
-    if (ehNum(p?.gemas?.justo)) partes.push(`Justo ${gemas(p.gemas.justo)} gemas`)
-  } catch {}
-  return `${partes.join(' · ')}\n${location.href}`
+  if (justo != null) partes.push(`Justo ${gemas(justo)} gemas`)
+  let link = location.href
+  if (PREVIA) {
+    const q = new URLSearchParams({ n: s.nome, nv: st.sim.level, po: st.sim.potencia })
+    if (st.sim.shiny) q.set('s', '1')
+    if (ehNum(s.score?.pvp)) q.set('pvp', s.score.pvp)
+    if (ehNum(s.score?.pve)) q.set('pve', s.score.pve)
+    if (ehNum(s.nota)) q.set('no', Math.round(s.nota * 10) / 10)
+    if (justo != null) q.set('j', justo)
+    q.set('c', st.ultimoHash || location.hash.replace(/^#/, ''))
+    link = `${PREVIA}?${q}`
+  }
+  return { linha: partes.join(' · '), link }
 }
 
 async function copiar(bt, comResumo) {
   if (st.hoje) gravarEstado()
-  const ok = await copiarTexto(comResumo ? await textoResumo() : location.href)
+  const { linha, link } = await dadosCompartilhar()
+  const ok = await copiarTexto(comResumo && linha ? `${linha}\n${link}` : link)
   const aviso = $('link-ok')
   aviso.className = `link-ok${ok ? '' : ' erro'}`
   aviso.textContent = ok ? (comResumo ? 'Resumo e link copiados' : 'Link copiado') : 'Copie o endereço na barra do navegador'

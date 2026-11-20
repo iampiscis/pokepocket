@@ -281,17 +281,28 @@ function calcularIndicador(c, pk) {
   return { pvp, pve }
 }
 
+const temSprite = (c, lt) => lt != null && !!(c.sprites?.looks?.[lt] || c.atlas?.slots?.[lt])
+
+function shinyDe(c, looktype, padrao) {
+  const lt = c.sprites?.shiny?.[looktype] ?? padrao ?? (looktype != null && c.sprites?.looks?.[looktype + 10000] ? looktype + 10000 : null)
+  if (lt == null) return null
+  return !c.sprites || temSprite(c, lt) ? lt : null
+}
+
 function looksDe(c, esp) {
-  const { megas, formas } = c.m
+  const { megas } = c.m
   const id = Number(esp.pokeId)
   const meta = megas.megaPorPokeId(id)
-  if (meta) return { looktype: megas.looktypeDaMega(meta), lookShiny: megas.megaTemShiny(meta) ? megas.looktypeShinyDaMega(meta) : null, mega: true }
+  if (meta) {
+    const looktype = megas.looktypeDaMega(meta)
+    return { looktype, lookShiny: megas.megaTemShiny(meta) ? shinyDe(c, looktype, megas.looktypeShinyDaMega(meta)) : null, mega: true }
+  }
   const forma = c.formaPorId.get(id)
-  const looktype = c.atlas?.slots?.[LOOK_NORMAL + id] ? LOOK_NORMAL + id : esp.looktype ?? null
-  if (forma) return { looktype: forma.looktype ?? looktype, lookShiny: forma.looktypeShiny ?? null, mega: false }
-  if (c.m.outland.isOutlandPokeId(id)) return { looktype, lookShiny: null, mega: false }
+  const looktype = forma?.looktype ?? (temSprite(c, LOOK_NORMAL + id) ? LOOK_NORMAL + id : esp.looktype ?? null)
+  if (forma) return { looktype, lookShiny: shinyDe(c, looktype, forma.looktypeShiny), mega: false }
+  if (c.m.outland.isOutlandPokeId(id)) return { looktype, lookShiny: shinyDe(c, looktype, null), mega: false }
   const dex = id <= 1025 || id >= 3000 ? id : id % 1000
-  return { looktype, lookShiny: LOOK_SHINY + dex, mega: false }
+  return { looktype, lookShiny: shinyDe(c, looktype, LOOK_SHINY + dex), mega: false }
 }
 
 function resumo(c, esp) {
@@ -301,12 +312,13 @@ function resumo(c, esp) {
 async function iniciar(aoProgresso) {
   const avisar = (fracao, texto) => { try { aoProgresso?.(fracao, texto) } catch {} }
   avisar(0, 'Baixando dados do jogo')
-  const [versao, mods, textos, meta, atlas, extras] = await Promise.all([
+  const [versao, mods, textos, meta, atlas, sprites, extras] = await Promise.all([
     lerJson(new URL('versao.json', JOGO)).catch(() => null),
     Promise.all(Object.entries(MODULOS).map(async ([k, arq]) => [k, await import(new URL(arq, JOGO).href)])),
     Promise.all(CATALOGOS.map((c) => lerTexto(new URL(`${c}.json`, JOGO), c !== 'creatures'))),
     lerJson(new URL('meta-pvp.json', BASE)),
     lerJson(new URL('marker-atlas.json', JOGO)).catch(() => null),
+    lerJson(new URL('sprites.json', JOGO)).catch(() => null),
     lerJson(new URL('especies-extras.json', BASE)).catch(() => null),
     carregarScript(PRECIFICADOR + SCRIPT_FICHA).catch(() => null)
   ])
@@ -316,7 +328,7 @@ async function iniciar(aoProgresso) {
   if (!textos[0]) throw new Error('catálogo do jogo vazio')
   const indicador = montarCatalogoIndicador(m, fontes())
   const jogo = montarCatalogoJogo(m, fontes())
-  const c = { gi: m.gi, m, meta, indicador, jogo, atlas, extras, versao, formaPorId: new Map(m.formas.FORMAS.map((f) => [f.pokeId, f])) }
+  const c = { gi: m.gi, m, meta, indicador, jogo, atlas, sprites, extras, versao, formaPorId: new Map(m.formas.FORMAS.map((f) => [f.pokeId, f])) }
   c.lista = [...jogo.values()].filter((e) => e?.name).map((e) => ({ esp: e, chave: normalizar(e.name), ...resumo(c, e) }))
   c.porNome = new Map()
   for (const x of c.lista) if (!c.porNome.has(x.chave)) c.porNome.set(x.chave, x.esp)
@@ -561,8 +573,12 @@ export async function preco(pk, resultadoSimular) {
 }
 
 export function sprite(looktype) {
+  if (looktype == null) return null
+  const q = ctx?.sprites?.looks?.[String(looktype)]
+  const pagina = q ? ctx.sprites.paginas?.[q[0]] : null
+  if (pagina) return { url: pagina, cell: Math.max(q[3], q[4]), x: q[1], y: q[2], caixa: [0, 0, q[3], q[4]] }
   const a = ctx?.atlas
-  const pos = looktype != null ? a?.slots?.[String(looktype)] : null
+  const pos = a?.slots?.[String(looktype)]
   if (!pos) return null
   return { url: a.url, cell: a.cell, x: pos[0] * a.cell, y: pos[1] * a.cell, caixa: a.caixas?.[String(looktype)] ?? null }
 }

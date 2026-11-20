@@ -145,6 +145,109 @@ async function baixarAtlas() {
   return JSON.stringify({ version: versao, url: `${ORIGEM}/assets/site/assets/maps/marker-atlas.png?v=${versao}`, cell: cel, cols: Number(j.cols) || 16, rows: Number(j.rows) || Math.ceil(altura / cel), slots, caixas })
 }
 
+const PACOTES = `${ORIGEM}/assets/asset-packs`
+const TIPOS_SPRITE = new Set(['pokemon', 'shiny', 'forma', 'forma-shiny', 'mega', 'mega-shiny'])
+const CONCORRENCIA = 8
+const urlDoPacote = (caminho) => `${PACOTES}${String(caminho).replace(/^\/assets-packs/, '')}`
+
+function lerJsonLocal(nome) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(destino, nome), 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+function quadroParado(m) {
+  const porDir = {}
+  for (const [chave, asset] of Object.entries(m?.assets || {})) {
+    const stem = chave.split('/').pop().replace(/\.png$/, '')
+    if (stem.endsWith('_template') || !asset?.frames?.[0]) continue
+    const n = stem.split('_').map(Number)
+    ;(porDir[n[3]] ??= [])[n[0] - 1] = asset.frames[0]
+  }
+  const quadros = porDir[3]?.length ? porDir[3] : Object.values(porDir)[0] || []
+  const quadro = quadros.find(Boolean)
+  const pagina = Object.values(m?.categories || {})[0]?.pages?.[quadro?.page ?? 0]
+  if (!quadro || !pagina?.image) return null
+  return { pagina: urlDoPacote(pagina.image), x: quadro.x, y: quadro.y, w: quadro.w, h: quadro.h }
+}
+
+function paresShiny(indice) {
+  const porNome = new Map()
+  for (const [lt, o] of Object.entries(indice)) if (TIPOS_SPRITE.has(o?.kind) && o.name) porNome.set(String(o.name).toLowerCase(), Number(lt))
+  const pares = {}
+  for (const [lt, o] of Object.entries(indice)) {
+    const nome = String(o?.name || '').toLowerCase()
+    const alvo = o?.kind === 'pokemon' || o?.kind === 'forma' ? `shiny_${nome}` : o?.kind === 'mega' ? nome.replace(/^mega_/, 'mega_shiny_') : null
+    const shiny = alvo ? porNome.get(alvo) : null
+    if (shiny != null && ![10000, 5000].includes(shiny - Number(lt))) pares[lt] = shiny
+  }
+  return pares
+}
+
+async function baixarSprites() {
+  const anterior = lerJsonLocal('sprites.json')
+  const manifestosAntes = lerJsonLocal('sprites-manifestos.json') || {}
+  let indice
+  try {
+    indice = JSON.parse(await baixar(`${PACOTES}/outfits-index.json`)).outfits
+    if (!indice || !Object.keys(indice).length) throw new Error('índice de sprites vazio')
+  } catch (err) {
+    if (!anterior) throw err
+    console.warn(`sprites: mantive a versão anterior (${err.message})`)
+    return { sprites: JSON.stringify(anterior), manifestos: JSON.stringify(manifestosAntes) }
+  }
+  const antes = new Map()
+  for (const [lt, e] of Object.entries(anterior?.looks || {})) {
+    const pagina = anterior.paginas?.[e[0]]
+    if (pagina) antes.set(lt, { pagina, x: e[1], y: e[2], w: e[3], h: e[4] })
+  }
+  const alvos = Object.entries(indice).filter(([, o]) => TIPOS_SPRITE.has(o?.kind) && o.manifest)
+  const resultado = new Map()
+  const manifestos = {}
+  const fila = []
+  for (const [lt, o] of alvos) {
+    if (manifestosAntes[lt] === o.manifest && antes.has(lt)) {
+      resultado.set(lt, antes.get(lt))
+      manifestos[lt] = o.manifest
+    } else fila.push([lt, o])
+  }
+  let falhas = 0
+  let proximo = 0
+  const trabalhador = async () => {
+    while (proximo < fila.length) {
+      const [lt, o] = fila[proximo++]
+      try {
+        const q = quadroParado(JSON.parse(await baixar(urlDoPacote(o.manifest))))
+        if (!q) throw new Error('manifesto sem quadro')
+        resultado.set(lt, q)
+        manifestos[lt] = o.manifest
+      } catch {
+        falhas++
+        if (antes.has(lt)) {
+          resultado.set(lt, antes.get(lt))
+          if (manifestosAntes[lt]) manifestos[lt] = manifestosAntes[lt]
+        }
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: CONCORRENCIA }, trabalhador))
+  const paginas = []
+  const posPagina = new Map()
+  const looks = {}
+  for (const lt of [...resultado.keys()].sort((a, b) => Number(a) - Number(b))) {
+    const q = resultado.get(lt)
+    if (!posPagina.has(q.pagina)) {
+      posPagina.set(q.pagina, paginas.length)
+      paginas.push(q.pagina)
+    }
+    looks[lt] = [posPagina.get(q.pagina), q.x, q.y, q.w, q.h]
+  }
+  console.log(`sprites: ${Object.keys(looks).length} looktypes, ${fila.length - falhas} manifestos baixados, ${falhas} falhas`)
+  return { sprites: JSON.stringify({ paginas, looks, shiny: paresShiny(indice) }), manifestos: JSON.stringify(manifestos) }
+}
+
 async function versaoDoJogo() {
   try {
     return /app\.js\?v=([\d.]+)/.exec(await baixar(`${ORIGEM}/app`))?.[1] || null
@@ -164,11 +267,13 @@ function lerVersaoAtual() {
 }
 
 async function principal() {
-  const [modulos, catalogos, atlas, versaoJogo] = await Promise.all([baixarModulos(), baixarCatalogos(), baixarAtlas(), versaoDoJogo()])
+  const [modulos, catalogos, atlas, sprites, versaoJogo] = await Promise.all([baixarModulos(), baixarCatalogos(), baixarAtlas(), baixarSprites(), versaoDoJogo()])
   const arquivos = new Map()
   for (const [nome, texto] of modulos) arquivos.set(nome, texto)
   for (const [nome, texto] of catalogos) arquivos.set(nome, texto)
   arquivos.set('marker-atlas.json', atlas)
+  arquivos.set('sprites.json', sprites.sprites)
+  arquivos.set('sprites-manifestos.json', sprites.manifestos)
 
   const anterior = lerVersaoAtual()
   const hashes = Object.fromEntries([...arquivos].sort(([a], [b]) => a.localeCompare(b)).map(([nome, texto]) => [nome, hash(texto)]))
