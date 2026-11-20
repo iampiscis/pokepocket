@@ -98,7 +98,6 @@ function cartao(p) {
   const nomesTipos = tipos.map((t) => NOME_TIPO[t] || t).join(' e ')
   const uso = []
   if (Number(p.uso) > 0) uso.push('uso ', el('b', { text: `${fmtPct.format(p.uso)}%` }))
-  if (Number(p.uso) > 0 && ehNum(p.vitorias)) uso.push(uso.length ? ' · ' : '', 'vitórias ', el('b', { text: `${fmtPct.format(p.vitorias)}%` }))
   const score = ehNum(p.score) ? Math.round(p.score) : null
   return el('a', { class: 'poke', href: linkCalc(p), 'data-id': String(p.speciesId), title: `${p.nome} shiny${nomesTipos ? ` (${nomesTipos})` : ''}${score != null ? ` · score ${fmt.format(score)}` : ''}` }, [
     el('span', { class: 'poke-img' }, [sprite(p)]),
@@ -409,7 +408,7 @@ function pintarFicha({ p, tier, fora }) {
         fora ? el('span', { class: 'f-fora', text: 'fora do meta no período' }) : null
       ])
     ]),
-    el('div', { class: 'f-nums' }, [num('uso', p.uso, '%'), num('vitórias', p.vitorias, '%'), num('aparições', p.n)]),
+    el('div', { class: 'f-nums' }, [num('uso', p.uso, '%'), num('aparições', p.n)]),
     bloco('evo', 'Linha evolutiva', evo, 'f-bloco-evo'),
     el('div', { class: 'f-duas' }, [bloco('escudo', 'Tipos contra', defs), bloco('stats', 'Stats base', stats)])
   )
