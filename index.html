@@ -183,6 +183,17 @@
 
     section.bloco { padding: 76px 0 10px; }
     .rotulo { display: inline-block; padding: 5px 14px; border-radius: 999px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
+    .versoes { display: grid; gap: 14px; max-width: 860px; margin: 28px auto 0; }
+    .versao { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 18px; padding: 18px 22px; border-radius: 18px; background: rgba(255, 246, 239, 0.035); border: 1px solid rgba(255, 233, 163, 0.12); }
+    .versao-tag { display: grid; align-content: start; gap: 4px; }
+    .versao-tag b { font-family: var(--display); font-weight: 400; font-size: 28px; color: var(--ouro); line-height: 1; }
+    .versao-tag small { color: var(--apagado); font-weight: 800; font-size: 13px; }
+    .versao-tag .atual { justify-self: start; margin-top: 4px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 900; color: #0b2a14; background: var(--verde); }
+    .versao ul { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+    .versao li { position: relative; padding-left: 18px; color: var(--suave); font-weight: 700; font-size: 15px; line-height: 1.45; }
+    .versao li::before { content: ""; position: absolute; left: 2px; top: 0.6em; width: 7px; height: 7px; border-radius: 50%; background: var(--ouro); }
+    .versao li b { color: var(--tinta); }
+    @media (max-width: 600px) { .versao { grid-template-columns: minmax(0, 1fr); gap: 10px; } .versao-tag { grid-auto-flow: column; justify-content: start; align-items: center; gap: 10px; } }
     h2 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: clamp(36px, 4.6vw, 60px); line-height: 1.02; text-transform: uppercase; letter-spacing: 0.01em; background: linear-gradient(180deg, #fffbe0 0%, #ffe066 40%, #ffb020 65%, #e8650f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 5px 0 var(--linha)); }
     .cab { max-width: 760px; }
     .cab.centro { margin: 0 auto; text-align: center; }
@@ -231,6 +242,8 @@
     .auto h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; background: linear-gradient(180deg, #fffbe0, #ffd34d 60%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .auto p { margin-top: 6px; font-size: 15px; color: var(--suave); }
     .auto p b { color: #fff; }
+    .lide b { color: #fff6ef; font-weight: 800; }
+    .novo-tag { display: inline-block; margin-bottom: 6px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: #0b2a14; background: var(--verde); }
     .avaliar { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 34px; }
     .avaliar .placa h3 { font-family: var(--display); font-weight: 400; font-size: 32px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
     .avaliar .placa > p { margin-top: 6px; color: #fff3df; opacity: 0.9; font-weight: 700; }
@@ -467,7 +480,7 @@
         <img class="bola" src="assets/pokebola.svg" alt="" />
         <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Twitch e Kick</span><span><i></i>Windows</span></div>
         <h1>Seu Pokéidle no <em>automático</em>.</h1>
-        <p class="lide">Ele não só mostra os números: joga por você, nas 4 contas ao mesmo tempo.</p>
+        <p class="lide">Não só mostra os números: joga por você,<br /><b>nas 4 contas ao mesmo tempo</b>.</p>
         <div class="acoes">
           <a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-heroi" data-goatcounter-title="baixar-instalador-heroi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zm8.5-1.2L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zm8.5 0H21V21l-9.5-1.3z"/></svg>Baixar para Windows</a>
           <a class="botao vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil" data-goatcounter-title="baixar-portatil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 7h4M12 17h.01"/></svg>Versão portátil</a>
@@ -497,6 +510,8 @@
           <div class="auto revela"><img src="assets/cenas/topcatch.jpg" alt="Top Catch subindo no ranking" loading="lazy" /><div><h3>Top Catch</h3><p>Pula de hunt em hunt atrás das espécies que faltam na semana e sobe no ranking.</p></div></div>
           <div class="auto revela"><img src="assets/cenas/compras.jpg" alt="Compras automáticas de itens" loading="lazy" /><div><h3>Compras</h3><p>Repõe pokébolas, poções e revives antes de acabar, em toda conta.</p></div></div>
           <div class="auto revela"><img src="assets/cenas/lives.jpg" alt="Lives simultâneas com resgate de bônus" loading="lazy" /><div><h3>Lives e bônus</h3><p>Até 2 lives por conta na Twitch e na Kick, com resgate de bônus automático.</p></div></div>
+          <div class="auto revela"><img src="assets/cenas/prey.jpg" alt="Cartela do Prey com indicadores de XP por hora" loading="lazy" /><div><span class="novo-tag">Novo</span><h3>Prey sem chute</h3><p>Indicadores mostram se a cartela vale. Gira <b>só o quadrado ruim</b> e vai direto para a hunt do escolhido.</p></div></div>
+          <div class="auto revela"><img src="assets/cenas/historico.jpg" alt="Histórico do pokémon com anúncios e vendas" loading="lazy" /><div><span class="novo-tag">Novo</span><h3>Histórico do pokémon</h3><p><b>Ofertas</b>, <b>vendas</b> e cada <b>melhoria</b> com o custo, em linha do tempo.</p></div></div>
         </div>
       </div>
     </section>
@@ -596,6 +611,33 @@
           <div class="p4 revela"><span class="n">4</span><div class="mini mock-abrir"><img src="assets/pokebola.svg" alt="" /><span class="botao pequeno" style="pointer-events:none">Começar</span></div><h3>Pronto</h3><p>Instale, abra e entre nas suas contas.</p></div>
         </div>
         <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.2: <code>7c7b19870e46d31a748fa953e4a1b2fc342bb2c11dc7e4b859c2fc7efda947f8</code><br />Portátil 1.0.2: <code>9bc4eefe54f2a768b65355e2079eb8c0e4c50aba5fb6ed08842f0ea20f0b6971</code></p></details>
+      </div>
+    </section>
+
+    <section class="bloco" id="versoes">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Versões</span>
+          <h2>O que mudou</h2>
+        </div>
+        <div class="versoes">
+          <article class="versao revela"><div class="versao-tag"><b>1.0.2</b><small>20/11/2026</small><span class="atual">atual</span></div><ul>
+            <li><b>Prey:</b> indicadores mostram se a cartela vale, gira só o quadrado ruim e um clique leva à hunt do escolhido.</li>
+            <li><b>Bestiário:</b> dano extra por tipo de cada conta e quanto falta para o próximo marco.</li>
+            <li><b>Histórico do pokémon:</b> preços ofertados, vendas e cada melhoria com o custo.</li>
+            <li><b>Calculadora:</b> nota, PvP, PvE e preço justo sempre à vista, nas cores do jogo.</li>
+            <li><b>PvP:</b> escolha de conta com tier, ranking e fila.</li>
+            <li><b>Atualização do jogo:</b> o app recarrega sozinho quando sai versão nova.</li>
+          </ul></article>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.1</b><small>19/11/2026</small></div><ul>
+            <li><b>Primeiro uso:</b> as 4 contas já aparecem prontas, só esperando o login.</li>
+            <li><b>Tour guiado</b> aponta para o lugar certo.</li>
+            <li><b>Login:</b> Discord ou e-mail (o Google bloqueia login dentro de apps).</li>
+          </ul></article>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.0</b><small>19/11/2026</small></div><ul>
+            <li>Primeira versão pública: 4 contas, troca de hunt e top catch, score PvP, compras e bônus automáticos, lives da Twitch e da Kick.</li>
+          </ul></article>
+        </div>
       </div>
     </section>
 
