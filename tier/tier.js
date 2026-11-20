@@ -215,7 +215,8 @@ function pintar() {
   const faixas = (j.tiers || []).map((t) => faixa(t.tier, t.itens, cortes)).filter(Boolean)
   $('faixas').replaceChildren(...faixas)
   let foraFaixas = []
-  if (estado.todas && fora.length) {
+  const buscando = normalizar(estado.busca) !== ''
+  if ((estado.todas || buscando) && fora.length) {
     const grupos = new Map()
     for (const p of fora) {
       const t = p.tier || '?'
@@ -226,12 +227,14 @@ function pintar() {
     const pos = (t) => { const k = ordem.indexOf(t); return k < 0 ? ordem.length : k }
     foraFaixas = [...grupos.keys()].sort((a, b) => pos(a) - pos(b)).map((t) => faixa(t, grupos.get(t), cortes, true)).filter(Boolean)
     const topo = j.topo ?? dados.topo
-    $('fora-aviso').textContent = ehNum(topo) ? `não usados no top ${fmt.format(topo)} no período` : 'não usados no ranqueado no período'
+    $('t-fora').textContent = `Fora do meta ${{ dia: 'hoje', semana: 'na semana', mes: 'no mês' }[estado.janela] || 'no período'}`
+    $('fora-aviso').textContent = `sem uso shiny no ${ehNum(topo) ? `top ${fmt.format(topo)}` : 'ranqueado'} no período`
   }
   $('fora-faixas').replaceChildren(...foraFaixas)
   $('fora').hidden = !foraFaixas.length
   ajustarNomes()
   $('vazio').hidden = faixas.length + foraFaixas.length > 0
+  $('vazio').textContent = buscando && !estado.tipos.length ? 'Nenhum shiny com esse nome no tier' : 'Nenhum pokémon com esses filtros.'
 }
 
 function faixa(tier, lista, cortes, apagada = false) {
