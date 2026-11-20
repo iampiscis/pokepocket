@@ -56,7 +56,6 @@ function dimensoes(png) {
   return { w: png.readUInt32BE(16), h: png.readUInt32BE(20) }
 }
 
-const dataSP = (d, op) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', ...op }).format(d)
 const escapar = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
 
 function trocarMeta(html, atributo, nome, valor) {
@@ -70,7 +69,7 @@ async function atualizarPagina() {
   const j = dados.janelas?.dia || dados
   const g = new Date(dados.geradoEm)
   const ref = Number.isNaN(g.getTime()) ? new Date() : g
-  const carimbo = dataSP(ref, { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/-/g, '')
+  const carimbo = ref.toISOString().slice(0, 16).replace(/[-:T]/g, '')
   const topo = (j.tiers || []).find((t) => t.itens?.length)
   const nomes = (topo?.itens || []).slice(0, 3).map((p) => p.nome)
   const resto = (topo?.itens?.length || 0) > nomes.length ? '…' : ''
