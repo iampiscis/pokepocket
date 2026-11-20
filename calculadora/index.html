@@ -142,20 +142,23 @@
             </summary>
             <div class="det-grade">
               <div id="bloco-stats" class="det-bloco det-stats"></div>
-              <div class="det-col">
-                <div id="golpe" class="det-bloco golpe" hidden></div>
-                <div id="bloco-score" class="det-bloco">
-                  <div class="bloco-cab">
-                    <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 17a8.5 8.5 0 0 1 17 0"/><path d="m12 17 4-5.5"/><circle cx="12" cy="17" r="1.4"/></svg></span>
-                    <h3>Score e nota</h3>
-                    <button type="button" id="info-score" class="info" aria-expanded="false" aria-controls="explica" aria-label="Como o score é feito">i</button>
-                  </div>
-                  <p id="explica" class="explica" hidden>O score mede o potencial: nível 100, evolução máxima e o melhor Z-&#8288;Move, sem refino. Assim dá para comparar qualquer pokémon. O PvP é exclusivo do PokePocket e pensa no meta do PvP.</p>
-                  <div id="score-formas" class="score-formas"></div>
+              <section class="det-bloco det-luta" aria-labelledby="t-luta">
+                <div class="bloco-cab">
+                  <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 17a8.5 8.5 0 0 1 17 0"/><path d="m12 17 4-5.5"/><circle cx="12" cy="17" r="1.4"/></svg></span>
+                  <h3 id="t-luta">Golpe, score e nota</h3>
+                  <button type="button" id="info-score" class="info" aria-expanded="false" aria-controls="explica" aria-label="Como o score é feito">i</button>
                 </div>
-              </div>
-              <div class="det-bloco det-preco">
+                <p id="explica" class="explica" hidden>O score mede o potencial: nível 100, evolução máxima e o melhor Z-&#8288;Move, sem refino. Assim dá para comparar qualquer pokémon. O PvP é exclusivo do PokePocket e pensa no meta do PvP.</p>
+                <div class="luta-grade">
+                  <div id="golpe" class="luta-col golpe" hidden></div>
+                  <div id="score-formas" class="luta-col score-formas"></div>
+                  <div id="nota-det" class="luta-col nota-det"></div>
+                </div>
+              </section>
+              <section class="det-bloco det-preco" aria-label="Preço">
                 <div id="bloco-preco"></div>
+                <div class="preco-rodape">
+                  <a class="credito" href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">Preços: precificador do Briao</a>
                 <div class="compartilhar">
                   <button type="button" id="copiar-link" class="botao copiar" data-goatcounter-click="calc-copiar-link" data-goatcounter-title="calc-copiar-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg>
@@ -167,7 +170,8 @@
                   </button>
                   <span id="link-ok" class="link-ok" role="status" aria-live="polite"></span>
                 </div>
-              </div>
+                </div>
+              </section>
             </div>
           </details>
         </section>

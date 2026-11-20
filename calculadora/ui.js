@@ -707,18 +707,28 @@ function textoForma(v) {
 
 function pintarScoreInfo() {
   const s = st.res.s
-  const linha = (rot, v, forma) => {
+  const linha = (rot, icone, v, forma) => {
     if (!ehNum(v)) return null
     const faixa = faixaDe(Number(v))
     const nome = textoForma(forma)
-    return el('div', { class: 'sf-l' }, [el('b', { text: `${rot} ${fmt.format(Math.round(v))}` }), el('span', { class: 'selo', style: `--cor:${faixa[2]}`, text: faixa[1] }), nome ? el('small', { text: `como ${nome}` }) : null])
+    return el('div', { class: 'sf-l' }, [
+      el('div', { class: 'sf-topo' }, [ico(icone, 15, 'ico-sf'), el('span', { class: 'sf-rot', text: rot }), el('b', { text: fmt.format(Math.round(v)) }), el('span', { class: 'selo', style: `--cor:${faixa[2]}`, text: faixa[1] })]),
+      escalaScore(Number(v)),
+      nome ? el('small', { text: `como ${nome}` }) : null
+    ])
   }
-  const linhas = [linha('PvP', s.score?.pvp, s.score?.formaPvp), linha('PvE', s.score?.pve, s.score?.formaPve)].filter(Boolean)
-  if (ehNum(s.nota)) {
-    const f = faixaNota(s.nota)
-    linhas.push(el('div', { class: 'sf-l' }, [el('b', { text: `Nota ${fmtNota(s.nota)}` }), el('span', { class: 'selo', style: `--cor:${f[2]}`, text: f[1] }), escalaNota(s.nota)]))
-  }
-  $('score-formas').replaceChildren(...(linhas.length ? linhas : [el('div', { class: 'sf-l', text: 'Sem score para esta espécie.' })]))
+  const linhas = [linha('PvP', 'pvp', s.score?.pvp, s.score?.formaPvp), linha('PvE', 'pve', s.score?.pve, s.score?.formaPve)].filter(Boolean)
+  $('score-formas').replaceChildren(el('span', { class: 'luta-rot', text: 'Score' }), ...(linhas.length ? linhas : [el('p', { class: 'luta-vazio', text: 'Sem score para esta espécie.' })]))
+  const nota = $('nota-det')
+  if (!ehNum(s.nota)) return nota.replaceChildren(el('span', { class: 'luta-rot', text: 'Nota do jogo' }), el('p', { class: 'luta-vazio', text: 'Sem nota.' }))
+  const f = faixaNota(s.nota)
+  const dn = ehNum(st.res.h.nota) ? Math.round((s.nota - st.res.h.nota) * 1000) / 1000 : null
+  nota.replaceChildren(
+    el('span', { class: 'luta-rot', text: 'Nota do jogo' }),
+    el('div', { class: 'nd-valor' }, [el('b', { style: `color:${f[2]}`, text: fmtNota(s.nota) }), el('small', { text: '/10' })]),
+    el('div', { class: 'nd-pe' }, [el('span', { class: 'selo', style: `--cor:${f[2]}`, text: f[1] }), dn == null ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: dn ? `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))} vs hoje` : 'igual a hoje' })]),
+    escalaNota(s.nota)
+  )
 }
 
 function variacao(a, b) {
@@ -751,13 +761,15 @@ function pintarGolpe() {
   const cat = categoriaTxt(g.categoria)
   const detalhe = [cat ? cat[0].toUpperCase() + cat.slice(1) : '', g.cdMs ? `recarga ${fmt1.format(g.cdMs / 1000)} s` : ''].filter(Boolean).join(' · ')
   box.replaceChildren(
-    ico('golpe', 24),
-    el('div', { style: 'min-width:0' }, [
-      el('small', { text: 'Golpe principal' }),
-      el('div', { class: 'golpe-nome' }, [el('strong', { text: nome }), !g.zmove && tipo ? tiposDe([tipo]) : null]),
-      detalhe ? el('div', { class: 'golpe-det', text: detalhe }) : null
+    el('span', { class: 'luta-rot', text: 'Golpe principal' }),
+    el('div', { class: 'golpe-linha' }, [
+      ico('golpe', 22),
+      el('div', { style: 'min-width:0' }, [
+        el('div', { class: 'golpe-nome' }, [el('strong', { text: nome }), !g.zmove && tipo ? tiposDe([tipo]) : null]),
+        detalhe ? el('div', { class: 'golpe-det', text: detalhe }) : null
+      ])
     ]),
-    el('div', { class: 'golpe-num' }, [el('b', { text: ehNum(g.power) ? fmt.format(g.power) : '—' }), el('small', { text: 'poder' })])
+    el('div', { class: 'golpe-num' }, [el('b', { text: ehNum(g.power) ? fmt.format(g.power) : '—' }), el('small', { text: 'de poder' })])
   )
   box.hidden = false
 }
@@ -801,8 +813,8 @@ function gemas(v) {
   return Math.abs(v) >= 1000000 ? fmtCurto.format(v) : fmt.format(Math.round(v))
 }
 
-const cabPreco = (extra = null) => el('div', { class: 'bloco-cab' }, [el('span', { class: 'gema-ico', 'aria-hidden': 'true' }), el('h3', { text: 'Preço' }), extra])
-const credito = () => el('a', { class: 'credito', href: 'https://briaoale.github.io/precificador-pokemon/', target: '_blank', rel: 'noopener' }, 'Preços: precificador do Briao')
+const cabPreco = (extra = null) => el('div', { class: 'bloco-cab preco-cab' }, [el('span', { class: 'gema-ico', 'aria-hidden': 'true' }), el('h3', { text: 'Preço' }), extra])
+const DESCR_PRECO = { rapido: 'vende logo', justo: 'preço de mercado', esperar: 'se puder esperar' }
 
 async function pintarPreco(seq, pkH, rh, pkS, rs) {
   const box = $('bloco-preco')
@@ -811,7 +823,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   let pronto = false
   pS.then(() => { pronto = true })
   await Promise.resolve()
-  if (!pronto) box.replaceChildren(cabPreco(el('span', { class: 'resumo', text: 'calculando…' })), el('div', { class: 'precos' }, [el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' })]))
+  if (!pronto) box.replaceChildren(cabPreco(el('span', { class: 'resumo', text: 'calculando…' })), el('div', { class: 'precos3' }, [el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' })]))
   const [ds, dh] = await Promise.all([pS, pH])
   if (seq !== st.seq) return
   const trocaPreco = (valor, p = null, dica = '') => $('v-preco')?.replaceWith(celPreco(valor, p, dica))
@@ -823,32 +835,46 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   const g = ds.gemas
   if (!g || !ehNum(g.justo)) {
     trocaPreco('—', null, 'Sem vendas parecidas')
-    box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: 'Sem vendas parecidas para estimar.' }), credito())
+    box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: 'Sem vendas parecidas para estimar.' }))
     return
   }
   const hojeJusto = dh && !dh.erro && ehNum(dh.gemas?.justo) ? Number(dh.gemas.justo) : null
   const p = hojeJusto ? variacao(hojeJusto, g.justo) : null
   trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas`)
-  const topo = Math.max(Number(g.rapido) || 0, Number(g.justo) || 0, Number(g.esperar) || 0) || 1
-  const linha = (rot, v, meio = false) => el('div', { class: `preco${meio ? ' meio' : ''}` }, [
-    el('b', { text: rot }),
-    el('div', { class: 'trilho', 'aria-hidden': 'true' }, [el('i', { style: `width:${Math.max(4, Math.min(100, (Number(v) / topo) * 100)).toFixed(1)}%` })]),
-    el('strong', {}, [gemas(v), el('span', { class: 'gema-ico', 'aria-hidden': 'true' })])
+  const pontos = [['rapido', 'Rápido', g.rapido], ['justo', 'Justo', g.justo], ['esperar', 'Esperar', g.esperar]].filter(([, , v]) => ehNum(v))
+  const valores = pontos.map(([, , v]) => Number(v))
+  const min = Math.min(...valores)
+  const max = Math.max(...valores)
+  const folga = (max - min) * 0.3 || Math.max(1, max * 0.08)
+  const posNum = (v) => ((Number(v) - (min - folga)) / (max - min + folga * 2)) * 100
+  const pos = (v) => Math.max(0, Math.min(100, posNum(v))).toFixed(1)
+  const cartao = ([k, rot, v]) => el('div', { class: `pc pc-${k}`, role: 'listitem' }, [
+    el('span', { class: 'pc-rot' }, [el('i', { 'aria-hidden': 'true' }), rot]),
+    el('strong', {}, [gemas(v), el('span', { class: 'gema-ico', 'aria-hidden': 'true' })]),
+    el('small', { text: DESCR_PRECO[k] })
   ])
-  const nota = []
-  if (ehNum(ds.confianca)) nota.push(`Confiança ${fmt.format(Math.round(ds.confianca))}%`)
-  if (Number(ds.vendasFamilia) > 0) nota.push(`${fmt.format(ds.vendasFamilia)} vendas da família${ds.familia ? ` ${ds.familia}` : ''}`)
+  const regua = el('div', { class: 'preco-regua', 'aria-hidden': 'true' }, [
+    el('span', { class: 'pr-faixa', style: `left:${pos(pontos[0][2])}%;right:${(100 - pos(pontos[pontos.length - 1][2])).toFixed(1)}%` }),
+    ...pontos.map(([k, , v]) => el('i', { class: `pr-ponto pc-${k}`, style: `left:${pos(v)}%` })),
+    hojeJusto != null ? el('b', { class: `pr-hoje${posNum(hojeJusto) < 0 ? ' antes' : posNum(hojeJusto) > 100 ? ' depois' : ''}`, style: `left:${pos(hojeJusto)}%` }, [el('span', { text: `hoje ${gemas(hojeJusto)}` })]) : null
+  ])
+  const detalhes = []
+  if (ehNum(ds.confianca)) {
+    const c = Math.max(0, Math.min(100, Math.round(ds.confianca)))
+    detalhes.push(el('span', { class: 'pd-conf' }, ['Confiança', el('span', { class: 'pd-barra', 'aria-hidden': 'true' }, [el('i', { style: `width:${c}%` })]), el('b', { text: `${c}%` })]))
+  }
+  if (Number(ds.vendasFamilia) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendasFamilia)} vendas da família${ds.familia ? ` ${ds.familia}` : ''}` }))
   for (const a of ds.adicionais || []) {
     if (!(Number(a?.total) > 0)) continue
     const nome = String(a.nome || '').replace(/Z-Move ([A-Z]+)/, (_, t) => `Z-\u2060Move ${nomeTipo(t)}`)
-    nota.push(`${nome} +${gemas(a.total)}`)
+    detalhes.push(el('span', { class: 'pd-chip' }, [`${nome} +${gemas(a.total)}`, el('span', { class: 'gema-ico', 'aria-hidden': 'true' })]))
   }
-  const hojeTxt = hojeJusto != null ? el('span', { class: 'preco-cab-hoje' }, [`hoje ${gemas(hojeJusto)}`, p != null ? el('span', { class: `delta ${p === 0 ? 'igual' : p > 0 ? 'sobe' : 'desce'}`, text: textoVariacao(p) }) : null]) : null
+  const hojeTxt = hojeJusto != null ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${gemas(hojeJusto)}` }), p != null ? el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) }) : null]) : null
   box.replaceChildren(
     cabPreco(hojeTxt),
-    el('div', { class: 'precos', role: 'list' }, [linha('Rápido', g.rapido), linha('Justo', g.justo, true), linha('Esperar', g.esperar)]),
-    nota.length ? el('p', { class: 'preco-nota' }, nota.flatMap((t, i) => [i ? ' · ' : '', el('span', { text: t })])) : null,
-    credito()
+    el('div', { class: 'precos3', role: 'list' }, pontos.map(cartao)),
+    regua,
+    detalhes.length ? el('div', { class: 'preco-det' }, detalhes) : null
   )
 }
 
