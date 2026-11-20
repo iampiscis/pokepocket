@@ -13,7 +13,7 @@ const PASTA_DADOS = path.join(raiz, 'tier', 'dados')
 
 const API = 'https://pokeidle.io/tracker/api/'
 const AGENTE = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
-const TOPO = Math.min(200, Math.max(50, Number(process.env.META_PVP_TOPO) || 150))
+const TOPO = Math.min(500, Math.max(50, Number(process.env.META_PVP_TOPO) || 500))
 const LIMITES = { partidasMin: 1000, p99: 15, max: 30 }
 const IV_MEDIO = { hp: 21, atk: 21, def: 21, spAtk: 21, spDef: 21, speed: 21 }
 const QUALIDADE_MEDIA = 1.28
