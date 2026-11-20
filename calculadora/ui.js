@@ -633,6 +633,25 @@ function vCel({ id = null, classe = '', icone, rotulo, valor, barra = null, pe =
 
 const pilula = (p) => el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) })
 
+const COR_TIER = { 'S+': '#ff7ec8', S: '#ffc02e', 'S-': '#ffd34d', 'A+': '#4ade80', A: '#42c97a', 'A-': '#3a9a5c', 'B+': '#7dd3fc', B: '#1fa5f5', 'B-': '#5b8fd6', C: '#b9aeb3', D: '#8a8086' }
+function tierDoScore(v) {
+  const c = st.cortes
+  if (!Array.isArray(c) || !c.length || !ehNum(v)) return null
+  return (c.find((x) => v >= Number(x.min)) || c[c.length - 1]).tier
+}
+async function carregarCortes() {
+  try {
+    const r = await fetch('../tier/tier.json', { cache: 'no-cache' })
+    if (!r.ok) return
+    const j = await r.json()
+    const c = j?.janelas?.dia?.cortes
+    if (Array.isArray(c) && c.length) {
+      st.cortes = c
+      if (st.res) pintarVisor()
+    }
+  } catch {}
+}
+
 function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra = '') {
   const v = ehNum(sc) ? Math.round(Number(sc)) : null
   const ho = ehNum(scHoje) ? Math.round(Number(scHoje)) : null
@@ -644,8 +663,8 @@ function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra 
     rotulo,
     valor: el('b', { class: 'v-val' }, [v != null ? fmt.format(v) : '—', d ? el('small', { class: `v-dif ${classeDelta(d)}`, text: `${d > 0 ? '+' : '−'}${fmt.format(Math.abs(d))}` }) : null]),
     barra: escalaScore(v ?? NaN),
-    pe: [el('span', { class: 'v-poder' }, [ico(iconePoder, 12, 'ico-v'), grande(pod)]), pilula(variacao(podHoje, pod))],
-    dica: [faixa ? `Score ${rotulo} ${fmt.format(v)} de 1000 (${faixa[1]})` : '', `Poder ${rotulo} ${grande(pod)}`, dicaExtra].filter(Boolean).join(' · ')
+    pe: [el('span', { class: 'v-poder' }, [ico(iconePoder, 12, 'ico-v'), grande(pod)]), pilula(variacao(podHoje, pod)), icone === 'pvp' && tierDoScore(v) ? el('a', { class: 'v-tier', href: '../tier/', style: `--ct:${COR_TIER[tierDoScore(v)] || '#ffd34d'}`, text: `Tier ${tierDoScore(v)}` }) : null],
+    dica: [faixa ? `Score ${rotulo} ${fmt.format(v)} de 1000 (${faixa[1]})` : '', icone === 'pvp' && tierDoScore(v) ? `Tier ${tierDoScore(v)} no meta de hoje` : '', `Poder ${rotulo} ${grande(pod)}`, dicaExtra].filter(Boolean).join(' · ')
   })
 }
 
@@ -1364,6 +1383,7 @@ async function iniciar() {
   $('carga-barra').style.width = '8%'
   try {
     await motor.carregar(progresso)
+    carregarCortes()
   } catch (err) {
     carga.classList.add('falhou')
     $('carga-txt').textContent = 'Não deu para carregar'

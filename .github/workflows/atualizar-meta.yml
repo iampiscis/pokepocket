@@ -1,0 +1,43 @@
+name: Atualizar meta PvP e tier
+
+on:
+  schedule:
+    - cron: '47 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-meta
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Coletar ranqueado e recalcular
+        run: node ferramentas/atualizar-meta.mjs
+
+      - name: Publicar se mudou
+        run: |
+          git add -A calculadora/meta-pvp.json tier/tier.json tier/dados
+          if git diff --cached --quiet; then
+            echo "nada mudou"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: meta PvP e tier $(date -u +%Y-%m-%d)"
+          for t in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 10
+          done
+          exit 1

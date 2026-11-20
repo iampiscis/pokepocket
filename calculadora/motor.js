@@ -589,3 +589,5 @@ export function spritePng(looktype) {
   if (!q || q.length < 9) return null
   return { url: `jogo/sprites-png/${Number(looktype)}.png`, w: q[7] - q[5], h: q[8] - q[6] }
 }
+
+export const TABELA_TIPOS = TABELA
