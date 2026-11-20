@@ -45,7 +45,7 @@
 
       <div id="calc" class="calc" hidden>
         <section id="visor" class="visor visor-topo" aria-label="Resultado" aria-live="polite">
-          <div id="visor-msg" class="visor-msg"><img src="../assets/pokebola.svg" alt="" /><span id="visor-msg-txt">Cole uma ficha ou busque uma espécie.</span></div>
+          <div id="visor-msg" class="visor-msg"><img src="../assets/pokebola.svg" alt="" /><span id="visor-msg-txt">Cole a ficha ou um print, ou busque uma espécie.</span></div>
           <div id="visor-id" class="visor-id" hidden></div>
           <div id="visor-cels" class="visor-cels" hidden></div>
           <button type="button" id="copiar-topo" class="botao pequeno copiar visor-copiar" title="Copiar link do resultado" aria-label="Copiar link do resultado" data-goatcounter-click="calc-copiar-link-topo" data-goatcounter-title="calc-copiar-link-topo" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Copiar link</span></button>
@@ -58,18 +58,36 @@
               <div class="cab-cartao">
                 <span class="ico-cab" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zM8.5 11h7M8.5 15h4.5"/></svg></span>
                 <h2 id="t-entrada">Seu pokémon</h2>
-                <button type="button" id="trocar" class="botao-leve" aria-expanded="true" aria-controls="entrada" hidden>Trocar</button>
+                <button type="button" id="trocar" class="botao-leve" aria-expanded="true" aria-controls="entrada" hidden>Editar</button>
               </div>
               <div id="identidade" class="identidade" hidden></div>
+              <div id="novo" class="novo" hidden>
+                <span class="novo-rot">Novo pokémon <small>Ctrl+V em qualquer lugar</small></span>
+                <label class="novo-colar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/><path d="M12 10v6M9 13l3 3 3-3"/></svg>
+                  <input id="novo-colar" class="campo" type="text" autocomplete="off" spellcheck="false" placeholder="Cole ficha ou print" title="Cole a ficha ou um print (Ctrl+V)" aria-label="Cole a ficha ou um print" />
+                </label>
+                <div class="novo-bts">
+                  <button type="button" id="novo-buscar" class="botao-leve" title="Buscar espécie" aria-label="Buscar espécie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="so-leitor">Buscar espécie</span></button>
+                  <button type="button" id="novo-imagem" class="botao-leve" title="Escolher imagem do print" aria-label="Escolher imagem do print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5 4.5 4"/></svg><span class="so-leitor">Imagem</span></button>
+                </div>
+              </div>
               <div id="entrada" class="entrada">
                 <div class="abas" role="tablist" aria-label="Como informar o pokémon">
                   <button type="button" role="tab" id="aba-colar" aria-selected="true" aria-controls="painel-colar">Colar ficha</button>
+                  <button type="button" role="tab" id="aba-print" aria-selected="false" aria-controls="painel-print" tabindex="-1">Print</button>
                   <button type="button" role="tab" id="aba-mao" aria-selected="false" aria-controls="painel-mao" tabindex="-1">Montar à mão</button>
                 </div>
                 <div id="painel-colar" class="painel vao" role="tabpanel" aria-labelledby="aba-colar">
                   <label class="dica" for="ficha">Na ficha do jogo, toque em <b>Copiar p/ ChatGPT</b> e cole aqui.</label>
                   <textarea id="ficha" rows="3" spellcheck="false" autocomplete="off" placeholder="Cole o texto da ficha"></textarea>
-                  <p id="status-ficha" class="status" role="status" aria-live="polite"></p>
+                </div>
+                <div id="painel-print" class="painel vao" role="tabpanel" aria-labelledby="aba-print" hidden>
+                  <button type="button" id="zona-print" class="zona-print">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5 4.5 4"/></svg>
+                    <b>Cole (Ctrl+V), solte ou escolha um print da ficha</b>
+                    <small>A imagem é lida no seu navegador e não é enviada.</small>
+                  </button>
                 </div>
                 <div id="painel-mao" class="painel vao" role="tabpanel" aria-labelledby="aba-mao" hidden>
                   <div class="busca">
@@ -80,6 +98,16 @@
                   <div id="editor-hoje" class="editor-hoje"></div>
                 </div>
               </div>
+              <div id="leitura" class="leitura" role="status" aria-live="polite" hidden>
+                <span id="leitura-txt">Lendo o print…</span>
+                <div class="carga-trilho" aria-hidden="true"><i id="leitura-barra"></i></div>
+              </div>
+              <div id="conferir" class="conferir" hidden>
+                <p id="conferir-txt"></p>
+                <button type="button" id="conferir-editar" class="botao-leve">Editar à mão</button>
+              </div>
+              <p id="status-ficha" class="status" role="status" aria-live="polite"></p>
+              <input type="file" id="arquivo-print" accept="image/*" hidden />
             </section>
 
             <section id="cartao-sim" class="placa cartao cartao-sim" aria-labelledby="t-sim" hidden>
@@ -141,6 +169,9 @@
       <p class="rodape">Projeto de fã, sem vínculo com o Pokéidle · <a href="../">Página inicial</a><br />Esta página conta visitas de forma anônima (GoatCounter): sem cookies e sem guardar o seu IP.</p>
     </section>
   </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden><span id="toast-txt"></span><button type="button" id="toast-desfazer">Desfazer</button></div>
+  <div id="soltar" class="soltar" aria-hidden="true" hidden><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5 4.5 4"/></svg><b>Solte o print</b></div></div>
 
   <script data-goatcounter="https://pokepocket.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

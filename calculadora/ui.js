@@ -14,7 +14,6 @@ const faixaNota = (n) => FAIXAS_NOTA.find(([ate]) => Number(n) <= ate) || FAIXAS
 const opcoesPot = () => [1, 2, 3, 4, 5].map((n) => [n, `P${n}`, COR_POT[n]])
 const NIVEL_PADRAO = 2000
 const NIVEL_MAX = 10000
-const CHAVE = 'pokepocket-calc'
 
 const ICONES = {
   nivel: '<path d="M5 21V4"/><path d="M5 4.5c3-1.6 5.5 1.6 8.5 0s4.5-.5 5.5 0v8c-1 .5-2.5 1.6-5.5 0s-5.5 1.6-8.5 0"/>',
@@ -219,14 +218,6 @@ function celula(rotulo, controle) {
   return el('label', { class: 'celula' }, [el('span', { text: rotulo }), controle])
 }
 
-function salvarLocal(txt) {
-  try { localStorage.setItem(CHAVE, txt) } catch {}
-}
-
-function lerLocal() {
-  try { return localStorage.getItem(CHAVE) || '' } catch { return '' }
-}
-
 function codificar() {
   const h = st.hoje
   const s = st.sim
@@ -279,7 +270,6 @@ function gravarEstado() {
   if (!st.hoje) return
   const cod = codificar()
   st.ultimoHash = cod
-  salvarLocal(cod)
   try { history.replaceState(null, '', `#${cod}`) } catch {}
 }
 
@@ -327,6 +317,7 @@ function definirHoje(h, simSalvo = null, recolher = true) {
   st.sim = simSalvo ? normal({ ...simSalvo, ivs: st.hoje.ivs, quality: st.hoje.quality }) : padraoSim(st.hoje)
   if (!st.formas.some((f) => f.speciesId === st.sim.speciesId)) st.sim.speciesId = st.hoje.speciesId
   st.res = null
+  limparConferir()
   montarEditorHoje()
   montarSimulacao()
   pintarIdentidade()
@@ -380,8 +371,9 @@ function abrirEntrada(abrir) {
   const tem = !!st.hoje
   const aberta = !tem || abrir
   $('entrada').hidden = !aberta
+  $('novo').hidden = !tem || aberta
   $('trocar').hidden = !tem
-  $('trocar').textContent = aberta ? 'Fechar' : 'Trocar'
+  $('trocar').textContent = aberta ? 'Fechar' : 'Editar'
   $('trocar').setAttribute('aria-expanded', String(aberta))
 }
 
@@ -823,20 +815,155 @@ function statusFicha(txt, tipo = '') {
   s.className = `status ${tipo}`.trim()
 }
 
-let timerFicha = 0
-async function lerColado() {
-  const t = $('ficha').value.trim()
-  if (!t) return statusFicha('')
+let timerToast = 0
+function mostrarToast(txt, desfazer = null) {
+  const t = $('toast')
+  $('toast-txt').textContent = txt
+  $('toast-desfazer').hidden = !desfazer
+  st.desfazer = desfazer
+  t.hidden = false
+  clearTimeout(timerToast)
+  timerToast = setTimeout(() => { t.hidden = true; st.desfazer = null }, desfazer ? 6000 : 3500)
+}
+
+function trocarPokemon(h, sim = null, recolher = true) {
+  const anterior = st.hoje ? { hoje: { ...pkDe(st.hoje) }, sim: { ...pkDe(st.sim) }, nome: st.nomeHoje } : null
+  definirHoje(h, sim, recolher)
+  if (anterior) {
+    mostrarToast(`${anterior.nome} substituído`, () => {
+      definirHoje(anterior.hoje, anterior.sim, true)
+      statusFicha('')
+    })
+  }
+}
+
+async function carregarFicha(t) {
+  t = String(t || '').trim()
+  if (!t) return false
   let f = null
   try { f = await motor.lerFicha(t) } catch {}
-  if (!f) return statusFicha('Não reconheci esse texto. Copie de novo pelo botão Copiar p/ ChatGPT da ficha.', 'erro')
+  if (!f) {
+    statusFicha('Não reconheci esse texto. Copie de novo pelo botão Copiar p/ ChatGPT da ficha.', 'erro')
+    return false
+  }
   let sid = Number(f.speciesId) || null
   if (!sid && f.nome) {
     try { sid = Number((await motor.buscarEspecies(f.nome, 1))?.[0]?.speciesId) || null } catch {}
   }
-  if (!sid || !especie(sid)) return statusFicha(`Não achei a espécie${f.nome ? ` "${f.nome}"` : ''}.`, 'erro')
-  definirHoje({ ...f, speciesId: sid })
+  if (!sid || !especie(sid)) {
+    statusFicha(`Não achei a espécie${f.nome ? ` "${f.nome}"` : ''}.`, 'erro')
+    return false
+  }
+  trocarPokemon({ ...f, speciesId: sid })
   statusFicha(`Lido: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}`, 'ok')
+  return true
+}
+
+let timerFicha = 0
+async function lerColado() {
+  const t = $('ficha').value.trim()
+  if (!t) return statusFicha('')
+  if (await carregarFicha(t)) $('ficha').value = ''
+}
+
+let leitorMod = null
+function leitor() {
+  leitorMod ??= import('./leitor.js').catch((err) => {
+    leitorMod = null
+    throw err
+  })
+  return leitorMod
+}
+
+function prepararLeitor() {
+  leitor().then((m) => m.preparar?.()).catch(() => {})
+}
+
+function mostrarLeitura(frac) {
+  $('leitura').hidden = false
+  $('leitura-barra').style.width = `${Math.max(6, Math.min(100, (Number(frac) || 0) * 100)).toFixed(1)}%`
+}
+
+function limparConferir() {
+  $('conferir').hidden = true
+  document.querySelector('.cartao-hoje')?.classList.remove('conferir-ivs')
+}
+
+const NOMES_FALTA = { especie: 'a espécie', level: 'o nível', potencia: 'a potência', quality: 'a qualidade', nota: 'a nota' }
+
+function conferirLeitura(r) {
+  const faltas = (r?.faltando || []).filter((k) => k !== 'nota')
+  const avisos = r?.avisos || []
+  const ivs = faltas.some((k) => k.startsWith('ivs.')) || avisos.some((a) => /iv/i.test(a))
+  const itens = [...new Set(faltas.filter((k) => !k.startsWith('ivs.')).map((k) => NOMES_FALTA[k]).filter(Boolean))]
+  if (ivs) itens.unshift('os IVs')
+  if (!itens.length) return
+  const txt = avisos.some((a) => /soma/i.test(a)) ? 'A soma dos IVs não bateu. Confira' : 'Confira'
+  $('conferir-txt').textContent = `${txt} ${itens.join(', ').replace(/, ([^,]*)$/, ' e $1')}.`
+  $('conferir').hidden = false
+  if (ivs) document.querySelector('.cartao-hoje').classList.add('conferir-ivs')
+}
+
+async function lerImagem(arquivo) {
+  if (!st.pronto || !arquivo) return
+  statusFicha('')
+  limparConferir()
+  mostrarLeitura(0)
+  let r = null
+  try {
+    const m = await leitor()
+    r = await m.lerPrint(arquivo, {
+      especiePorNome: typeof motor.especiePorNome === 'function' ? motor.especiePorNome : undefined,
+      buscarEspecies: motor.buscarEspecies,
+      aoProgresso: (f) => mostrarLeitura(f)
+    })
+  } catch {
+    $('leitura').hidden = true
+    statusFicha('Não consegui ler o print agora. Tente de novo ou cole a ficha.', 'erro')
+    return
+  }
+  $('leitura').hidden = true
+  const f = r?.ficha
+  const sid = Number(f?.speciesId) || null
+  if (!sid || !especie(sid)) {
+    statusFicha('Não reconheci o pokémon nesse print. Use um print da ficha inteira ou monte à mão.', 'erro')
+    return
+  }
+  trocarPokemon({ ...f, speciesId: sid })
+  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}`, 'ok')
+  conferirLeitura(r)
+}
+
+function imagemDe(lista) {
+  for (const it of lista || []) {
+    if (it.kind === 'file' && /^image\//.test(it.type)) return it.getAsFile()
+    if (it instanceof File && /^image\//.test(it.type)) return it
+  }
+  return null
+}
+
+function aoColar(e) {
+  const dados = e.clipboardData
+  if (!dados) return false
+  const img = imagemDe(dados.items) || imagemDe(dados.files)
+  if (img) {
+    e.preventDefault()
+    lerImagem(img)
+    return true
+  }
+  const txt = dados.getData('text/plain') || dados.getData('text')
+  if (txt && txt.trim()) {
+    e.preventDefault()
+    carregarFicha(txt)
+    return true
+  }
+  return false
+}
+
+function abrirBusca() {
+  abrirEntrada(true)
+  trocarAba('mao')
+  $('busca').focus()
 }
 
 let timerBusca = 0
@@ -863,21 +990,23 @@ function buscar() {
 
 function escolherEspecie(e) {
   const base = st.hoje || { level: 100, potencia: 1, quality: 1, shiny: false, ivs: Object.fromEntries(STATS.map(([k]) => [k, 16])), refino: {} }
-  definirHoje({ ...base, speciesId: e.speciesId, nome: e.nome, refino: {} }, null, false)
+  trocarPokemon({ ...base, speciesId: e.speciesId, nome: e.nome, refino: {} }, null, false)
   $('busca').value = ''
   $('resultados').hidden = true
   $('resultados').replaceChildren()
   statusFicha('')
 }
 
+const ABAS = ['colar', 'print', 'mao']
+
 function trocarAba(qual) {
-  const colar = qual === 'colar'
-  $('aba-colar').setAttribute('aria-selected', String(colar))
-  $('aba-mao').setAttribute('aria-selected', String(!colar))
-  $('aba-colar').tabIndex = colar ? 0 : -1
-  $('aba-mao').tabIndex = colar ? -1 : 0
-  $('painel-colar').hidden = !colar
-  $('painel-mao').hidden = colar
+  for (const a of ABAS) {
+    const sel = a === qual
+    $(`aba-${a}`).setAttribute('aria-selected', String(sel))
+    $(`aba-${a}`).tabIndex = sel ? 0 : -1
+    $(`painel-${a}`).hidden = !sel
+  }
+  if (qual === 'print') prepararLeitor()
 }
 
 let timerLink = 0
@@ -1031,16 +1160,80 @@ function ligarEventos() {
     if (e.key === 'ArrowUp' && i === 0) return $('busca').focus()
     bts[Math.max(0, Math.min(bts.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))].focus()
   })
-  $('aba-colar').addEventListener('click', () => trocarAba('colar'))
-  $('aba-mao').addEventListener('click', () => trocarAba('mao'))
-  for (const id of ['aba-colar', 'aba-mao']) {
-    $(id).addEventListener('keydown', (e) => {
+  ABAS.forEach((a, i) => {
+    $(`aba-${a}`).addEventListener('click', () => trocarAba(a))
+    $(`aba-${a}`).addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
-      const outro = id === 'aba-colar' ? 'mao' : 'colar'
+      const outro = ABAS[(i + (e.key === 'ArrowRight' ? 1 : ABAS.length - 1)) % ABAS.length]
       trocarAba(outro)
       $(`aba-${outro}`).focus()
     })
+  })
+  $('ficha').addEventListener('paste', (e) => {
+    const img = imagemDe(e.clipboardData?.items) || imagemDe(e.clipboardData?.files)
+    if (img) {
+      e.preventDefault()
+      lerImagem(img)
+    }
+  })
+  $('novo-colar').addEventListener('paste', (e) => aoColar(e))
+  $('novo-colar').addEventListener('input', () => { $('novo-colar').value = '' })
+  $('novo-buscar').addEventListener('click', abrirBusca)
+  $('novo-imagem').addEventListener('click', () => $('arquivo-print').click())
+  $('zona-print').addEventListener('click', () => $('arquivo-print').click())
+  for (const id of ['zona-print', 'novo-imagem', 'novo-colar']) {
+    $(id).addEventListener('pointerenter', prepararLeitor, { once: true })
+    $(id).addEventListener('focus', prepararLeitor, { once: true })
   }
+  $('arquivo-print').addEventListener('change', () => {
+    const f = $('arquivo-print').files?.[0]
+    $('arquivo-print').value = ''
+    if (f) lerImagem(f)
+  })
+  $('conferir-editar').addEventListener('click', () => {
+    abrirEntrada(true)
+    trocarAba('mao')
+    $('editor-hoje').querySelector('.grade6 .campo')?.focus()
+  })
+  $('toast-desfazer').addEventListener('click', () => {
+    const f = st.desfazer
+    st.desfazer = null
+    $('toast').hidden = true
+    clearTimeout(timerToast)
+    if (f) f()
+  })
+  document.addEventListener('paste', (e) => {
+    if (!st.pronto || e.defaultPrevented) return
+    const alvo = e.target
+    if (alvo instanceof Element && alvo.closest('input, textarea, select, [contenteditable="true"]')) return
+    aoColar(e)
+  })
+  let arrastando = 0
+  const temArquivo = (e) => [...(e.dataTransfer?.types || [])].includes('Files')
+  window.addEventListener('dragenter', (e) => {
+    if (!st.pronto || !temArquivo(e)) return
+    arrastando++
+    $('soltar').hidden = false
+  })
+  window.addEventListener('dragover', (e) => {
+    if (!temArquivo(e)) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+  })
+  window.addEventListener('dragleave', (e) => {
+    if (!temArquivo(e)) return
+    arrastando = Math.max(0, arrastando - 1)
+    if (!arrastando) $('soltar').hidden = true
+  })
+  window.addEventListener('drop', (e) => {
+    if (!temArquivo(e)) return
+    e.preventDefault()
+    arrastando = 0
+    $('soltar').hidden = true
+    const f = [...(e.dataTransfer.files || [])].find((x) => /^image\//.test(x.type))
+    if (f) lerImagem(f)
+    else statusFicha('Solte uma imagem (print da ficha).', 'erro')
+  })
   $('trocar').addEventListener('click', () => abrirEntrada($('entrada').hidden))
   $('voltar').addEventListener('click', () => {
     if (!st.hoje) return
@@ -1100,10 +1293,9 @@ async function iniciar() {
   st.pronto = true
   carga.hidden = true
   $('calc').hidden = false
+  try { localStorage.removeItem('pokepocket-calc') } catch {}
   const doLink = location.hash.replace(/^#/, '')
-  if (doLink && aplicarCodigo(doLink)) return
-  const salvo = lerLocal()
-  if (salvo) aplicarCodigo(salvo)
+  if (doLink) aplicarCodigo(doLink)
 }
 
 ligarEventos()
