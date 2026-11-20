@@ -1114,7 +1114,7 @@ async function imagemPrevia(s, resumo) {
   const { desenharCartao } = await import('./cartao.js')
   const forma = formaSim()
   const look = lookDe(forma, st.sim.shiny)
-  const png = look != null && typeof motor.spritePng === 'function' ? motor.spritePng(look) : null
+  const png = typeof motor.spritePng === 'function' ? [].concat(look ?? []).map((lt) => motor.spritePng(lt)).find(Boolean) || null : null
   return desenharCartao({
     nome: resumo.nome,
     shiny: !!st.sim.shiny,
