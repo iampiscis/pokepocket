@@ -245,7 +245,7 @@
         const el = document.getElementById('visitas');
         if (!el) return;
         let c = guarda('pp-visitas');
-        if (!c) { try { const r = await fetch('https://pokepocket.goatcounter.com/counter/TOTAL.json'); if (r.ok) { const j = await r.json(); c = { v: String(j.count_unique ?? j.count ?? '').trim().replace(/,/g, '.') }; salva('pp-visitas', c.v) } } catch {} }
+        if (!c) { try { const r = await fetch(`https://pokepocket.goatcounter.com/counter/TOTAL.json?start=2025-01-01&t=${Math.floor(Date.now() / 600000)}`); if (r.ok) { const j = await r.json(); c = { v: String(j.count_unique ?? j.count ?? '').trim().replace(/,/g, '.') }; salva('pp-visitas', c.v) } } catch {} }
         const v = c && c.v;
         if (!v || !/[1-9]/.test(v)) return;
         el.querySelector('b').textContent = v;
