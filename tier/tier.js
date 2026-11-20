@@ -309,9 +309,18 @@ function defesas(tipos, tabela) {
 }
 
 function listaDefesa(rot, itens, cls) {
+  const grupos = new Map()
+  for (const [t, v] of itens) {
+    if (!grupos.has(v)) grupos.set(v, [])
+    grupos.get(v).push(t)
+  }
+  const rotMult = (v) => (v === 0 ? 'imune' : MULT_TXT.get(v) || `×${fmtPct.format(v)}`)
+  const nivel = (v) => (v === 0 ? 'zero' : v >= 4 ? 'forte' : v > 1 ? 'medio' : v <= 0.25 ? 'forte' : 'medio')
   return el('div', { class: `def-l ${cls}` }, [
     el('span', { class: 'def-rot', text: rot }),
-    el('span', { class: 'def-itens' }, itens.length ? itens.map(([t, v]) => el('span', { class: 'def-i' }, [chipTipo(t), el('b', { text: MULT_TXT.get(v) || `×${fmtPct.format(v)}` })])) : el('span', { class: 'def-nada', text: 'nenhum' }))
+    itens.length
+      ? el('div', { class: 'def-grupos' }, [...grupos].map(([v, ts]) => el('div', { class: `def-g ${nivel(v)}` }, [el('span', { class: 'def-mult', text: rotMult(v) }), el('span', { class: 'def-tipos' }, ts.map(chipTipo))])))
+      : el('span', { class: 'def-nada', text: 'nenhum' })
   ])
 }
 
@@ -354,12 +363,6 @@ function pintarFicha({ p, tier, fora }) {
   const evo = el('div', { class: 'f-evo', 'aria-busy': 'true' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
   const defs = el('div', { class: 'f-defs' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
   const stats = el('div', { class: 'f-stats' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
-  const ok = el('span', { class: 'f-ok', role: 'status', 'aria-live': 'polite' })
-  const copiar = el('button', { type: 'button', class: 'botao pequeno vazado' }, [ico('link'), 'Copiar link'])
-  copiar.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(location.href); ok.textContent = 'Link copiado' } catch { ok.textContent = 'Não deu para copiar' }
-    setTimeout(() => { ok.textContent = '' }, 2500)
-  })
   const corTier = COR_TIER[tier] || '#a1a1aa'
   $('ficha-corpo').replaceChildren(
     el('button', { type: 'button', class: 'f-fechar', 'aria-label': 'Fechar', title: 'Fechar (Esc)', 'data-fechar': '' }, [ico('fechar')]),
@@ -381,11 +384,7 @@ function pintarFicha({ p, tier, fora }) {
     ]),
     el('div', { class: 'f-nums' }, [num('uso', p.uso, '%'), num('vitórias', p.vitorias, '%'), num('aparições', p.n)]),
     bloco('evo', 'Linha evolutiva', evo, 'f-bloco-evo'),
-    el('div', { class: 'f-duas' }, [bloco('escudo', 'Tipos contra', defs), bloco('stats', 'Stats base', stats)]),
-    el('footer', { class: 'f-pe' }, [
-      el('a', { class: 'botao pequeno', href: linkCalc(p) }, [ico('calc'), 'Abrir na calculadora']),
-      copiar, ok
-    ])
+    el('div', { class: 'f-duas' }, [bloco('escudo', 'Tipos contra', defs), bloco('stats', 'Stats base', stats)])
   )
   carregarMotor().then((m) => {
     if (seq !== fichaSeq) return
