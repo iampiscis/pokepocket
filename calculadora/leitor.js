@@ -473,6 +473,25 @@ function localizarIvs(origem, reg, porCor = true) {
   trilhas(base, h, w, (y, x) => y * w + x, maxH, (y, x) => apagarH.push(y * w + x))
   for (const i of apagarV) cor[i] = solto[i] = 0
   for (const i of apagarH) base[i] = 0
+  if (porCor) {
+    const apagarS = []
+    trilhas(solto, h, w, (y, x) => y * w + x, maxH, (y, x) => apagarS.push(y * w + x))
+    for (const i of apagarS) solto[i] = 0
+  }
+  const valorDe = (f, xFim) => {
+    const hb = f.y1 - f.y0 + 1
+    const ocupada = (x) => { for (let y = f.y0; y <= f.y1; y++) if (solto[y * w + x]) return true; return false }
+    let x = xFim
+    while (x >= 0 && xFim - x < hb * 0.6 && ocupada(x)) x--
+    while (x >= 0 && xFim - x <= hb * 3 && !ocupada(x)) x--
+    if (x < 0 || !ocupada(x)) return null
+    const x1 = x
+    let x0 = x, vazio = 0
+    for (; x >= 0; x--) {
+      if (ocupada(x)) { x0 = x; vazio = 0 } else if (++vazio > hb * 0.9) break
+    }
+    return x1 - x0 >= hb * 0.4 ? { x0: p.x + x0, x1: p.x + x1 + 1 } : null
+  }
   if (!porCor) cor.set(solto)
   const direita = new Int32Array(h).fill(-1)
   for (let y = 0; y < h; y++) for (let x = w - 1; x >= 0; x--) if (cor[y * w + x]) { direita[y] = x; break }
@@ -514,6 +533,7 @@ function localizarIvs(origem, reg, porCor = true) {
     if (separador && colDireita - separador.x1 >= hb * 1.5) xl = separador.x1 + 1
     const maior = lacunas.filter((l) => l.x0 > xl).sort((a, b) => largura(b) - largura(a) || a.x0 - b.x0)[0]
     return {
+      valor: valorDe(f, xl - 1),
       x0: p.x + xl, x1: p.x + colDireita + 1, y0: p.y + f.y0, y1: p.y + f.y1 + 1,
       corte: maior && maior.x1 - maior.x0 + 1 >= hb * 0.15 ? p.x + maior.x1 + 1 : null
     }
@@ -677,6 +697,61 @@ function candidatosNome(linhas, limiteY) {
     .filter((t) => !vistos.has(t.toLowerCase()) && vistos.add(t.toLowerCase()))
 }
 
+function caixaDoSelo(origem, titulo) {
+  const th = altura(titulo)
+  const p = lerPixels(origem, titulo.x1 - th * 3, titulo.y0 - th * 0.2, th * 9, th * 1.4)
+  const d = p.img.data
+  const colunas = new Array(p.w).fill(0)
+  let y0 = p.h, y1 = -1
+  for (let y = 0; y < p.h; y++) {
+    for (let x = 0; x < p.w; x++) {
+      const i = (y * p.w + x) * 4
+      const r = d[i], g = d[i + 1], b = d[i + 2]
+      if (g > 70 && g > r * 1.35 && g > b * 1.15) {
+        colunas[x]++
+        if (y < y0) y0 = y
+        if (y > y1) y1 = y
+      }
+    }
+  }
+  const minimo = Math.max(2, th * 0.25)
+  let x0 = -1, x1 = -1
+  for (let x = 0; x < p.w; x++) {
+    if (colunas[x] >= minimo) {
+      if (x0 < 0) x0 = x
+      x1 = x
+    } else if (x0 >= 0 && x - x1 > th * 0.6) break
+  }
+  if (x0 < 0 || x1 - x0 < th * 0.8 || y1 - y0 < th * 0.4) return null
+  return { x0: p.x + x0 - 1, x1: p.x + x1 + 2, y0: p.y + y0 - 1, y1: p.y + y1 + 2 }
+}
+
+function binarioDoSelo(origem, c) {
+  const ch = c.y1 - c.y0
+  const esc = limitar(84 / ch, 2, 8)
+  const p = lerPixels(origem, c.x0 + ch * 0.2, c.y0 + ch * 0.15, c.x1 - c.x0 - ch * 0.4, ch * 0.7, esc)
+  const d = p.img.data
+  const L = new Float32Array(p.w * p.h)
+  for (let i = 0; i < L.length; i++) L[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]
+  const ord = Float32Array.from(L).sort()
+  const limite = (ord[Math.floor(ord.length * 0.6)] + ord[Math.floor(ord.length * 0.03)]) / 2
+  const m = 16
+  const tela = document.createElement('canvas')
+  tela.width = p.w + 2 * m
+  tela.height = p.h + 2 * m
+  const g = tela.getContext('2d')
+  g.fillStyle = '#fff'
+  g.fillRect(0, 0, tela.width, tela.height)
+  const img = g.getImageData(m, m, p.w, p.h)
+  for (let i = 0; i < L.length; i++) {
+    const v = L[i] < limite ? 0 : 255
+    img.data[i * 4] = img.data[i * 4 + 1] = img.data[i * 4 + 2] = v
+    img.data[i * 4 + 3] = 255
+  }
+  g.putImageData(img, m, m)
+  return tela
+}
+
 const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
 
 function lerChips(texto) {
@@ -727,7 +802,7 @@ async function executar(imagem, opcoes) {
   let feitos = 0
   const ctx = { worker, origem, passo: () => avisar(0.75 + Math.min(0.23, ++feitos * 0.02), 'Conferindo os números') }
 
-  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmAoe: false }
+  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmAoe: false, stats: null, statsOpcoes: null, selo: null }
   const avisos = []
 
   const cartoes = localizarCartoes(linhas, W)
@@ -821,6 +896,23 @@ async function executar(imagem, opcoes) {
   }
   const cand = candidatosNome([...linhas.filter((l) => l.y1 <= limiteTopo), ...cabecalho], null)
   const esp = identificarEspecie(cand, numero, especiePorNome, buscarEspecies)
+  const palavrasNome = normalizarNome(esp?.nome || '').split(' ').filter((w) => w.length >= 3)
+  const pontoTitulo = (l) => normalizarNome(l.t).split(' ').filter((w) => palavrasNome.some((n) => distancia(w, n) <= 1)).length
+  const titulo = cabecalho.filter((l) => pontoTitulo(l) > 0).sort((a, b) => pontoTitulo(b) - pontoTitulo(a) || altura(b) - altura(a) || b.y0 - a.y0)[0]
+  const seloTexto = [...linhas.filter((l) => l.y1 <= limiteTopo), ...cabecalho].map((l) => /\+\s?(\d{1,4})\b/.exec(l.t)).find(Boolean)
+  if (seloTexto) ficha.selo = Number(seloTexto[1])
+  else if (titulo) {
+    const caixaSelo = caixaDoSelo(origem, titulo)
+    if (caixaSelo) {
+      const tela = binarioDoSelo(origem, caixaSelo)
+      for (const psm of ['8', '7']) {
+        const t = (await reconhecer(worker, tela, psm, '+0123456789')).text.replace(/\s+/g, '')
+        ctx.passo()
+        const m = /\+(\d{1,4})/.exec(t) || /^4(\d{1,4})$/.exec(t) || /^(\d{1,4})$/.exec(t)
+        if (m) { ficha.selo = Number(m[1]); break }
+      }
+    }
+  }
   if (esp) {
     ficha.speciesId = esp.speciesId
     ficha.nome = esp.nome
@@ -832,11 +924,18 @@ async function executar(imagem, opcoes) {
   const regiaoIvs = { x0: W * 0.4, x1: W, y0: yTopo, y1: yFim }
   const qualidadeTokens = (ts) => ts.length !== 6 ? -1 : ts.filter((t) => {
     const hb = t.y1 - t.y0
-    return t.corte != null && t.corte - t.x0 >= hb * 0.8 && t.x1 - t.corte >= hb * 0.4
+    const larg = t.x1 - t.x0
+    if (larg > hb * 5.5) return false
+    return (t.corte != null && t.corte - t.x0 >= hb * 0.8 && t.x1 - t.corte >= hb * 0.4) || (larg >= hb * 1.8 && larg <= hb * 4.5)
   }).length
   const porCor = localizarIvs(origem, regiaoIvs)
   const porLuz = localizarIvs(origem, regiaoIvs, false)
-  const tokens = qualidadeTokens(porLuz) > qualidadeTokens(porCor) ? porLuz : porCor
+  const [tokens, outros] = qualidadeTokens(porLuz) > qualidadeTokens(porCor) ? [porLuz, porCor] : [porCor, porLuz]
+  tokens.forEach((t) => {
+    if (t.valor) return
+    const par = outros.find((o) => o.valor && Math.abs(o.y0 - t.y0) <= 2 && o.valor.x1 <= t.x1)
+    if (par) t.valor = par.valor
+  })
   const opcoesIv = STATS.map(() => [])
   if (tokens.length === 6) {
     const pad = (t) => (t.y1 - t.y0) * 0.35
@@ -855,6 +954,36 @@ async function executar(imagem, opcoes) {
     ]
     for (const [textos, soDigitos] of leituras) {
       textos.forEach((t, i) => { for (const v of ivsDeTexto(t, soDigitos)) if (!opcoesIv[i].includes(v)) opcoesIv[i].push(v) })
+    }
+  }
+  if (tokens.length === 6 && tokens.every((t) => t.valor)) {
+    const caixas = tokens.map((t) => {
+      const hb = t.y1 - t.y0
+      return { caixa: { x0: t.valor.x0 - hb * 0.4, x1: t.valor.x1 + hb * 0.4, y0: t.y0 - hb * 0.45, y1: t.y1 + hb * 0.45 }, h: hb * 1.1 }
+    })
+    const valorDeTexto = (t) => {
+      const d = digitos(t).replace(/[^0-9]/g, '')
+      return d && d.length <= 9 ? Number(d) : null
+    }
+    const leituras = [
+      await lerPilha(ctx, caixas, '0123456789.,', 0, { ampliarAntes: true }),
+      await lerPilha(ctx, caixas, '0123456789.,'),
+      await lerPilha(ctx, caixas, '0123456789.,', 160)
+    ].map((l) => l.map(valorDeTexto))
+    const stats = {}
+    const opcoesStats = {}
+    STATS.forEach((k, i) => {
+      const vals = leituras.map((l) => l[i]).filter((v) => v != null && v > 0)
+      if (!vals.length) return
+      const contagem = new Map()
+      for (const v of vals) contagem.set(v, (contagem.get(v) || 0) + 1)
+      const ordem = [...contagem].sort((a, b) => b[1] - a[1] || vals.indexOf(a[0]) - vals.indexOf(b[0])).map(([v]) => v)
+      stats[k] = ordem[0]
+      opcoesStats[k] = ordem
+    })
+    if (Object.keys(stats).length) {
+      ficha.stats = stats
+      ficha.statsOpcoes = opcoesStats
     }
   }
   const daPassada = ivsDaPassada(linhas, yTopo, yFim)
@@ -908,6 +1037,39 @@ async function executar(imagem, opcoes) {
 
   avisar(1, 'Pronto')
   return { ficha, faltando, avisos, confianca }
+}
+
+const REFINAVEIS = ['hp', 'atk', 'def', 'spAtk', 'spDef']
+
+export function refinoPelosStats(pk, stats, motor) {
+  if (!pk || !stats || typeof motor?.simular !== 'function') return null
+  const opcoes = Object.fromEntries(STATS.map((k) => [k, (Array.isArray(stats[k]) ? stats[k] : [stats[k]]).map(Number).filter((v) => v > 0)]))
+  const simular = (refino) => motor.simular({ ...pk, refino })?.stats || null
+  const zero = { hp: 0, atk: 0, def: 0, spAtk: 0, spDef: 0 }
+  const base = simular(zero)
+  if (!base || !opcoes.speed.includes(base.speed)) return null
+  const PASSO = 1000
+  const teste = simular(Object.fromEntries(REFINAVEIS.map((k) => [k, PASSO])))
+  if (!teste) return null
+  const refino = { ...zero }
+  for (const k of REFINAVEIS) {
+    const porPonto = (teste[k] - base[k]) / PASSO
+    if (!(porPonto > 0)) return null
+    let achado = null
+    for (const alvo of opcoes[k]) {
+      const estimado = Math.max(0, Math.round((alvo - base[k]) / porPonto))
+      const tentativas = porPonto < 1
+        ? Array.from({ length: Math.ceil(2 / porPonto) + 1 }, (_, i) => i)
+        : [0, -1, 1, -2, 2].map((d) => estimado + d).filter((v) => v >= 0)
+      achado = tentativas.find((v) => simular({ ...zero, [k]: v })?.[k] === alvo) ?? null
+      if (achado != null) break
+    }
+    if (achado == null && porPonto < 1) achado = 0
+    if (achado == null) return null
+    refino[k] = achado
+  }
+  const final = simular(refino)
+  return final && REFINAVEIS.every((k) => opcoes[k].includes(final[k]) || (base[k] === final[k] && (teste[k] - base[k]) / PASSO < 1)) ? refino : null
 }
 
 export function lerPrint(imagem, opcoes = {}) {

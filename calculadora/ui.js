@@ -12,7 +12,6 @@ const corQual = (q) => COR_POT[q >= 1.7 ? 5 : q >= 1.5 ? 4 : q >= 1.4 ? 3 : q >=
 const corIv = (v) => (v <= 6 ? '#ff6b6b' : v <= 10 ? '#ff9a3c' : v <= 14 ? '#ffd93d' : v <= 26 ? '#2ecc71' : '#7dff9a')
 const faixaNota = (n) => FAIXAS_NOTA.find(([ate]) => Number(n) <= ate) || FAIXAS_NOTA[FAIXAS_NOTA.length - 1]
 const opcoesPot = () => [1, 2, 3, 4, 5].map((n) => [n, `P${n}`, COR_POT[n]])
-const NIVEL_PADRAO = 2000
 const NIVEL_MAX = 10000
 
 const ICONES = {
@@ -81,7 +80,7 @@ function normal(x = {}) {
     speciesId: Number(x.speciesId) || null,
     level: inteiro(x.level || 1, 1, NIVEL_MAX),
     potencia: inteiro(x.potencia || 1, 1, 5),
-    quality: q > 0 ? Math.round(q * 100) / 100 : 1,
+    quality: q > 0 ? Math.round(q * 1000) / 1000 : 1,
     shiny: !!x.shiny,
     ivs,
     refino,
@@ -92,7 +91,7 @@ function normal(x = {}) {
 }
 
 const pkDe = (x) => ({ speciesId: x.speciesId, level: x.level, potencia: x.potencia, quality: x.quality, shiny: x.shiny, ivs: { ...x.ivs }, refino: { ...x.refino }, tmElemental: x.tmElemental, tmFisico: x.tmFisico, tmAoe: x.tmAoe })
-const padraoSim = (h) => ({ ...pkDe(h), level: Math.max(h.level, NIVEL_PADRAO) })
+const padraoSim = (h) => ({ ...pkDe(h) })
 const somaRefino = (r) => STATS.reduce((t, [k]) => t + (r?.[k] || 0), 0)
 const somaIvs = (r) => STATS.reduce((t, [k]) => t + (r?.[k] || 0), 0)
 
@@ -260,7 +259,7 @@ function decodificar(txt) {
   const sim = {
     ...hoje,
     speciesId: Number(p.get('f')) || sid,
-    level: Number(p.get('sn')) || Math.max(hoje.level, NIVEL_PADRAO),
+    level: Number(p.get('sn')) || hoje.level,
     potencia: p.has('sp') ? Number(p.get('sp')) : hoje.potencia,
     shiny: p.has('ss') ? p.get('ss') === '1' : hoje.shiny,
     refino: lista(p.get('sr')),
@@ -355,7 +354,7 @@ function montarEditorHoje() {
   }
   const nivel = passos({ valor: h.level, min: 1, max: NIVEL_MAX, passo: 10, rotulo: 'nível de hoje', aoMudar: muda('level') })
   const mudaQual = muda('quality')
-  const qual = passos({ valor: h.quality, min: 0.5, max: 2, passo: 0.01, casas: 2, rotulo: 'qualidade', classe: 'colorido', aoMudar: (v) => { qual.style.setProperty('--vc', corQual(v)); mudaQual(v) } })
+  const qual = passos({ valor: h.quality, min: 0.5, max: 2, passo: 0.001, casas: 3, rotulo: 'qualidade', classe: 'colorido', aoMudar: (v) => { qual.style.setProperty('--vc', corQual(v)); mudaQual(v) } })
   qual.style.setProperty('--vc', corQual(h.quality))
   const pot = seg(opcoesPot(), h.potencia, muda('potencia'), 'Potência de hoje', 'pot')
   const shiny = alternar('Shiny', 'estrela', h.shiny, muda('shiny'), 'shiny')
@@ -402,7 +401,7 @@ function pintarIdentidade() {
     el('div', { class: 'id-dados' }, [
       dado('Nível', fmt.format(h.level)),
       dado('Pot', `P${h.potencia}`, null, { class: 'pot-cel', style: `--pc:${COR_POT[h.potencia]}` }),
-      dado('Qual', fmt2.format(h.quality), null, { style: `--vc:${corQual(h.quality)}`, class: 'cor-cel' }),
+      dado('Qual', fmt3.format(h.quality), null, { style: `--vc:${corQual(h.quality)}`, class: 'cor-cel' }),
       (st.ui.notaHojeCel = dado('Nota', '', st.ui.notaHoje, { class: 'cor-cel' }))
     ]),
     el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}${h.tmElemental ? ` · Z-\u2060Move ${nomeTipo(h.tmElemental)}${h.tmAoe ? ' em área' : ''}` : ''}` })]),
@@ -973,8 +972,16 @@ async function lerImagem(arquivo) {
     statusFicha('Não reconheci o pokémon nesse print. Use um print da ficha inteira ou monte à mão.', 'erro')
     return
   }
-  trocarPokemon({ ...f, speciesId: sid })
-  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}`, 'ok')
+  let refino = f.refino || {}
+  let refinoAviso = ''
+  if (f.stats) {
+    let deduzido = null
+    try { deduzido = (await leitor()).refinoPelosStats?.({ ...f, speciesId: sid }, f.statsOpcoes || f.stats, motor) } catch {}
+    if (deduzido) refino = deduzido
+    else refinoAviso = ' Não deu para conferir o refino; ajuste à mão.'
+  }
+  trocarPokemon({ ...f, speciesId: sid, refino })
+  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}${refinoAviso ? `.${refinoAviso}` : ''}`, 'ok')
   conferirLeitura(r)
 }
 
