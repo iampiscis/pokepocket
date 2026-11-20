@@ -1,10 +1,17 @@
 import * as motor from './motor.js'
+import { codificarCompacto, decodificarCompacto } from './link.js'
 
 const STATS = [['hp', 'HP'], ['atk', 'ATK'], ['def', 'DEF'], ['spAtk', 'SP.ATK'], ['spDef', 'SP.DEF'], ['speed', 'VEL']]
 const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
 const NOME_TIPO = { NORMAL: 'Normal', FIRE: 'Fogo', WATER: 'Água', ELECTRIC: 'Elétrico', GRASS: 'Planta', ICE: 'Gelo', FIGHTING: 'Lutador', POISON: 'Veneno', GROUND: 'Terra', FLYING: 'Voador', PSYCHIC: 'Psíquico', BUG: 'Inseto', ROCK: 'Pedra', GHOST: 'Fantasma', DRAGON: 'Dragão', DARK: 'Sombrio', STEEL: 'Aço', FAIRY: 'Fada' }
 const COR_TIPO = { NORMAL: '#9a9a6e', FIRE: '#e8742a', WATER: '#4f7fe6', ELECTRIC: '#d9b51c', GRASS: '#5fae38', ICE: '#5ec2be', FIGHTING: '#b8302a', POISON: '#9a3c98', GROUND: '#c9a24c', FLYING: '#8f78e0', PSYCHIC: '#ec4b7d', BUG: '#94a61a', ROCK: '#a8952f', GHOST: '#6a4f8f', DRAGON: '#6a35ea', DARK: '#6a5345', STEEL: '#8c8cae', FAIRY: '#d0739f' }
 const FAIXAS = [[0, 'Baixo', '#f87171'], [300, 'Regular', '#fb923c'], [500, 'Bom', '#facc15'], [700, 'Excelente', '#4ade80']]
+const COR_POT = { 1: '#b9aeb3', 2: '#6bc96b', 3: '#1fa5f5', 4: '#be66ff', 5: '#ffc02e' }
+const FAIXAS_NOTA = [[1, 'Extremamente fraco', '#b0b5bc'], [2, 'Fraco', '#c94444'], [3, 'Mediano', '#f08830'], [4, 'Razoável', '#3a9a5c'], [5, 'Bom', '#8ee4a8'], [6, 'Forte', '#42ff9a'], [7, 'Poderoso', '#c8b4ff'], [8, 'Mítico', '#d896ff'], [9, 'Lendário', '#ffb8dc'], [Infinity, 'Divino', '#ff7ec8']]
+const corQual = (q) => COR_POT[q >= 1.7 ? 5 : q >= 1.5 ? 4 : q >= 1.4 ? 3 : q >= 1.2 ? 2 : 1]
+const corIv = (v) => (v <= 6 ? '#ff6b6b' : v <= 10 ? '#ff9a3c' : v <= 14 ? '#ffd93d' : v <= 26 ? '#2ecc71' : '#7dff9a')
+const faixaNota = (n) => FAIXAS_NOTA.find(([ate]) => Number(n) <= ate) || FAIXAS_NOTA[FAIXAS_NOTA.length - 1]
+const opcoesPot = () => [1, 2, 3, 4, 5].map((n) => [n, `P${n}`, COR_POT[n]])
 const NIVEL_PADRAO = 2000
 const NIVEL_MAX = 10000
 const CHAVE = 'pokepocket-calc'
@@ -22,12 +29,15 @@ const ICONES = {
   poderPve: '<path d="M3 19.5 9 9l4 6 2.5-3.5 5.5 8z"/><circle cx="16.5" cy="6" r="2"/>',
   golpe: '<path d="M4.5 19.5 14 10M14 10l1.5-5.5L20 3l-1.5 4.5L13 9zM9 15l-3-3M7.5 13.5 4 10"/>',
   stats: '<path d="M5 20V11M10 20V5M15 20v-7M20 20V8"/>',
+  gema: '<path d="M6.5 4.5h11l3.5 5-9 10.5L3 9.5z"/><path d="M3 9.5h18M9.5 4.5 12 9.5l2.5-5M12 9.5V20"/>',
   estrela: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   area: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/>'
 }
 
 const fmt = new Intl.NumberFormat('pt-BR')
 const fmt1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const fmt3 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
+const fmtNota = (v) => fmt3.format(Number(v))
 const fmt2 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const fmtCurto = new Intl.NumberFormat('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
 const ehNum = (v) => v != null && v !== '' && Number.isFinite(Number(v))
@@ -109,10 +119,12 @@ function sprite(looktype, tam) {
     return caixa
   }
   const cel = Number(s.cell) || 32
-  const [x0, y0, x1, y1] = Array.isArray(s.caixa) && s.caixa.length === 4 ? s.caixa : [0, 0, cel, cel]
+  const fw = Number(s.w ?? s.largura) || cel
+  const fh = Number(s.h ?? s.altura) || cel
+  const [x0, y0, x1, y1] = Array.isArray(s.caixa) && s.caixa.length === 4 && s.caixa[2] > s.caixa[0] && s.caixa[3] > s.caixa[1] ? s.caixa.map(Number) : [0, 0, fw, fh]
   const w = Math.max(1, x1 - x0)
   const h = Math.max(1, y1 - y0)
-  const esc = (tam * 0.92) / Math.max(w, h)
+  const esc = (tam * 0.88) / Math.max(w, h)
   const img = el('i', { style: `width:${w}px;height:${h}px;background-position:${-((Number(s.x) || 0) + x0)}px ${-((Number(s.y) || 0) + y0)}px;transform:translate(-50%,-50%) scale(${esc.toFixed(4)})` })
   img.style.backgroundImage = `url("${String(s.url).replace(/"/g, '%22')}")`
   caixa.append(img)
@@ -173,14 +185,14 @@ function passos({ valor, min, max, passo = 1, casas = 0, rotulo, aoMudar, classe
   return raiz
 }
 
-function seg(opcoes, atual, aoMudar, rotulo) {
-  const bts = opcoes.map(([k, txt]) => el('button', { type: 'button', 'aria-pressed': String(k === atual), text: txt }))
+function seg(opcoes, atual, aoMudar, rotulo, classe = '') {
+  const bts = opcoes.map(([k, txt, cor]) => el('button', { type: 'button', 'aria-pressed': String(k === atual), text: txt, style: cor ? `--pc:${cor}` : null }))
   const definir = (k) => bts.forEach((b, i) => b.setAttribute('aria-pressed', String(opcoes[i][0] === k)))
   bts.forEach((b, i) => b.addEventListener('click', () => {
     definir(opcoes[i][0])
     aoMudar(opcoes[i][0])
   }))
-  const raiz = el('div', { class: 'seg', role: 'group', 'aria-label': rotulo }, bts)
+  const raiz = el('div', { class: `seg ${classe}`.trim(), role: 'group', 'aria-label': rotulo }, bts)
   raiz.definir = definir
   return raiz
 }
@@ -272,7 +284,14 @@ function gravarEstado() {
 }
 
 function aplicarCodigo(txt) {
-  const d = decodificar(txt)
+  let d = null
+  const k = /^#?k=([A-Za-z0-9_-]+)$/.exec(String(txt || ''))
+  if (k) {
+    try {
+      const c = decodificarCompacto(k[1])
+      if (especie(c.hoje.speciesId)) d = { hoje: c.hoje, sim: { ...c.sim, ivs: c.hoje.ivs, quality: c.hoje.quality } }
+    } catch {}
+  } else d = decodificar(txt)
   if (!d) return false
   definirHoje(d.hoje, d.sim)
   return true
@@ -300,7 +319,7 @@ function formaSim() {
   return st.formas.find((f) => f.speciesId === st.sim.speciesId) || especie(st.sim.speciesId)
 }
 
-function definirHoje(h, simSalvo = null) {
+function definirHoje(h, simSalvo = null, recolher = true) {
   st.hoje = normal(h)
   const e = especie(st.hoje.speciesId)
   st.nomeHoje = e?.nome || h.nome || 'Pokémon'
@@ -308,12 +327,11 @@ function definirHoje(h, simSalvo = null) {
   st.sim = simSalvo ? normal({ ...simSalvo, ivs: st.hoje.ivs, quality: st.hoje.quality }) : padraoSim(st.hoje)
   if (!st.formas.some((f) => f.speciesId === st.sim.speciesId)) st.sim.speciesId = st.hoje.speciesId
   st.res = null
-  st.rolar = true
   montarEditorHoje()
   montarSimulacao()
   pintarIdentidade()
+  abrirEntrada(!recolher)
   $('cartao-sim').hidden = false
-  $('vazio').hidden = true
   agendar(true)
 }
 
@@ -340,10 +358,17 @@ function montarEditorHoje() {
     hojeMudou(campo, antes)
   }
   const nivel = passos({ valor: h.level, min: 1, max: NIVEL_MAX, passo: 10, rotulo: 'nível de hoje', aoMudar: muda('level') })
-  const qual = passos({ valor: h.quality, min: 0.5, max: 2, passo: 0.01, casas: 2, rotulo: 'qualidade', aoMudar: muda('quality') })
-  const pot = seg([1, 2, 3, 4, 5].map((n) => [n, `P${n}`]), h.potencia, muda('potencia'), 'Potência de hoje')
+  const mudaQual = muda('quality')
+  const qual = passos({ valor: h.quality, min: 0.5, max: 2, passo: 0.01, casas: 2, rotulo: 'qualidade', classe: 'colorido', aoMudar: (v) => { qual.style.setProperty('--vc', corQual(v)); mudaQual(v) } })
+  qual.style.setProperty('--vc', corQual(h.quality))
+  const pot = seg(opcoesPot(), h.potencia, muda('potencia'), 'Potência de hoje', 'pot')
   const shiny = alternar('Shiny', 'estrela', h.shiny, muda('shiny'), 'shiny')
-  const ivs = STATS.map(([k, rot]) => celula(rot, passos({ valor: h.ivs[k], min: 0, max: 32, rotulo: `IV de ${rot}`, aoMudar: (v) => { h.ivs[k] = v; hojeMudou('ivs') } })))
+  const ivs = STATS.map(([k, rot]) => {
+    const p = passos({ valor: h.ivs[k], min: 0, max: 32, rotulo: `IV de ${rot}`, classe: 'colorido', aoMudar: (v) => { h.ivs[k] = v; p.style.setProperty('--vc', corIv(v)); p.classList.toggle('brilho', v >= 27); hojeMudou('ivs') } })
+    p.style.setProperty('--vc', corIv(h.ivs[k]))
+    p.classList.toggle('brilho', h.ivs[k] >= 27)
+    return celula(rot, p)
+  })
   caixa.replaceChildren(
     el('div', { class: 'duas-col' }, [celula('Nível', nivel), celula('Qualidade', qual)]),
     el('div', { class: 'linha' }, [el('div', { style: 'flex:1 1 220px;min-width:0' }, [pot]), shiny]),
@@ -351,28 +376,54 @@ function montarEditorHoje() {
   )
 }
 
+function abrirEntrada(abrir) {
+  const tem = !!st.hoje
+  const aberta = !tem || abrir
+  $('entrada').hidden = !aberta
+  $('trocar').hidden = !tem
+  $('trocar').textContent = aberta ? 'Fechar' : 'Trocar'
+  $('trocar').setAttribute('aria-expanded', String(aberta))
+}
+
 function pintarIdentidade() {
   const h = st.hoje
   const box = $('identidade')
   if (!h) return (box.hidden = true)
   const e = especie(h.speciesId)
-  const dado = (rot, v) => el('span', {}, [el('small', { text: rot }), el('b', { text: v })])
-  st.ui.notaHoje = el('b', { text: st.res?.h?.nota != null ? fmt1.format(st.res.h.nota) : '—' })
+  const dado = (rot, v, no = null, attrs = {}) => el('span', attrs, [el('small', { text: rot }), no || el('b', { text: v })])
+  st.ui.notaHoje = el('b', { text: ehNum(st.res?.h?.nota) ? fmtNota(st.res.h.nota) : '—' })
+  st.ui.notaHojeCel = null
+  const ref = somaRefino(h.refino)
   box.replaceChildren(
-    sprite(lookDe(e, h.shiny), 76),
-    el('div', { style: 'min-width:0' }, [
-      el('div', { class: 'id-nome' }, [el('strong', { text: st.nomeHoje }), h.shiny ? ico('estrela', 18, 'estrela') : null, el('span', { class: 'id-hoje', text: 'Hoje' })]),
-      el('div', { style: 'margin-top:4px' }, [tiposDe(e?.tipos)]),
-      el('div', { class: 'id-dados' }, [
-        dado('Nv', fmt.format(h.level)),
-        dado('Pot', `P${h.potencia}`),
-        dado('Qual', fmt2.format(h.quality)),
-        dado('IVs', `${fmt.format(somaIvs(h.ivs))}/192`),
-        el('span', {}, [el('small', { text: 'Nota' }), st.ui.notaHoje])
+    el('div', { class: 'id-topo' }, [
+      sprite(lookDe(e, h.shiny), 60),
+      el('div', { style: 'min-width:0' }, [
+        el('div', { class: 'id-nome' }, [el('strong', { text: st.nomeHoje }), h.shiny ? ico('estrela', 16, 'estrela') : null, el('span', { class: 'id-hoje', text: 'Hoje' })]),
+        el('div', { style: 'margin-top:3px' }, [tiposDe(e?.tipos)])
       ])
-    ])
+    ]),
+    el('div', { class: 'id-dados' }, [
+      dado('Nível', fmt.format(h.level)),
+      dado('Pot', `P${h.potencia}`, null, { class: 'pot-cel', style: `--pc:${COR_POT[h.potencia]}` }),
+      dado('Qual', fmt2.format(h.quality), null, { style: `--vc:${corQual(h.quality)}`, class: 'cor-cel' }),
+      (st.ui.notaHojeCel = dado('Nota', '', st.ui.notaHoje, { class: 'cor-cel' }))
+    ]),
+    el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}` })]),
+    el('div', { class: 'id-ivs' }, STATS.map(([k, rot]) => dado(rot, fmt.format(h.ivs[k]), null, { class: `cor-cel${h.ivs[k] >= 27 ? ' brilho' : ''}`, style: `--vc:${corIv(h.ivs[k])}` })))
   )
+  pintarNotaHoje()
   box.hidden = false
+}
+
+function pintarNotaHoje() {
+  const n = st.res?.h?.nota
+  if (!st.ui.notaHoje) return
+  st.ui.notaHoje.textContent = ehNum(n) ? fmtNota(n) : '—'
+  if (st.ui.notaHojeCel) {
+    const f = ehNum(n) ? faixaNota(n) : null
+    st.ui.notaHojeCel.style.setProperty('--vc', f ? f[2] : 'var(--tinta)')
+    st.ui.notaHojeCel.title = f ? f[1] : ''
+  }
 }
 
 function montarSimulacao() {
@@ -386,17 +437,14 @@ function montarSimulacao() {
   }
 
   const regua = el('input', { type: 'range', class: 'regua', min: 1, max: NIVEL_MAX, step: 1, value: s.level, 'aria-label': 'Nível simulado' })
-  const nivel = passos({ valor: s.level, min: 1, max: NIVEL_MAX, passo: 100, rotulo: 'nível simulado', classe: 'largo', aoMudar: (v) => { s.level = v; regua.value = String(v); mudou() } })
+  const nivel = passos({ valor: s.level, min: 1, max: NIVEL_MAX, passo: 100, rotulo: 'nível simulado', aoMudar: (v) => { s.level = v; regua.value = String(v); mudou() } })
   regua.addEventListener('input', () => { s.level = Number(regua.value); nivel.definir(s.level); mudou() })
-  ui.nivel = bloco('nivel', 'Nível', [
-    nivel,
-    regua
-  ])
+  ui.nivel = bloco('nivel', 'Nível', [el('div', { class: 'nivel-linha' }, [nivel, regua])])
 
   let secForma = null
   if (st.formas.length > 1) {
     const bts = st.formas.map((f) => {
-      const b = el('button', { type: 'button', class: `forma${f.mega ? ' mega' : ''}`, 'aria-pressed': String(f.speciesId === s.speciesId) }, [sprite(lookDe(f, s.shiny), 40), el('span', { text: f.nome })])
+      const b = el('button', { type: 'button', class: `forma${f.mega ? ' mega' : ''}`, 'aria-pressed': String(f.speciesId === s.speciesId) }, [sprite(lookDe(f, s.shiny), 34), el('span', { text: f.nome })])
       b.addEventListener('click', () => {
         s.speciesId = f.speciesId
         bts.forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
@@ -408,18 +456,18 @@ function montarSimulacao() {
     ui.forma = secForma
   }
 
-  const pot = seg([1, 2, 3, 4, 5].map((n) => [n, `P${n}`]), s.potencia, (v) => { s.potencia = v; mudou() }, 'Potência simulada')
+  const pot = seg(opcoesPot(), s.potencia, (v) => { s.potencia = v; mudou() }, 'Potência simulada', 'pot')
   const shiny = alternar('Shiny', 'estrela', s.shiny, (v) => {
     s.shiny = v
-    if (secForma) secForma.querySelectorAll('.forma').forEach((b, i) => b.replaceChild(sprite(lookDe(st.formas[i], v), 40), b.firstChild))
+    if (secForma) secForma.querySelectorAll('.forma').forEach((b, i) => b.replaceChild(sprite(lookDe(st.formas[i], v), 34), b.firstChild))
     mudou()
   }, 'shiny')
-  ui.nasc = bloco('nascimento', 'Potência', [el('div', { class: 'linha' }, [el('div', { style: 'flex:1 1 220px;min-width:0' }, [pot]), shiny])])
+  ui.nasc = bloco('nascimento', 'Potência', [el('div', { class: 'linha' }, [el('div', { style: 'flex:1 1 200px;min-width:0' }, [pot]), shiny])])
 
   const tipoSel = el('select', { 'aria-label': 'Tipo do Z-Move' }, TIPOS.map((t) => el('option', { value: t, text: nomeTipo(t) })))
   const cat = seg([['e', 'Especial'], ['f', 'Físico']], s.tmFisico ? 'f' : 'e', (k) => { s.tmFisico = k === 'f'; mudou() }, 'Categoria do Z-Move')
   const aoe = alternar('Em área', 'area', s.tmAoe, (v) => { s.tmAoe = v; mudou() })
-  const detalhe = el('div', {}, [el('div', { class: 'z-detalhe' }, [tipoSel, cat]), el('div', { style: 'margin-top:10px' }, [aoe])])
+  const detalhe = el('div', { class: 'z-detalhe' }, [tipoSel, cat])
   tipoSel.value = s.tmElemental || 'NORMAL'
   tipoSel.addEventListener('change', () => { s.tmElemental = tipoSel.value; mudou() })
   detalhe.hidden = !s.tmElemental
@@ -430,14 +478,18 @@ function montarSimulacao() {
       tipoSel.value = s.tmElemental
     } else s.tmElemental = null
     detalhe.hidden = !s.tmElemental
+    aoe.hidden = !s.tmElemental
     mudou()
   }, 'Z-Move')
-  ui.z = bloco('zmove', 'Z-Move', [z, detalhe])
+  aoe.hidden = !s.tmElemental
+  ui.z = bloco('zmove', 'Z-Move', [el('div', { class: 'z-topo' }, [z, aoe]), detalhe])
 
   const refino = STATS.map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
   ui.refino = bloco('refino', 'Refino', [el('div', { class: 'grade6' }, refino)])
+  ui.refino.classList.add('larga')
+  if (!secForma) ui.z.classList.add('larga')
 
-  caixa.replaceChildren(ui.nivel, ...(secForma ? [secForma] : []), ui.nasc, ui.z, ui.refino)
+  caixa.replaceChildren(ui.nivel, ui.nasc, ...(secForma ? [secForma] : []), ui.z, ui.refino)
   resumos()
 }
 
@@ -460,7 +512,7 @@ function resumos() {
 
 function agendar(imediato = false) {
   clearTimeout(st.timer)
-  $('resultado').classList.add('calculando')
+  $('calc').classList.add('calculando')
   st.timer = setTimeout(calcular, imediato ? 0 : 200)
 }
 
@@ -476,81 +528,138 @@ async function calcular() {
     rh = { erro: err?.message || 'Não consegui calcular.' }
   }
   if (seq !== st.seq) return
-  $('resultado').classList.remove('calculando')
+  $('calc').classList.remove('calculando')
   gravarEstado()
   const erro = rh?.erro || rs?.erro || (!rh || !rs ? 'Não consegui calcular este pokémon.' : '')
   if (erro) {
     st.res = null
-    $('copiar-topo').hidden = true
-    $('erro-res').textContent = erro
-    $('erro-res').hidden = false
-    $('resultado').hidden = true
-    $('cartao-res').hidden = false
-    $('cartao-preco').hidden = true
+    mensagemVisor(erro, true)
+    $('detalhes').hidden = true
     return
   }
-  $('erro-res').hidden = true
   st.res = { h: rh, s: rs }
-  $('resultado').hidden = false
-  $('cartao-res').hidden = false
-  $('cartao-preco').hidden = false
-  if (st.rolar) {
-    st.rolar = false
-    requestAnimationFrame(() => $('cartao-res').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }))
-  }
-  $('copiar-topo').hidden = false
-  if (st.ui.notaHoje) st.ui.notaHoje.textContent = ehNum(rh.nota) ? fmt1.format(rh.nota) : '—'
-  pintarSimMini()
-  pintarScore()
-  pintarKpis()
+  pintarNotaHoje()
+  pintarVisor()
+  pintarScoreInfo()
   pintarGolpe()
   pintarStats()
+  $('detalhes').hidden = false
   pintarPreco(seq, pkH, rh, pkS, rs)
 }
 
-function pintarSimMini() {
-  const f = formaSim()
-  const box = $('sim-mini')
-  box.replaceChildren(sprite(lookDe(f, st.sim.shiny), 34), el('span', { text: `${st.res?.s?.nome || f?.nome || ''} · Nv ${fmt.format(st.sim.level)}` }))
-  box.title = 'Simulado'
-  box.hidden = false
+function mensagemVisor(txt, erro = false) {
+  $('visor-msg-txt').textContent = txt
+  $('visor-msg').classList.toggle('erro', erro)
+  $('visor-msg').hidden = false
+  $('visor-id').hidden = true
+  $('visor-cels').hidden = true
+  $('copiar-topo').hidden = true
 }
 
 const faixaDe = (v) => [...FAIXAS].reverse().find(([de]) => v >= de) || FAIXAS[0]
 
-function arcoSvg(valor, hoje) {
-  const cx = 60
-  const cy = 60
-  const r = 48
-  const ri = 37
-  const pt = (v, raio) => {
-    const t = Math.PI * (1 - Math.max(0, Math.min(1000, v)) / 1000)
-    return [cx + raio * Math.cos(t), cy - raio * Math.sin(t)]
-  }
-  const arco = (de, ate, raio, attrs) => {
-    if (!(ate > de)) return ''
-    const [x1, y1] = pt(de, raio)
-    const [x2, y2] = pt(ate, raio)
-    return `<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${raio} ${raio} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}" ${attrs}/>`
-  }
-  const vao = 8
-  let s = ''
-  FAIXAS.forEach(([de, , cor], i) => {
+function classeDelta(d) {
+  return d == null || d === 0 ? 'igual' : d > 0 ? 'sobe' : 'desce'
+}
+
+function escalaScore(valor) {
+  const v = ehNum(valor) ? Math.max(0, Math.min(1000, Number(valor))) : null
+  const segs = FAIXAS.map(([de, nome, cor], i) => {
     const ate = FAIXAS[i + 1]?.[0] ?? 1000
-    const a = de + (i ? vao : 0)
-    const b = ate - (i < FAIXAS.length - 1 ? vao : 0)
-    s += arco(a, b, r, `class="faixa" stroke="${cor}"`)
-    if (valor != null && valor > a) s += arco(a, Math.min(b, valor), r, `class="cheio" stroke="${cor}"`)
+    const cheio = v == null ? 0 : Math.max(0, Math.min(1, (v - de) / (ate - de)))
+    const aqui = v != null && v >= de && (v < ate || ate === 1000)
+    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}`, title: nome }, [
+      el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
+      aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
+    ])
   })
-  if (hoje != null) {
-    s += arco(0, 1000, ri, 'class="trilho-hoje"')
-    if (hoje > 0) s += arco(0, hoje, ri, 'class="cheio-hoje"')
-  }
-  if (valor != null) {
-    const [mx, my] = pt(valor, r)
-    s += `<circle class="marca" cx="${mx.toFixed(2)}" cy="${my.toFixed(2)}" r="6"/>`
-  }
-  return `<svg viewBox="0 0 120 68" aria-hidden="true">${s}</svg>`
+  return el('span', { class: 'escala', 'aria-hidden': 'true' }, segs)
+}
+
+function escalaNota(nota) {
+  const n = ehNum(nota) ? Math.max(0, Math.min(10, Number(nota))) : null
+  const segs = FAIXAS_NOTA.map(([, nome, cor], i) => {
+    const cheio = n == null ? 0 : Math.max(0, Math.min(1, n - i))
+    const aqui = n != null && n >= i && (n < i + 1 || i === 9)
+    return el('span', { class: 'esc-f', style: `flex-grow:1;--c:${cor}`, title: nome }, [
+      el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
+      aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
+    ])
+  })
+  return el('span', { class: 'escala nota-esc', 'aria-hidden': 'true' }, segs)
+}
+
+function vCel({ id = null, classe = '', icone, rotulo, valor, barra = null, pe = [], dica = '' }) {
+  return el('div', { class: `v-cel ${classe}`.trim(), id, title: dica || null }, [
+    el('span', { class: 'v-rot' }, [ico(icone, 13, 'ico-v'), ...[].concat(rotulo).map((r, i) => el('span', { class: i ? 'longo' : null, text: r }))]),
+    valor,
+    barra || el('span', { class: 'escala vazia', 'aria-hidden': 'true' }),
+    el('span', { class: 'v-pe' }, pe)
+  ])
+}
+
+const pilula = (p) => el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) })
+
+function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra = '') {
+  const v = ehNum(sc) ? Math.round(Number(sc)) : null
+  const ho = ehNum(scHoje) ? Math.round(Number(scHoje)) : null
+  const d = v != null && ho != null ? v - ho : null
+  const faixa = v != null ? faixaDe(v) : null
+  return vCel({
+    classe: 'modo',
+    icone,
+    rotulo,
+    valor: el('b', { class: 'v-val' }, [v != null ? fmt.format(v) : '—', d ? el('small', { class: `v-dif ${classeDelta(d)}`, text: `${d > 0 ? '+' : '−'}${fmt.format(Math.abs(d))}` }) : null]),
+    barra: escalaScore(v ?? NaN),
+    pe: [el('span', { class: 'v-poder' }, [ico(iconePoder, 12, 'ico-v'), grande(pod)]), pilula(variacao(podHoje, pod))],
+    dica: [faixa ? `Score ${rotulo} ${fmt.format(v)} de 1000 (${faixa[1]})` : '', `Poder ${rotulo} ${grande(pod)}`, dicaExtra].filter(Boolean).join(' · ')
+  })
+}
+
+function celPreco(valor, p = null, dica = '') {
+  return vCel({
+    id: 'v-preco',
+    classe: 'preco-v',
+    icone: 'gema',
+    rotulo: ['Preço', 'justo'],
+    valor: el('b', { class: 'v-val rosa' }, [valor, valor !== '—' && valor !== '…' ? el('span', { class: 'gema-ico', 'aria-hidden': 'true' }) : null]),
+    pe: [p === undefined || p === null ? el('span', { class: 'delta igual', text: valor === '…' ? 'calculando' : '—' }) : pilula(p)],
+    dica
+  })
+}
+
+function pintarVisor() {
+  const { h, s } = st.res
+  const f = formaSim()
+  $('visor-id').replaceChildren(
+    sprite(lookDe(f, st.sim.shiny), 56),
+    el('div', { style: 'min-width:0' }, [
+      el('span', { class: 'tag', text: 'Resultado' }),
+      el('strong', {}, [s.nome || f?.nome || '', st.sim.shiny ? ico('estrela', 14, 'estrela') : null]),
+      el('span', { class: 'v-sub' }, [`Nv ${fmt.format(st.sim.level)} · `, el('b', { class: 'pot-txt', style: `color:${COR_POT[st.sim.potencia]}`, text: `P${st.sim.potencia}` })])
+    ])
+  )
+  const fn = ehNum(s.nota) ? faixaNota(s.nota) : null
+  const dn = ehNum(h.nota) && ehNum(s.nota) ? Math.round((s.nota - h.nota) * 1000) / 1000 : null
+  const nota = vCel({
+    classe: 'nota-v',
+    icone: 'nota',
+    rotulo: 'Nota',
+    valor: el('b', { class: 'v-val', style: fn ? `color:${fn[2]}` : null }, [ehNum(s.nota) ? fmtNota(s.nota) : '—', el('small', { text: '/10' })]),
+    barra: escalaNota(s.nota),
+    pe: [fn ? el('span', { class: 'v-nome', style: `color:${fn[2]}`, text: fn[1] }) : null, dn == null ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: dn ? `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))}` : 'igual' })],
+    dica: fn ? `Nota do jogo: ${fmtNota(s.nota)}, ${fn[1]}` : 'Nota do jogo, de 0 a 10'
+  })
+  $('visor-cels').replaceChildren(
+    nota,
+    celModo('pvp', 'poderPvp', 'PvP', s.score?.pvp, h.score?.pvp, s.pvp, h.pvp, ehNum(s.nivelPvp) ? `conta como Nv ${fmt.format(s.nivelPvp)}` : ''),
+    celModo('pve', 'poderPve', 'PvE', s.score?.pve, h.score?.pve, s.pve, h.pve),
+    celPreco('…')
+  )
+  $('visor-msg').hidden = true
+  $('visor-id').hidden = false
+  $('visor-cels').hidden = false
+  $('copiar-topo').hidden = false
 }
 
 function textoForma(v) {
@@ -561,31 +670,20 @@ function textoForma(v) {
   return e?.nome || ''
 }
 
-function medidor(icone, rotulo, valor, hoje, forma) {
-  const v = ehNum(valor) ? Math.round(Number(valor)) : null
-  const ho = ehNum(hoje) ? Math.round(Number(hoje)) : null
-  const faixa = v != null ? faixaDe(v) : [0, '—', '#a88e86']
-  const dif = v != null && ho != null ? v - ho : null
-  const arco = el('div', { class: 'arco' })
-  arco.innerHTML = arcoSvg(v, ho != null && ho !== v ? ho : null)
-  arco.append(el('b', { class: 'valor', text: v != null ? fmt.format(v) : '—' }))
-  const nomeForma = textoForma(forma)
-  const no = el('div', { class: 'medidor', style: `--cor:${faixa[2]}`, 'aria-label': `${rotulo}: ${v != null ? `${fmt.format(v)} de 1000, ${faixa[1]}` : 'sem dado'}${dif ? `, ${dif > 0 ? 'mais' : 'menos'} ${fmt.format(Math.abs(dif))} que hoje` : ''}`, role: 'group' }, [
-    arco,
-    el('span', { class: 'rot' }, [ico(icone, 16, 'ico-rot'), rotulo]),
-    v != null ? el('span', { class: 'selo', text: faixa[1] }) : null,
-    dif != null ? el('span', { class: `delta ${dif > 0 ? 'sobe' : dif < 0 ? 'desce' : 'igual'}`, text: dif ? `${dif > 0 ? '+' : '−'}${fmt.format(Math.abs(dif))} vs hoje` : 'igual a hoje' }) : null,
-    nomeForma ? el('small', { text: `como ${nomeForma}` }) : null
-  ])
-  return no
-}
-
-function pintarScore() {
-  const { h, s } = st.res
-  $('medidores').replaceChildren(
-    medidor('pvp', 'Score PvP', s.score?.pvp, h.score?.pvp, s.score?.formaPvp),
-    medidor('pve', 'Score PvE', s.score?.pve, h.score?.pve, s.score?.formaPve)
-  )
+function pintarScoreInfo() {
+  const s = st.res.s
+  const linha = (rot, v, forma) => {
+    if (!ehNum(v)) return null
+    const faixa = faixaDe(Number(v))
+    const nome = textoForma(forma)
+    return el('div', { class: 'sf-l' }, [el('b', { text: `${rot} ${fmt.format(Math.round(v))}` }), el('span', { class: 'selo', style: `--cor:${faixa[2]}`, text: faixa[1] }), nome ? el('small', { text: `como ${nome}` }) : null])
+  }
+  const linhas = [linha('PvP', s.score?.pvp, s.score?.formaPvp), linha('PvE', s.score?.pve, s.score?.formaPve)].filter(Boolean)
+  if (ehNum(s.nota)) {
+    const f = faixaNota(s.nota)
+    linhas.push(el('div', { class: 'sf-l' }, [el('b', { text: `Nota ${fmtNota(s.nota)}` }), el('span', { class: 'selo', style: `--cor:${f[2]}`, text: f[1] }), escalaNota(s.nota)]))
+  }
+  $('score-formas').replaceChildren(...(linhas.length ? linhas : [el('div', { class: 'sf-l', text: 'Sem score para esta espécie.' })]))
 }
 
 function variacao(a, b) {
@@ -600,28 +698,6 @@ function textoVariacao(p) {
   if (p < 100) return `${p > 0 ? '+' : '−'}${fmt.format(Math.round(Math.abs(p)))}%`
   const x = 1 + p / 100
   return `${x < 10 ? fmt1.format(x) : grande(x)}×`
-}
-
-function kpi(icone, rotulo, valorH, valorS, formato, extra = null, dica = '') {
-  const p = variacao(valorH, valorS)
-  return el('div', { class: 'kpi vao', title: dica || null }, [
-    el('div', { class: 'kpi-cab' }, [ico(icone, 17, 'ico-kpi'), el('small', { text: rotulo })]),
-    el('strong', {}, [formato(valorS), extra]),
-    el('div', { class: 'kpi-pe' }, [
-      el('span', { class: `delta ${p == null || p === 0 ? 'igual' : p > 0 ? 'sobe' : 'desce'}`, text: textoVariacao(p) }),
-      el('span', { text: `hoje ${formato(valorH)}` })
-    ])
-  ])
-}
-
-function pintarKpis() {
-  const { h, s } = st.res
-  const nota = (v) => (ehNum(v) ? fmt1.format(v) : '—')
-  $('kpis').replaceChildren(
-    kpi('nota', 'Nota', h.nota, s.nota, nota, el('sup', { text: '/10' }), 'Nota do jogo, de 0 a 10'),
-    kpi('poderPvp', 'Poder PvP', h.pvp, s.pvp, grande, null, ehNum(s.nivelPvp) ? `No PvP conta como Nv ${fmt.format(s.nivelPvp)}` : ''),
-    kpi('poderPve', 'Poder PvE', h.pve, s.pve, grande, null, 'Poder na caça')
-  )
 }
 
 function categoriaTxt(c) {
@@ -703,17 +779,21 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   if (!pronto) box.replaceChildren(cabPreco(el('span', { class: 'resumo', text: 'calculando…' })), el('div', { class: 'precos' }, [el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' })]))
   const [ds, dh] = await Promise.all([pS, pH])
   if (seq !== st.seq) return
+  const trocaPreco = (valor, p = null, dica = '') => $('v-preco')?.replaceWith(celPreco(valor, p, dica))
   if (!ds || ds.erro) {
+    trocaPreco('—', null, 'Preço indisponível')
     box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: ds?.erro || 'Não consegui estimar o preço agora.' }))
     return
   }
   const g = ds.gemas
   if (!g || !ehNum(g.justo)) {
+    trocaPreco('—', null, 'Sem vendas parecidas')
     box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: 'Sem vendas parecidas para estimar.' }), credito())
     return
   }
   const hojeJusto = dh && !dh.erro && ehNum(dh.gemas?.justo) ? Number(dh.gemas.justo) : null
   const p = hojeJusto ? variacao(hojeJusto, g.justo) : null
+  trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas`)
   const topo = Math.max(Number(g.rapido) || 0, Number(g.justo) || 0, Number(g.esperar) || 0) || 1
   const linha = (rot, v, meio = false) => el('div', { class: `preco${meio ? ' meio' : ''}` }, [
     el('b', { text: rot }),
@@ -783,7 +863,7 @@ function buscar() {
 
 function escolherEspecie(e) {
   const base = st.hoje || { level: 100, potencia: 1, quality: 1, shiny: false, ivs: Object.fromEntries(STATS.map(([k]) => [k, 16])), refino: {} }
-  definirHoje({ ...base, speciesId: e.speciesId, nome: e.nome, refino: {} })
+  definirHoje({ ...base, speciesId: e.speciesId, nome: e.nome, refino: {} }, null, false)
   $('busca').value = ''
   $('resultados').hidden = true
   $('resultados').replaceChildren()
@@ -817,7 +897,58 @@ async function copiarTexto(texto) {
   }
 }
 
-const PREVIA = 'https://pokepocket.piscis.workers.dev/p'
+const PREVIA = 'https://pokepocket.piscis.workers.dev'
+const linksFeitos = new Map()
+
+function comPrazo(p, ms) {
+  return Promise.race([p, new Promise((_, nao) => setTimeout(() => nao(new Error('demorou')), ms))])
+}
+
+async function imagemPrevia(s, resumo) {
+  const { desenharCartao } = await import('./cartao.js')
+  const forma = formaSim()
+  const look = lookDe(forma, st.sim.shiny)
+  const png = look != null && typeof motor.spritePng === 'function' ? motor.spritePng(look) : null
+  return desenharCartao({
+    nome: resumo.nome,
+    shiny: !!st.sim.shiny,
+    nivel: st.sim.level,
+    potencia: st.sim.potencia,
+    nota: resumo.nota,
+    pvp: resumo.pvp,
+    pve: resumo.pve,
+    poderPvp: ehNum(s.pvp) ? s.pvp : null,
+    poderPve: ehNum(s.pve) ? s.pve : null,
+    justo: resumo.justo,
+    sprite: png ? { url: new URL(png.url, location.href).href, x: 0, y: 0, w: png.w, h: png.h } : null
+  })
+}
+
+async function linkCurto(s, resumo) {
+  const token = codificarCompacto({ hoje: st.hoje, sim: st.sim }, resumo)
+  if (linksFeitos.has(token)) return linksFeitos.get(token)
+  const longo = `${PREVIA}/p/${token}`
+  const tarefa = (async () => {
+    try {
+      const r = await comPrazo(fetch(`${PREVIA}/s`, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: token }), 5000)
+      if (!r.ok) return longo
+      const { id, temImagem } = await r.json()
+      if (!/^[0-9A-Za-z]{7}$/.test(id || '')) return longo
+      if (!temImagem) {
+        try {
+          const img = await comPrazo(imagemPrevia(s, resumo), 6000)
+          await comPrazo(fetch(`${PREVIA}/i/${id}`, { method: 'POST', headers: { 'content-type': 'image/png' }, body: img }), 8000)
+        } catch {}
+      }
+      return `${PREVIA}/${id}`
+    } catch {
+      return longo
+    }
+  })()
+  linksFeitos.set(token, tarefa)
+  tarefa.then((l) => { if (l.includes('/p/')) linksFeitos.delete(token) })
+  return tarefa
+}
 
 async function dadosCompartilhar() {
   const s = st.res?.s
@@ -827,29 +958,31 @@ async function dadosCompartilhar() {
     const p = await precoDe(pkDe(st.sim), s)
     if (ehNum(p?.gemas?.justo)) justo = Math.round(p.gemas.justo)
   } catch {}
-  const partes = [`${s.nome}${st.sim.shiny ? ' shiny' : ''} · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
-  if (ehNum(s.score?.pvp)) partes.push(`Score PvP ${fmt.format(s.score.pvp)} (${faixaDe(s.score.pvp)[1]})`)
-  if (ehNum(s.score?.pve)) partes.push(`Score PvE ${fmt.format(s.score.pve)} (${faixaDe(s.score.pve)[1]})`)
-  if (ehNum(s.nota)) partes.push(`Nota ${fmt1.format(s.nota)}/10`)
-  if (justo != null) partes.push(`Justo ${gemas(justo)} gemas`)
+  const faixaTxt = (v) => (ehNum(v) ? ` · ${faixaDe(Number(v))[1]}` : '')
+  const linhas = [`**${s.nome}${st.sim.shiny ? ' shiny' : ''}** · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
+  if (ehNum(s.nota)) linhas.push(`⭐ Nota ${fmtNota(s.nota)} · ${faixaNota(s.nota)[1]}`)
+  if (ehNum(s.score?.pvp)) linhas.push(`⚔️ PvP ${fmt.format(s.score.pvp)}${faixaTxt(s.score.pvp)}${ehNum(s.pvp) ? ` · poder ${grande(s.pvp)}` : ''}`)
+  if (ehNum(s.score?.pve)) linhas.push(`🎯 PvE ${fmt.format(s.score.pve)}${faixaTxt(s.score.pve)}${ehNum(s.pve) ? ` · poder ${grande(s.pve)}` : ''}`)
+  if (justo != null) linhas.push(`💎 Preço justo ${gemas(justo)} gemas`)
+  const resumo = { nome: s.nome, pvp: ehNum(s.score?.pvp) ? s.score.pvp : null, pve: ehNum(s.score?.pve) ? s.score.pve : null, nota: ehNum(s.nota) ? s.nota : null, justo }
   let link = location.href
-  if (PREVIA) {
-    const q = new URLSearchParams({ n: s.nome, nv: st.sim.level, po: st.sim.potencia })
-    if (st.sim.shiny) q.set('s', '1')
-    if (ehNum(s.score?.pvp)) q.set('pvp', s.score.pvp)
-    if (ehNum(s.score?.pve)) q.set('pve', s.score.pve)
-    if (ehNum(s.nota)) q.set('no', Math.round(s.nota * 10) / 10)
-    if (justo != null) q.set('j', justo)
-    q.set('c', st.ultimoHash || location.hash.replace(/^#/, ''))
-    link = `${PREVIA}?${q}`
-  }
-  return { linha: partes.join(' · '), link }
+  try { link = await linkCurto(s, resumo) } catch {}
+  return { linha: linhas.join('\n'), link }
 }
 
 async function copiar(bt, comResumo) {
   if (st.hoje) gravarEstado()
-  const { linha, link } = await dadosCompartilhar()
-  const ok = await copiarTexto(comResumo && linha ? `${linha}\n${link}` : link)
+  bt.classList.add('gerando')
+  const texto = dadosCompartilhar().then(({ linha, link }) => (comResumo && linha ? `${linha}\n${link}` : link))
+  let ok = false
+  try {
+    if (typeof ClipboardItem === 'function' && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': texto.then((t) => new Blob([t], { type: 'text/plain' })) })])
+      ok = true
+    }
+  } catch {}
+  if (!ok) ok = await copiarTexto(await texto)
+  bt.classList.remove('gerando')
   const aviso = $('link-ok')
   aviso.className = `link-ok${ok ? '' : ' erro'}`
   aviso.textContent = ok ? (comResumo ? 'Resumo e link copiados' : 'Link copiado') : 'Copie o endereço na barra do navegador'
@@ -908,6 +1041,7 @@ function ligarEventos() {
       $(`aba-${outro}`).focus()
     })
   }
+  $('trocar').addEventListener('click', () => abrirEntrada($('entrada').hidden))
   $('voltar').addEventListener('click', () => {
     if (!st.hoje) return
     st.sim = pkDe(st.hoje)

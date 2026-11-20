@@ -2,3 +2,7 @@ name = "pokepocket"
 main = "worker.js"
 compatibility_date = "2025-06-01"
 workers_dev = true
+
+[[kv_namespaces]]
+binding = "LINKS"
+id = "52f0a8e34d9a4f77b27d051909b044d3"

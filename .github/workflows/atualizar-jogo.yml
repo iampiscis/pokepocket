@@ -23,12 +23,15 @@ jobs:
         with:
           node-version: 20
 
+      - name: Instalar decodificador de imagens
+        run: npm i --no-save --no-package-lock sharp@0.34
+
       - name: Baixar módulos e catálogos
         run: node ferramentas/atualizar-jogo.mjs
 
       - name: Publicar se mudou
         run: |
-          git add calculadora/jogo
+          git add -A calculadora/jogo calculadora/jogo/sprites-png
           if git diff --cached --quiet; then
             echo "nada mudou"
             exit 0

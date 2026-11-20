@@ -576,9 +576,16 @@ export function sprite(looktype) {
   if (looktype == null) return null
   const q = ctx?.sprites?.looks?.[String(looktype)]
   const pagina = q ? ctx.sprites.paginas?.[q[0]] : null
-  if (pagina) return { url: pagina, cell: Math.max(q[3], q[4]), x: q[1], y: q[2], caixa: [0, 0, q[3], q[4]] }
+  if (pagina) return { url: pagina, cell: Math.max(q[3], q[4]), x: q[1], y: q[2], caixa: q.length >= 9 ? q.slice(5, 9) : [0, 0, q[3], q[4]] }
   const a = ctx?.atlas
   const pos = a?.slots?.[String(looktype)]
   if (!pos) return null
   return { url: a.url, cell: a.cell, x: pos[0] * a.cell, y: pos[1] * a.cell, caixa: a.caixas?.[String(looktype)] ?? null }
+}
+
+export function spritePng(looktype) {
+  if (looktype == null) return null
+  const q = ctx?.sprites?.looks?.[String(looktype)]
+  if (!q || q.length < 9) return null
+  return { url: `jogo/sprites-png/${Number(looktype)}.png`, w: q[7] - q[5], h: q[8] - q[6] }
 }

@@ -17,6 +17,7 @@ const ATLAS = `${ORIGEM}/assets/site/assets/maps/marker-atlas.json`
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const destino = path.join(raiz, 'calculadora', 'jogo')
+const pastaPng = path.join(destino, 'sprites-png')
 
 async function baixar(url, binario = false) {
   for (let tentativa = 1; ; tentativa++) {
@@ -148,6 +149,7 @@ async function baixarAtlas() {
 const PACOTES = `${ORIGEM}/assets/asset-packs`
 const TIPOS_SPRITE = new Set(['pokemon', 'shiny', 'forma', 'forma-shiny', 'mega', 'mega-shiny'])
 const CONCORRENCIA = 8
+const LIMIAR_ALFA = 8
 const urlDoPacote = (caminho) => `${PACOTES}${String(caminho).replace(/^\/assets-packs/, '')}`
 
 function lerJsonLocal(nome) {
@@ -186,6 +188,88 @@ function paresShiny(indice) {
   return pares
 }
 
+async function carregarSharp() {
+  try {
+    return (await import('sharp')).default
+  } catch {
+    return null
+  }
+}
+
+function caixaVisivel(px, largura, altura, q) {
+  let x0 = q.w, y0 = q.h, x1 = -1, y1 = -1
+  for (let y = 0; y < q.h && q.y + y < altura; y++) {
+    for (let x = 0; x < q.w && q.x + x < largura; x++) {
+      if (px[((q.y + y) * largura + q.x + x) * 4 + 3] > LIMIAR_ALFA) {
+        if (x < x0) x0 = x
+        if (y < y0) y0 = y
+        if (x > x1) x1 = x
+        if (y > y1) y1 = y
+      }
+    }
+  }
+  return x1 < 0 ? [0, 0, q.w, q.h] : [x0, y0, x1 + 1, y1 + 1]
+}
+
+const pngDe = (lt) => path.join(pastaPng, `${lt}.png`)
+
+async function processarSprites(resultado) {
+  fs.mkdirSync(pastaPng, { recursive: true })
+  const porPagina = new Map()
+  for (const [lt, q] of resultado) {
+    if (q.caixa && fs.existsSync(pngDe(lt))) continue
+    if (!porPagina.has(q.pagina)) porPagina.set(q.pagina, [])
+    porPagina.get(q.pagina).push([lt, q])
+  }
+  const validos = new Set([...resultado.keys()].map((lt) => `${lt}.png`))
+  let apagados = 0
+  for (const nome of fs.readdirSync(pastaPng)) {
+    if (!validos.has(nome)) {
+      fs.rmSync(path.join(pastaPng, nome), { force: true })
+      apagados++
+    }
+  }
+  if (!porPagina.size) {
+    if (apagados) console.log(`sprites: ${apagados} PNGs apagados`)
+    return
+  }
+  const sharp = await carregarSharp()
+  if (!sharp) {
+    console.warn(`sprites: sharp indisponível, ${porPagina.size} páginas ficaram sem caixa visível e sem PNG`)
+    return
+  }
+  const fila = [...porPagina]
+  let proximo = 0
+  let falhas = 0
+  let gravados = 0
+  const trabalhador = async () => {
+    while (proximo < fila.length) {
+      const [url, quadros] = fila[proximo++]
+      try {
+        const { data, info } = await sharp(await baixar(url, true)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+        if (info.channels !== 4) throw new Error('página sem alfa')
+        for (const [lt, q] of quadros) {
+          q.caixa ??= caixaVisivel(data, info.width, info.height, q)
+          const [x0, y0, x1, y1] = q.caixa
+          const largura = Math.min(x1 - x0, info.width - q.x - x0)
+          const altura = Math.min(y1 - y0, info.height - q.y - y0)
+          if (largura < 1 || altura < 1) continue
+          const png = await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+            .extract({ left: q.x + x0, top: q.y + y0, width: largura, height: altura })
+            .png({ palette: true, compressionLevel: 9, effort: 10 })
+            .toBuffer()
+          fs.writeFileSync(pngDe(lt), png)
+          gravados++
+        }
+      } catch {
+        falhas++
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: CONCORRENCIA }, trabalhador))
+  console.log(`sprites: ${fila.length - falhas} páginas decodificadas, ${gravados} PNGs gravados, ${apagados} apagados, ${falhas} falhas`)
+}
+
 async function baixarSprites() {
   const anterior = lerJsonLocal('sprites.json')
   const manifestosAntes = lerJsonLocal('sprites-manifestos.json') || {}
@@ -201,7 +285,7 @@ async function baixarSprites() {
   const antes = new Map()
   for (const [lt, e] of Object.entries(anterior?.looks || {})) {
     const pagina = anterior.paginas?.[e[0]]
-    if (pagina) antes.set(lt, { pagina, x: e[1], y: e[2], w: e[3], h: e[4] })
+    if (pagina) antes.set(lt, { pagina, x: e[1], y: e[2], w: e[3], h: e[4], ...(e.length >= 9 ? { caixa: e.slice(5, 9) } : {}) })
   }
   const alvos = Object.entries(indice).filter(([, o]) => TIPOS_SPRITE.has(o?.kind) && o.manifest)
   const resultado = new Map()
@@ -221,6 +305,8 @@ async function baixarSprites() {
       try {
         const q = quadroParado(JSON.parse(await baixar(urlDoPacote(o.manifest))))
         if (!q) throw new Error('manifesto sem quadro')
+        const velho = antes.get(lt)
+        if (velho?.caixa && velho.pagina === q.pagina && ['x', 'y', 'w', 'h'].every((k) => velho[k] === q[k])) q.caixa = velho.caixa
         resultado.set(lt, q)
         manifestos[lt] = o.manifest
       } catch {
@@ -233,6 +319,7 @@ async function baixarSprites() {
     }
   }
   await Promise.all(Array.from({ length: CONCORRENCIA }, trabalhador))
+  await processarSprites(resultado)
   const paginas = []
   const posPagina = new Map()
   const looks = {}
@@ -242,7 +329,7 @@ async function baixarSprites() {
       posPagina.set(q.pagina, paginas.length)
       paginas.push(q.pagina)
     }
-    looks[lt] = [posPagina.get(q.pagina), q.x, q.y, q.w, q.h]
+    looks[lt] = [posPagina.get(q.pagina), q.x, q.y, q.w, q.h, ...(q.caixa || [])]
   }
   console.log(`sprites: ${Object.keys(looks).length} looktypes, ${fila.length - falhas} manifestos baixados, ${falhas} falhas`)
   return { sprites: JSON.stringify({ paginas, looks, shiny: paresShiny(indice) }), manifestos: JSON.stringify(manifestos) }
@@ -285,7 +372,7 @@ async function principal() {
 
   fs.mkdirSync(destino, { recursive: true })
   for (const nome of fs.readdirSync(destino)) {
-    if (nome !== 'versao.json' && !arquivos.has(nome)) fs.rmSync(path.join(destino, nome), { recursive: true, force: true })
+    if (nome !== 'versao.json' && nome !== 'sprites-png' && !arquivos.has(nome)) fs.rmSync(path.join(destino, nome), { recursive: true, force: true })
   }
   for (const [nome, texto] of arquivos) {
     const arq = path.join(destino, nome)
