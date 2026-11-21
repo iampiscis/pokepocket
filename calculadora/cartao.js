@@ -20,7 +20,7 @@ const url = (rel) => new URL(rel, import.meta.url).href
 
 let recursos = null
 
-function carregarRecursos() {
+export function carregarRecursos() {
   if (!recursos) {
     recursos = (async () => {
       const fontes = [

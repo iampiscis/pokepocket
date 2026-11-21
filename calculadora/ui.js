@@ -1161,10 +1161,12 @@ async function linkCurto(s, resumo) {
       const { id, temImagem } = await r.json()
       if (!/^[0-9A-Za-z]{7}$/.test(id || '')) return longo
       if (!temImagem) {
-        try {
-          const img = await comPrazo(imagemPrevia(s, resumo), 6000)
-          await comPrazo(fetch(`${PREVIA}/i/${id}`, { method: 'POST', headers: { 'content-type': 'image/png' }, body: img }), 8000)
-        } catch {}
+        const enviar = async () => {
+          const img = await comPrazo(imagemPrevia(s, resumo), 15000)
+          const ri = await comPrazo(fetch(`${PREVIA}/i/${id}`, { method: 'POST', headers: { 'content-type': 'image/png' }, body: img }), 15000)
+          if (!ri.ok) throw new Error(`imagem ${ri.status}`)
+        }
+        try { await enviar() } catch { setTimeout(() => enviar().catch(() => {}), 3000) }
       }
       return `${PREVIA}/${id}`
     } catch {
@@ -1403,3 +1405,7 @@ async function iniciar() {
 ligarEventos()
 $('carga-tentar').addEventListener('click', () => location.reload())
 iniciar()
+
+const preCarregarCartao = () => import('./cartao.js').then((m) => m.carregarRecursos?.()).catch(() => {})
+if ('requestIdleCallback' in window) requestIdleCallback(preCarregarCartao, { timeout: 4000 })
+else setTimeout(preCarregarCartao, 2500)
