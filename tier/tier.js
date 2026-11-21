@@ -165,10 +165,9 @@ function dia(iso) {
 
 const ICO_IND = {
   periodo: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
-  topo: '<path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M9.5 16.5h5v4h-5z"/>',
+  recorte: '<path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M9.5 16.5h5v4h-5z"/>',
   partidas: '<path d="M4 4l7.5 7.5M20 4l-7.5 7.5M4.5 15.5l4 4M19.5 15.5l-4 4M6 18l-2 2M18 18l2 2"/>',
-  jogadores: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.8a3.2 3.2 0 0 1 0 6.4M17.5 13.8c2.1.6 3.5 2.6 3.5 5.2"/>',
-  shiny: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'
+  jogadores: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.8a3.2 3.2 0 0 1 0 6.4M17.5 13.8c2.1.6 3.5 2.6 3.5 5.2"/>'
 }
 
 function faixaDatas(de, ate) {
@@ -177,6 +176,13 @@ function faixaDatas(de, ate) {
   const [da, ma] = fmtDia.format(a).split('/'), [db, mb] = fmtDia.format(b).split('/')
   if (da === db && ma === mb) return `${db}/${mb}`
   return ma === mb ? `${da}-${db}/${mb}` : `${da}/${ma}-${db}/${mb}`
+}
+
+function recorteDe(j) {
+  if (typeof dados.recorte === 'string' && dados.recorte) return { curto: dados.recorte, frase: `no ${dados.recorte}`, titulo: 'Jogadores Mestre, Grão-Mestre e Challenger do ranqueado' }
+  const topo = j?.topo ?? dados.topo
+  if (ehNum(topo)) return { curto: `Top ${fmt.format(topo)}`, frase: `no top ${fmt.format(topo)}`, titulo: 'Jogadores do topo do ranqueado' }
+  return null
 }
 
 function indicador(icone, texto, extra = null, titulo = null) {
@@ -199,11 +205,10 @@ function pintarPeriodo(j) {
     }
     itens.push(indicador('periodo', datas, selo, 'Período'))
   }
-  const topo = j.topo ?? dados.topo
-  if (ehNum(topo)) itens.push(indicador('topo', `Top ${fmt.format(topo)}`, null, 'Jogadores do topo do ranqueado'))
+  const rec = recorteDe(j)
+  if (rec) itens.push(indicador('recorte', rec.curto, null, rec.titulo))
   if (ehNum(j.partidas)) itens.push(indicador('partidas', plural(j.partidas, 'partida', 'partidas')))
   if (ehNum(j.jogadores)) itens.push(indicador('jogadores', plural(j.jogadores, 'jogador', 'jogadores')))
-  itens.push(indicador('shiny', 'Shiny · Nv 100 padrão', null, 'Indivíduo padrão: qualidade 1,1, IV 20, P1, sem refino'))
   $('indicadores').replaceChildren(...itens)
 }
 
@@ -242,9 +247,8 @@ function pintar() {
     const ordem = [...(j.cortes || []).map((c) => c.tier), ...Object.keys(COR_TIER)]
     const pos = (t) => { const k = ordem.indexOf(t); return k < 0 ? ordem.length : k }
     foraFaixas = [...grupos.keys()].sort((a, b) => pos(a) - pos(b)).map((t) => faixa(t, grupos.get(t), cortes, true)).filter(Boolean)
-    const topo = j.topo ?? dados.topo
     $('t-fora').textContent = `Fora do meta ${{ dia: 'hoje', semana: 'na semana', mes: 'no mês' }[estado.janela] || 'no período'}`
-    $('fora-aviso').textContent = `sem uso shiny no ${ehNum(topo) ? `top ${fmt.format(topo)}` : 'ranqueado'} no período`
+    $('fora-aviso').textContent = `sem uso shiny ${recorteDe(j)?.frase ?? 'no ranqueado'} no período`
   }
   $('fora-faixas').replaceChildren(...foraFaixas)
   $('fora').hidden = !foraFaixas.length
@@ -395,10 +399,9 @@ function pintarFicha({ p, tier, fora }) {
   const carga = () => el('span', { class: 'f-carga', text: 'Carregando…' })
   const defs = el('div', { class: 'f-defs' }, [carga()])
   const stats = el('div', { class: 'f-stats' }, [carga()])
-  const topo = janelaAtual()?.topo ?? dados.topo
-  const noTopo = ehNum(topo) ? `top ${fmt.format(topo)}` : 'topo do ranqueado'
+  const noTopo = recorteDe(janelaAtual())?.frase ?? 'no topo do ranqueado'
   const uso = [
-    Number(p.uso) > 0 ? `Uso ${fmtPct.format(p.uso)}% no ${noTopo}` : `Sem uso no ${noTopo}`,
+    Number(p.uso) > 0 ? `Uso ${fmtPct.format(p.uso)}% ${noTopo}` : `Sem uso ${noTopo}`,
     ehNum(p.vitorias) ? `${fmtPct.format(p.vitorias)}% de vitórias` : null,
     Number(p.n) > 0 ? plural(p.n, 'partida', 'partidas') : null
   ].filter(Boolean).join(' · ')
@@ -497,11 +500,11 @@ function pintarCabecalho() {
     $('atualizado').replaceChildren(...filhos)
     $('atualizado').hidden = false
   }
-  const topo = dados.topo ?? janelasDe(dados).dia?.topo
+  const rec = recorteDe(janelasDe(dados).dia)
   const versao = [temporadaTxt(dados.temporada), dados.versaoJogo ? `jogo ${dados.versaoJogo}` : ''].filter(Boolean).join(' · ')
   const linhas = [
     'Cada shiny no indivíduo padrão: nível 100, qualidade 1,1, IV 20, P1, sem refino.',
-    `Meta e uso vêm das partidas do ${ehNum(topo) ? `top ${fmt.format(topo)}` : 'topo'} do ranqueado. Sem lendários e míticos.`,
+    dados.recorte ? 'Meta e uso vêm de todas as partidas do dia dos jogadores Mestre, Grão-Mestre e Challenger do ranqueado. Sem lendários e míticos.' : `Meta e uso vêm das partidas do ${rec ? rec.curto.toLowerCase() : 'topo'} do ranqueado. Sem lendários e míticos.`,
     'Score de 0 a 1000, o mesmo da calculadora.'
   ]
   const nos = []

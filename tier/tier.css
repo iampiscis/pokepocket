@@ -31,8 +31,6 @@
 .indicadores { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
 .ind { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 800; color: #fff3df; white-space: nowrap; background: rgba(21, 11, 16, 0.55); border: 1px solid rgba(255, 233, 163, 0.12); }
 .ind svg { flex: none; width: 15px; height: 15px; color: var(--ouro); }
-.ind-shiny svg { color: #f9a8d4; }
-.ind-shiny span { background: linear-gradient(100deg, #fbcfe8, #f9a8d4 50%, #d8b4fe); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .parcial { margin-left: 2px; padding: 0 7px; border-radius: 999px; font-style: normal; font-size: 11.5px; font-weight: 900; line-height: 1.5; color: #2a1a12; background: #fde68a; }
 .explica small { font-size: 12px; color: var(--apagado); }
 .info-linha .info { width: 26px; height: 26px; font-size: 14px; }

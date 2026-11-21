@@ -1,0 +1,36 @@
+name: Coletar partidas PvP
+
+on:
+  schedule:
+    - cron: '3,33 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coletar-pvp
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ferramentas
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Ler as últimas partidas dos jogadores Mestre+
+        run: node ferramentas/atualizar-meta.mjs --passada
+        env:
+          META_PVP_SAIDA: coleta/passada.json.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coleta-pvp
+          path: coleta/passada.json.gz
+          if-no-files-found: ignore
+          retention-days: 3
+          compression-level: 0

@@ -99,7 +99,8 @@ async function montar() {
   if (!Number.isNaN(g.getTime())) document.getElementById('data').textContent = `Atualizado ${new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }).format(g)}`
   const topo = j.topo ?? dados.topo
   const base = []
-  if (num(topo)) base.push(`top ${fmt.format(topo)}`)
+  if (typeof dados.recorte === 'string' && dados.recorte) base.push(dados.recorte)
+  else if (num(topo)) base.push(`top ${fmt.format(topo)}`)
   if (num(j.partidas)) base.push(`${fmt.format(j.partidas)} partidas`)
   const pBase = document.getElementById('base')
   base.forEach((t, i) => { if (i) pBase.append(' · '); pBase.append(Object.assign(el('b'), { textContent: t })) })

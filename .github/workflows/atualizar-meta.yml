@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: atualizar-meta
@@ -17,7 +18,7 @@ concurrency:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -39,9 +40,32 @@ jobs:
         with:
           node-version: 20
 
+      - name: Baixar as passadas das últimas 30 horas
+        if: steps.hoje.outputs.feito != 'sim'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p coleta/passadas
+          desde=$(date -u -d '30 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          n=0
+          for pagina in 1 2 3; do
+            ids=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=coleta-pvp&per_page=100&page=$pagina" --jq ".artifacts[] | select(.expired == false and .created_at >= \"$desde\") | .id")
+            [ -z "$ids" ] && break
+            for id in $ids; do
+              if gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > coleta/a.zip 2>/dev/null && unzip -oq coleta/a.zip -d "coleta/passadas/$id"; then n=$((n + 1)); fi
+              sleep 0.3
+            done
+          done
+          rm -f coleta/a.zip
+          echo "$n passadas baixadas"
+
       - name: Coletar ranqueado e recalcular
         if: steps.hoje.outputs.feito != 'sim'
         run: node ferramentas/atualizar-meta.mjs
+        env:
+          META_PVP_PASSADAS: coleta/passadas
+          NODE_OPTIONS: --max-old-space-size=6144
 
       - name: Gerar prévia do tier
         if: steps.hoje.outputs.feito != 'sim'

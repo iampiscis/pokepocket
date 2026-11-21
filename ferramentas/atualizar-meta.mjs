@@ -13,19 +13,25 @@ const PASTA_DADOS = path.join(raiz, 'tier', 'dados')
 
 const API = 'https://pokeidle.io/tracker/api/'
 const AGENTE = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
-const TOPO = Math.min(500, Math.max(50, Number(process.env.META_PVP_TOPO) || 500))
+const LIGAS = ['challenger', 'graomestre', 'mestre']
+const NOME_LIGA = { challenger: 'Challenger', graomestre: 'Grão-Mestre', mestre: 'Mestre' }
+const RECORTE = 'Mestre+'
+const TETO_JOGADORES = Math.min(3000, Math.max(50, Number(process.env.META_PVP_TETO) || 1500))
+const PAUSA_MS = 500
 const LIMITES = { partidasMin: 1000, p99: 15, max: 30 }
 const IV_MEDIO = { hp: 21, atk: 21, def: 21, spAtk: 21, spDef: 21, speed: 21 }
 const QUALIDADE_MEDIA = 1.28
 const PADRAO = { potencia: 1, quality: 1.1, shiny: true, ivs: { hp: 20, atk: 20, def: 20, spAtk: 20, spDef: 20, speed: 20 } }
 const TIERS = [['S+', 0.04], ['S', 0.08], ['S-', 0.18], ['A+', 0.23], ['A', 0.32], ['A-', 0.41], ['B+', 0.51], ['B', 0.6], ['B-', 0.69], ['C', 0.85], ['D', 1]]
-const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos, e sem a versão comum de quem tem mega. Faixas pelas formas shiny usadas nos times do top ${TOPO} do ranqueado, com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
+const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos, e sem a versão comum de quem tem mega. Faixas pelas formas shiny usadas nos times dos jogadores Mestre, Grão-Mestre e Challenger do ranqueado (todas as partidas do dia que o tracker registra para eles), com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
 const HORA = 3600000
 const DIA = 24 * HORA
 const JANELAS = { dia: { idade: 20 * HORA, dias: 1 }, semana: { idade: 7 * DIA - 4 * HORA, dias: 7 }, mes: { idade: 30 * DIA - 4 * HORA, dias: 30 } }
 const GUARDA_MS = 31 * DIA
 const AMOSTRA = 4000
 const MIN_VITORIAS = 20
+const AMOSTRA_META = 50000
+const AMOSTRA_AUC = 40000
 
 const NIVEL_REFERENCIA = 2000
 const ESCALA_PVP = [10, 25000]
@@ -70,6 +76,7 @@ const MODULOS = {
 const CATALOGOS = ['creatures', 'creatures-novos', 'creatures-outland-novos', 'creatures-formas', 'creatures-audit-overrides']
 const BASE_DE = ['baseHp', 'baseAtk', 'baseDef', 'baseSpAtk', 'baseSpDef', 'baseSpeed']
 
+const amostrar = (a, n) => { if (a.length <= n) return a; const b = a.slice(); for (let i = 0; i < n; i++) { const k = i + Math.floor(Math.random() * (b.length - i)); [b[i], b[k]] = [b[k], b[i]] } return b.slice(0, n) }
 const espera = (ms) => new Promise((r) => setTimeout(r, ms))
 const media = (a) => a.reduce((x, y) => x + y, 0) / a.length
 const desvio = (a) => { const m = media(a); return Math.sqrt(media(a.map((x) => (x - m) ** 2))) }
@@ -257,35 +264,93 @@ function metaValido(m) {
 
 async function api(rota, q) {
   const url = API + rota + '?' + new URLSearchParams(q)
-  for (let t = 0; t < 3; t++) {
+  for (let t = 0; t < 4; t++) {
     try {
       const r = await fetch(url, { headers: { 'User-Agent': AGENTE, accept: 'application/json' }, signal: AbortSignal.timeout(20000) })
       if (r.ok) return await r.json()
+      if (r.status === 404) return null
+      if (r.status === 429) { await espera(65000); continue }
     } catch {}
     await espera(3000 + 5000 * t)
   }
   return null
 }
 
-async function coletar() {
+const enxutoLado = (L) => (L ? { pks: (L.pks || []).map((x) => ({ id: x.id, nivel: x.nivel, shiny: x.shiny ? 1 : 0, caiu: x.caiu ? 1 : 0, recebido: x.recebido || 0 })) } : null)
+const enxuta = (p) => ({ em: p.em, venci: !!p.venci, oponente: p.oponente?.nick ? { nick: p.oponente.nick } : null, eu: enxutoLado(p.eu), ele: enxutoLado(p.ele) })
+
+async function elegiveis() {
   const nicks = []
+  const porLiga = {}
   let temporada = null
-  for (let p = 0; nicks.length < TOPO; p++) {
+  let fim = false
+  for (let p = 0; !fim && nicks.length < TETO_JOGADORES; p++) {
     const j = await api('ladder', { pagina: p, limite: 50 })
     if (!j?.linhas?.length) break
     temporada = j.temporada
-    nicks.push(...j.linhas.map((x) => x.nick))
-    await espera(500)
+    for (const x of j.linhas) {
+      if (!LIGAS.includes(x.tierId)) { fim = true; break }
+      if (nicks.length >= TETO_JOGADORES) break
+      nicks.push(x.nick)
+      porLiga[x.tierId] = (porLiga[x.tierId] || 0) + 1
+    }
+    await espera(PAUSA_MS)
   }
-  nicks.length = Math.min(nicks.length, TOPO)
-  log(`ladder: ${nicks.length} jogadores da temporada ${temporada}`)
+  log(`ladder: ${nicks.length} jogadores ${RECORTE} da temporada ${temporada} (${LIGAS.map((l) => `${NOME_LIGA[l]} ${porLiga[l] || 0}`).join(', ')})${nicks.length >= TETO_JOGADORES ? `, no teto de ${TETO_JOGADORES}` : ''}`)
+  return { nicks, temporada, porLiga }
+}
+
+async function coletarListas(nicks) {
   const listas = []
   for (const nick of nicks) {
     const j = await api('partidas', { nick })
-    if (j) listas.push({ nick, partidas: j.partidas || [] })
-    await espera(500)
-    if (listas.length && listas.length % 50 === 0) log(`partidas: ${listas.length} jogadores`)
+    if (j) listas.push({ nick, partidas: (j.partidas || []).map(enxuta) })
+    await espera(PAUSA_MS)
+    if (listas.length && listas.length % 100 === 0) log(`partidas: ${listas.length} jogadores`)
   }
+  return listas
+}
+
+async function coletarPassada() {
+  const { nicks, temporada, porLiga } = await elegiveis()
+  const listas = await coletarListas(nicks)
+  return { em: new Date().toISOString(), temporada, porLiga, listas }
+}
+
+function juntarListas(passadas, desde) {
+  const porNick = new Map()
+  for (const ps of passadas) for (const l of ps.listas || []) {
+    let m = porNick.get(l.nick)
+    if (!m) porNick.set(l.nick, (m = new Map()))
+    for (const p of l.partidas || []) if (Date.parse(p.em) > desde && !m.has(p.em)) m.set(p.em, p)
+  }
+  return [...porNick].map(([nick, m]) => ({ nick, partidas: [...m.values()].sort((a, b) => Date.parse(b.em) - Date.parse(a.em)) }))
+}
+
+function lerPassadas(pasta) {
+  const saida = []
+  const visitar = (d) => {
+    let itens = []
+    try { itens = fs.readdirSync(d, { withFileTypes: true }) } catch { return }
+    for (const it of itens) {
+      const arq = path.join(d, it.name)
+      if (it.isDirectory()) visitar(arq)
+      else if (it.name.endsWith('.json.gz')) { try { saida.push(JSON.parse(zlib.gunzipSync(fs.readFileSync(arq)).toString('utf8'))) } catch {} }
+    }
+  }
+  if (pasta) visitar(pasta)
+  return saida.filter((x) => Array.isArray(x?.listas))
+}
+
+async function coletar(desde) {
+  const anteriores = lerPassadas(process.env.META_PVP_PASSADAS)
+  const agora = await coletarPassada()
+  const temporada = agora.temporada
+  const validas = anteriores.filter((x) => !temporada || !x.temporada || x.temporada === temporada)
+  const elegiveisAgora = new Set(agora.listas.map((l) => l.nick))
+  const listas = juntarListas([...validas, agora], desde)
+  const total = listas.reduce((t, l) => t + l.partidas.length, 0)
+  log(`passadas: ${validas.length} anteriores + esta; ${total} registros de partida de ${listas.length} jogadores desde ${new Date(desde).toISOString()}`)
   const cobertos = new Set()
   const detalhes = []
   for (const l of listas) {
@@ -300,7 +365,7 @@ async function coletar() {
     await espera(400)
   }
   log(`detalhes: ${detalhes.length} partidas`)
-  return { temporada, listas, detalhes }
+  return { temporada, porLiga: agora.porLiga, elegiveis: elegiveisAgora.size, passadas: validas.length + 1, listas, detalhes }
 }
 
 function deBruto(c, r) {
@@ -319,7 +384,7 @@ function montarPartidas(c, { listas, detalhes }, dentro) {
   const tmMap = new Map()
   const tmEsp = {}
   const kn = (nick, id) => `${nick}|${id}`
-  const guardaHp = (nick, p, hp) => { const k = kn(nick, p.id); const a = hpMap.get(k) || []; a.push([p.nivel, hp]); hpMap.set(k, a) }
+  const guardaHp = (nick, p, hp) => { const k = kn(nick, p.id); let a = hpMap.get(k); if (!a) hpMap.set(k, (a = new Map())); if (!a.has(p.nivel) || p.hp) a.set(p.nivel, hp) }
   for (const m of detalhes) {
     ;[m.eu, m.ele].forEach((L, lado) => (L.pks || []).forEach((p, idx) => {
       if (p.hp) guardaHp(L.nick, p, p.hp)
@@ -351,17 +416,23 @@ function montarPartidas(c, { listas, detalhes }, dentro) {
     if (!a) return null
     let best = null
     for (const x of a) if (!best || Math.abs(x[0] - p.nivel) < Math.abs(best[0] - p.nivel)) best = x
+    if (!best) return null
     if (Math.abs(best[0] - p.nivel) / p.nivel > 0.05) return null
     return best[1] * p.nivel / best[0]
   }
+  const criados = new Map()
   const cria = (nick, p) => {
     if (!c.especies.has(Number(p.id))) return null
     const hp = hpDe(nick, p)
     if (!hp) return null
     const tm0 = tmMap.has(kn(nick, p.id)) ? tmMap.get(kn(nick, p.id)) : (tmModa[p.id] ?? null)
     const ti = tm0 ? TIPOS.indexOf(String(tm0.tipo).toUpperCase()) : -1
-    const o = deBruto(c, [Number(p.id), p.nivel, p.shiny ? 1 : 0, hp, ti >= 0 ? ti + (tm0.aoe ? 18 : 0) : -1])
-    if (o) o.bruto = [o.bruto[0], o.bruto[1], o.bruto[2], Math.round(hp), o.bruto[4]]
+    const bruto = [Number(p.id), p.nivel, p.shiny ? 1 : 0, Math.round(hp), ti >= 0 ? ti + (tm0.aoe ? 18 : 0) : -1]
+    const k = bruto.join('|')
+    if (criados.has(k)) return criados.get(k)
+    const o = deBruto(c, [...bruto.slice(0, 3), hp, bruto[4]])
+    if (o) o.bruto = bruto
+    criados.set(k, o)
     return o
   }
   const vistos = new Set()
@@ -385,13 +456,15 @@ function somarMeta(meta0, pks) {
   const def = Object.fromEntries(TIPOS.map((t) => [t, [0, 0]]))
   let invInc = 0
   let defInv = 0
-  for (const o of pks) {
+  const vezes = new Map()
+  for (const o of pks) vezes.set(o, (vezes.get(o) || 0) + 1)
+  for (const [o, n] of vezes) {
     const a = agendaPvp(meta0, o.st, o.esp, o.nv, o.tm)
-    a.gs.forEach((g, i) => { if (inc[g.tipo]) inc[g.tipo][g.especial ? 1 : 0] += a.casts[i] * a.valor[i] })
-    invInc += a.investidas * a.valorInvestida
+    a.gs.forEach((g, i) => { if (inc[g.tipo]) inc[g.tipo][g.especial ? 1 : 0] += n * a.casts[i] * a.valor[i] })
+    invInc += n * a.investidas * a.valorInvestida
     const tipos = tiposDe(o.esp)
-    for (const t of TIPOS) { const e = efetividade(t, tipos); def[t][0] += e / o.st.def; def[t][1] += e / o.st.spDef }
-    defInv += 1 / o.st.def
+    for (const t of TIPOS) { const e = efetividade(t, tipos); def[t][0] += n * e / o.st.def; def[t][1] += n * e / o.st.spDef }
+    defInv += n / o.st.def
   }
   return { inc, def, invInc, defInv }
 }
@@ -434,7 +507,8 @@ function montarBalde(c, ativo, bruta, de, ate) {
       times, uso, vit, nicks
     },
     partidas,
-    pks
+    pks,
+    amostraMeta: embaralhados.slice(0, AMOSTRA_META)
   }
 }
 
@@ -513,7 +587,9 @@ function metaDosBaldes(c, ativo, ref, fichas, formasDe, baldes, geradoEm) {
     const w = b.N / Math.max(1, pks.length)
     for (const o of pks) pares.push([o, w])
   }
-  meta.mO = medianaPonderada(pares.map(([o, w]) => [ataqueEfetivo(meta, o.st, o.esp, o.nv, o.tm), w]))
+  const ataques = new Map()
+  const ataqueDe = (o) => { if (!ataques.has(o)) ataques.set(o, ataqueEfetivo(meta, o.st, o.esp, o.nv, o.tm)); return ataques.get(o) }
+  meta.mO = medianaPonderada(pares.map(([o, w]) => [ataqueDe(o), w]))
   meta.mR = medianaPonderada(pares.map(([o, w]) => [resistenciaEfetiva(meta, o.st, o.hp / 1.5, o.esp), w]))
   meta.escala = ancorarEscala(avaliarReferencia(c, formasDe, fichas, meta), ref)
   return meta
@@ -544,7 +620,7 @@ function validarMeta(c, ativo, meta, partidas, refNovo, refAtual) {
   const relatorio = { partidas: meta.partidas, pokemons: meta.pokemons }
   if (meta.partidas < LIMITES.partidasMin) return { ...relatorio, status: 'rejeitado', motivo: `poucas partidas (${meta.partidas})` }
   if (!metaValido(meta)) return { ...relatorio, status: 'rejeitado', motivo: 'meta incompleto' }
-  const mesmoRecorte = ativo.topo === TOPO
+  const mesmoRecorte = ativo.recorte === RECORTE
   const nv = (b, esc) => scorePoder(Math.exp(esc[0] + esc[1] * Math.log(b))) ?? 0
   const difs = []
   refNovo.forEach((x, i) => {
@@ -556,9 +632,11 @@ function validarMeta(c, ativo, meta, partidas, refNovo, refAtual) {
   relatorio.estabilidade = { referencia: difs.length, mediana: q(0.5), p99: q(0.99), max: difs.at(-1) }
   const forcaCom = (m) => { const cache = new Map(); return (o) => { if (!cache.has(o)) cache.set(o, ataqueEfetivo(m, o.st, o.esp, o.nv, o.tm) / m.mO + resistenciaEfetiva(m, o.st, o.hp / 1.5, o.esp) / m.mR); return cache.get(o) } }
   const r3 = (x) => (x == null ? null : Math.round(x * 1000) / 1000)
-  relatorio.auc = { novo: r3(auc(partidas, forcaCom(meta))), ativo: r3(auc(partidas, forcaCom(ativo))), jogo: r3(auc(partidas, (o) => forcaJogo(c.gi, o))) }
+  const jogo = new Map()
+  const forcaJogoDe = (o) => { if (!jogo.has(o)) jogo.set(o, forcaJogo(c.gi, o)); return jogo.get(o) }
+  relatorio.auc = { novo: r3(auc(partidas, forcaCom(meta))), ativo: r3(auc(partidas, forcaCom(ativo))), jogo: r3(auc(partidas, forcaJogoDe)) }
   if (!(relatorio.auc.novo > relatorio.auc.jogo)) return { ...relatorio, status: 'rejeitado', motivo: 'o meta novo não previu os vencedores melhor que o poder do jogo' }
-  if (!mesmoRecorte) return { ...relatorio, status: 'aplicado', motivo: `primeiro meta do top ${TOPO}, sem comparar estabilidade` }
+  if (!mesmoRecorte) return { ...relatorio, status: 'aplicado', motivo: `primeiro meta do recorte ${RECORTE} (antes ${ativo.recorte ?? (ativo.topo ? `top ${ativo.topo}` : 'sem recorte')}), sem comparar estabilidade` }
   if (relatorio.estabilidade.p99 <= LIMITES.p99 && relatorio.estabilidade.max <= LIMITES.max) return { ...relatorio, status: 'aplicado' }
   return { ...relatorio, status: 'pendente', motivo: `mudança acima do limite (99% até ${relatorio.estabilidade.p99} pts, máximo ${relatorio.estabilidade.max})` }
 }
@@ -566,7 +644,7 @@ function validarMeta(c, ativo, meta, partidas, refNovo, refAtual) {
 function arredondarMeta(m) {
   const r = (x) => sig(x, 6)
   return {
-    geradoEm: m.geradoEm, topo: TOPO, partidas: m.partidas, pokemons: m.pokemons, T: m.T, aoe: m.aoe,
+    geradoEm: m.geradoEm, recorte: RECORTE, partidas: m.partidas, pokemons: m.pokemons, T: m.T, aoe: m.aoe,
     inc: Object.fromEntries(TIPOS.map((t) => [t, m.inc[t].map(r)])), invInc: r(m.invInc),
     def: Object.fromEntries(TIPOS.map((t) => [t, m.def[t].map(r)])), defInv: r(m.defInv),
     mO: r(m.mO), mR: r(m.mR), escala: m.escala.map(r)
@@ -695,12 +773,16 @@ async function principal() {
   const fichas = fichasReferencia(ref)
   log(`catálogo: ${c.especies.size} espécies, ${linhas.formas.size} iniciais`)
 
+  const anteriores = lerBaldes(c).filter((b) => agora - Date.parse(b.ate) <= GUARDA_MS)
+  const ultimo = anteriores.length ? Date.parse(anteriores.at(-1).ate) : 0
+  const de = Math.max(ultimo, agora - DIA)
+
   let bruta = null
   const cache = process.env.META_PVP_COLETA
   if (cache && fs.existsSync(cache)) bruta = JSON.parse(zlib.gunzipSync(fs.readFileSync(cache)).toString('utf8'))
   else {
     const t0 = Date.now()
-    bruta = await coletar()
+    bruta = await coletar(de)
     log(`coleta em ${Math.round((Date.now() - t0) / 60000)} min`)
     if (cache && bruta.listas.length) fs.writeFileSync(cache, zlib.gzipSync(JSON.stringify(bruta)))
   }
@@ -709,16 +791,13 @@ async function principal() {
     return
   }
 
-  const anteriores = lerBaldes(c).filter((b) => agora - Date.parse(b.ate) <= GUARDA_MS)
-  const ultimo = anteriores.length ? Date.parse(anteriores.at(-1).ate) : 0
-  const de = Math.max(ultimo, agora - DIA)
   const atual = montarBalde(c, ativo, bruta, de, agora)
   log(`balde ${atual.balde.de} a ${atual.balde.ate}: ${atual.balde.partidas} partidas, ${atual.balde.completas} completas, ${atual.balde.N} pokémons, ${atual.balde.times} times`)
   if (!atual.balde.partidas) {
     console.warn('aviso: nenhuma partida nova no período; mantive os arquivos como estão')
     return
   }
-  atual.balde.carregarPks = () => atual.pks
+  atual.balde.carregarPks = () => atual.amostraMeta
   const baldes = [...anteriores, atual.balde]
   const geradoEm = new Date(agora).toISOString()
   const naJanela = (j) => baldes.filter((b) => agora - Date.parse(b.ate) < JANELAS[j].idade)
@@ -729,7 +808,7 @@ async function principal() {
   if (novoDia) {
     const refNovo = avaliarReferencia(c, formasDe, fichas, novoDia)
     const refAtual = avaliarReferencia(c, formasDe, fichas, ativo)
-    const rel = validarMeta(c, ativo, novoDia, atual.partidas, refNovo, refAtual)
+    const rel = validarMeta(c, ativo, novoDia, amostrar(atual.partidas, AMOSTRA_AUC), refNovo, refAtual)
     log(`meta do dia: ${rel.status}${rel.motivo ? ` (${rel.motivo})` : ''} ${JSON.stringify({ auc: rel.auc, estabilidade: rel.estabilidade })}`)
     if (rel.status === 'aplicado') {
       metaDia = arredondarMeta(novoDia)
@@ -756,13 +835,23 @@ async function principal() {
     }
     log(`${j}: ${dias} dia(s), ${janelas[j].partidas} partidas, ${tiers.reduce((t, g) => t + g.itens.length, 0)} formas no meta, ${foraDoMeta.length} fora; S+: ${tiers[0].itens.slice(0, 5).map((x) => `${x.nome} ${x.score}`).join(', ')}`)
   }
-  const saida = { geradoEm, versaoJogo: c.versao?.versaoJogo ?? null, temporada: bruta.temporada ?? null, topo: TOPO, regra: REGRA, janelas }
+  const saida = { geradoEm, versaoJogo: c.versao?.versaoJogo ?? null, temporada: bruta.temporada ?? null, recorte: RECORTE, ligas: LIGAS, elegiveis: bruta.elegiveis ?? null, regra: REGRA, janelas }
   const texto = JSON.stringify(saida)
   gravarAtomico(ARQ_TIER, texto)
   log(`tier.json: ${Math.round(texto.length / 1024)} KB`)
 }
 
-principal().catch((err) => {
+async function soPassada() {
+  const saida = process.env.META_PVP_SAIDA || path.join(raiz, 'coleta', `${new Date().toISOString().slice(0, 16).replace(':', '-')}.json.gz`)
+  const t0 = Date.now()
+  const ps = await coletarPassada()
+  const n = ps.listas.reduce((t, l) => t + l.partidas.length, 0)
+  if (!ps.listas.length) { console.warn('aviso: o tracker não respondeu; nada gravado'); return }
+  gravarAtomico(saida, zlib.gzipSync(JSON.stringify(ps), { level: 9 }))
+  log(`passada: ${ps.listas.length} jogadores, ${n} registros em ${Math.round((Date.now() - t0) / 1000)} s; gravei ${path.relative(raiz, saida)}`)
+}
+
+;(process.argv.includes('--passada') ? soPassada() : principal()).catch((err) => {
   console.error(err?.stack || err)
   process.exit(1)
 })
