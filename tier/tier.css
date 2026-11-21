@@ -188,3 +188,41 @@ button.f-evo-no:hover { background: rgba(255, 233, 163, 0.07); color: #fff; }
 .resiste .def-g.medio .def-mult { color: #bbf7d0; background: rgba(74, 222, 128, 0.16); box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.4); }
 .resiste .def-g.zero .def-mult { color: #e0e7ff; background: rgba(148, 163, 184, 0.22); box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.5); }
 .def-tipos { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+
+.barra .vista { display: none; }
+.vista button { display: grid; place-items: center; }
+.vista svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+  .barra { gap: 6px; padding: 6px; }
+  .barra .busca { order: 1; flex: 1 1 0; min-width: 0; max-width: none; }
+  .abre-tipos { order: 2; flex: none !important; }
+  .tipos-filtro { order: 3; }
+  .janelas { order: 4; flex: 1 1 100%; }
+  .ordem { order: 5; flex: 1 1 auto; }
+  #todas { order: 6; flex: 1 1 auto; }
+  .barra .vista { order: 7; display: flex; flex: none; }
+  .barra .vista button { flex: none; width: 40px; padding: 0; }
+  .barra .campo { height: 42px; font-size: 16px; }
+  .barra .chip { height: 42px; padding: 0 12px; }
+  .barra .seg button { min-height: 40px; }
+  .f-fechar { width: 40px; height: 40px; }
+  .so-largo { display: none; }
+  .todas-txt { display: inline-block; }
+  .todas-txt::first-letter { text-transform: uppercase; }
+  .chip-tipo { padding: 6px 12px; font-size: 13px; }
+  .limpa-tipos { padding: 6px 10px; font-size: 13px; }
+  .info-linha .info { position: relative; width: 30px; height: 30px; }
+  .info-linha .info::after { content: ""; position: absolute; inset: -6px; }
+
+  .tier:not(.lista) .faixa { grid-template-columns: 38px minmax(0, 1fr); }
+  .tier:not(.lista) .faixa-rot { display: grid; align-content: center; justify-content: center; gap: 2px; padding: 6px 1px; }
+  .tier:not(.lista) .faixa-rot b { font-size: 19px; }
+  .tier:not(.lista) .faixa-rot small { font-size: 9.5px; }
+  .tier:not(.lista) .faixa-cartoes { grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 4px; padding: 4px; }
+  .tier:not(.lista) .poke { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; grid-template-areas: "img" "val"; justify-items: center; row-gap: 0; min-height: 0; padding: 3px 1px 5px; border-radius: 9px; }
+  .tier:not(.lista) .poke-cab, .tier:not(.lista) .poke-uso, .tier:not(.lista) .poke-esc, .tier:not(.lista) .poke > .pontos { display: none; }
+  .tier:not(.lista) .poke-img { width: 44px; height: 44px; }
+  .tier:not(.lista) .poke-img img { max-width: 44px; max-height: 44px; }
+  .tier:not(.lista) .poke-val { justify-self: center; font-size: 14px; color: #fff3df; }
+  .tier:not(.lista) .poke:hover { transform: none; }
+}

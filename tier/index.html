@@ -90,10 +90,14 @@
             <span class="busca-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></span>
             <input id="busca" class="campo" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar pokémon" aria-label="Buscar pokémon" />
           </label>
-          <button type="button" id="todas" class="chip" aria-pressed="false" title="Mostrar também as formas fora do meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>Mostrar todas</button>
+          <button type="button" id="todas" class="chip" aria-pressed="false" title="Mostrar também as formas fora do meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="todas-txt"><span class="so-largo">Mostrar </span>todas</span></button>
           <div class="seg ordem" role="group" aria-label="Ordenar por">
             <button type="button" data-ordem="score" aria-pressed="true">Score</button>
             <button type="button" data-ordem="uso" aria-pressed="false">Uso</button>
+          </div>
+          <div class="seg vista" role="group" aria-label="Exibição">
+            <button type="button" data-vista="grade" aria-pressed="true" aria-label="Grade" title="Grade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
+            <button type="button" data-vista="lista" aria-pressed="false" aria-label="Lista" title="Lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="6.5" rx="1.5"/><rect x="3.5" y="13.5" width="17" height="6.5" rx="1.5"/></svg></button>
           </div>
           <button type="button" id="abre-tipos" class="chip abre-tipos" aria-expanded="false" aria-controls="tipos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></svg>Tipos<span id="n-tipos" class="n-tipos" hidden></span></button>
           <div id="tipos" class="tipos-filtro" role="group" aria-label="Filtrar por tipo" hidden></div>

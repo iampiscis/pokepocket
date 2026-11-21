@@ -83,10 +83,10 @@ button { cursor: pointer; }
 .painel-pe .apoio svg { color: #f9a8d4; }
 .topo .baixar { gap: 8px; white-space: nowrap; }
 .topo .baixar svg { width: 17px; height: 17px; }
-.estrela { position: relative; flex: none; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; font-weight: 800; font-size: 14px; color: var(--tinta); background: rgba(21, 11, 16, 0.62); border: 1px solid rgba(255, 233, 163, 0.2); transition: transform 0.2s; }
-.estrela::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; box-shadow: 0 0 18px rgba(255, 211, 77, 0.28); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
-.estrela:hover { transform: translateY(-1px); }
-.estrela:hover::after { opacity: 1; }
+a.estrela { position: relative; flex: none; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px; border-radius: 999px; text-decoration: none; white-space: nowrap; font-weight: 800; font-size: 14px; color: var(--tinta); background: rgba(21, 11, 16, 0.62); border: 1px solid rgba(255, 233, 163, 0.2); transition: transform 0.2s; }
+a.estrela::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; box-shadow: 0 0 18px rgba(255, 211, 77, 0.28); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+a.estrela:hover { transform: translateY(-1px); }
+a.estrela:hover::after { opacity: 1; }
 .estrela .gh { flex: none; width: 18px; height: 18px; }
 .estrela .st { flex: none; width: 14px; height: 14px; color: var(--ouro); transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
 .estrela:hover .st { transform: rotate(72deg) scale(1.2); }
@@ -99,9 +99,9 @@ button { cursor: pointer; }
 .visitas svg { flex: none; width: 15px; height: 15px; }
 .visitas b { font-weight: 900; color: var(--suave); }
 @media (max-width: 1359px) {
-  .estrela { width: 40px; padding: 0; justify-content: center; }
-  .estrela .txt, .estrela .estrela-n { display: none; }
-  .estrela .st { position: absolute; top: -3px; right: -3px; width: 13px; height: 13px; filter: drop-shadow(0 0 2px #0b0608); }
+  a.estrela { width: 40px; padding: 0; justify-content: center; }
+  a.estrela .txt, a.estrela .estrela-n { display: none; }
+  a.estrela .st { position: absolute; top: -3px; right: -3px; width: 13px; height: 13px; filter: drop-shadow(0 0 2px #0b0608); }
 }
 @media (min-width: 1181px) and (max-width: 1359px) {
   .secoes a { padding: 7px 11px; font-size: 13.5px; }
@@ -624,3 +624,42 @@ details[open] .det-seta { transform: rotate(180deg); }
 
 .v-tier { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 999px; font-family: var(--display); font-size: 12px; letter-spacing: 0.03em; line-height: 1.5; color: #1a0e12; background: var(--ct); text-decoration: none; white-space: nowrap; }
 .v-tier:hover { filter: brightness(1.1); }
+
+@media (max-width: 560px) {
+  .topo .envolve { height: 60px; }
+  .abre { padding: 8px 0 6px; }
+  .abre p { margin-top: 4px; font-size: 14px; line-height: 1.4; }
+  .rodape a, .preco-rodape .credito { display: inline-block; padding: 11px 2px; margin: -11px -2px; }
+  .final { margin-top: 36px; padding: 28px 16px 24px; }
+  .final-txt { font-size: 16px; margin-bottom: 18px; }
+  .rodape { margin-top: 20px; font-size: 13px; }
+  .visor-topo { top: 66px; }
+  .visor-id .sprite { zoom: 0.65; }
+  .visor-id strong { font-size: 15px; }
+  .visor-copiar, .visor-novo { width: 40px; height: 40px; }
+  .visor-cels { row-gap: 6px; }
+  .v-cel { grid-template-rows: auto 8px auto; row-gap: 2px; }
+  .v-cel .v-val { font-size: 19px; }
+  .v-pe { min-height: 18px; }
+  .abas { gap: 4px; }
+  .abas button { min-height: 42px; }
+  textarea, .novo-colar .campo { font-size: 16px; }
+  .novo-colar .campo { height: 42px; }
+  .novo-bts .botao-leve { width: 42px; height: 42px; }
+  .botao-leve { min-height: 40px; }
+  .novo-calc { padding: 4px 11px; }
+  .passos { height: 42px; grid-template-columns: 40px minmax(0, 1fr) 40px; }
+  .grade6, .larga .grade6, .cartao-hoje .grade6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .passo { font-size: 22px; }
+  .seg button { min-height: 40px; }
+  .chip { min-height: 40px; }
+  .forma { min-height: 44px; }
+  .regua { height: 32px; margin: -4px 0; }
+  .info { position: relative; width: 30px; height: 30px; }
+  .info::after { content: ""; position: absolute; inset: -6px; }
+  .compartilhar .botao { flex: 1 1 100%; min-height: 46px; }
+}
+@media (max-width: 420px) {
+  .visor-topo { top: 66px; }
+  .passos { grid-template-columns: 40px minmax(0, 1fr) 40px; }
+}

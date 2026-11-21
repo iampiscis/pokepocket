@@ -271,6 +271,18 @@ function montarFiltros() {
   document.querySelectorAll('[data-janela]').forEach((b) => b.addEventListener('click', () => { estado.janela = b.dataset.janela; muda() }))
   document.querySelectorAll('[data-ordem]').forEach((b) => b.addEventListener('click', () => { estado.ordem = b.dataset.ordem; muda() }))
   $('todas').addEventListener('click', () => { estado.todas = !estado.todas; muda() })
+  const vista = (v) => {
+    $('tier').classList.toggle('lista', v === 'lista')
+    document.querySelectorAll('[data-vista]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)))
+    ajustarNomes()
+  }
+  let vistaSalva = 'grade'
+  try { vistaSalva = localStorage.getItem('pp-tier-vista') === 'lista' ? 'lista' : 'grade' } catch {}
+  vista(vistaSalva)
+  document.querySelectorAll('[data-vista]').forEach((b) => b.addEventListener('click', () => {
+    vista(b.dataset.vista)
+    try { localStorage.setItem('pp-tier-vista', b.dataset.vista) } catch {}
+  }))
   let espera = 0
   $('busca').addEventListener('input', (e) => {
     estado.busca = e.target.value
