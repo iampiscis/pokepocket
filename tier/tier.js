@@ -298,11 +298,15 @@ function montarFiltros() {
     clearTimeout(espera)
     espera = setTimeout(muda, 120)
   })
+  const fecharExplica = () => { $('info-score').setAttribute('aria-expanded', 'false'); $('explica').hidden = true }
   $('info-score').addEventListener('click', (e) => {
+    e.stopPropagation()
     const aberto = e.currentTarget.getAttribute('aria-expanded') === 'true'
     e.currentTarget.setAttribute('aria-expanded', String(!aberto))
     $('explica').hidden = aberto
   })
+  document.addEventListener('click', (e) => { if (!$('explica').hidden && !$('explica').contains(e.target)) fecharExplica() })
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharExplica() })
   addEventListener('hashchange', () => { lerHash(); pintar(); sincronizarFicha() })
   $('faixas').addEventListener('click', clicouCartao)
   $('fora-faixas').addEventListener('click', clicouCartao)
@@ -502,15 +506,17 @@ function pintarCabecalho() {
   }
   const rec = recorteDe(janelasDe(dados).dia)
   const versao = [temporadaTxt(dados.temporada), dados.versaoJogo ? `jogo ${dados.versaoJogo}` : ''].filter(Boolean).join(' · ')
-  const linhas = [
-    'Cada shiny no indivíduo padrão: nível 100, qualidade 1,1, IV 20, P1, sem refino.',
-    dados.recorte ? 'Meta e uso vêm de todas as partidas do dia dos jogadores Mestre, Grão-Mestre e Challenger do ranqueado. Sem lendários e míticos.' : `Meta e uso vêm das partidas do ${rec ? rec.curto.toLowerCase() : 'topo'} do ranqueado. Sem lendários e míticos.`,
-    'Score de 0 a 1000, o mesmo da calculadora.'
-  ]
-  const nos = []
-  linhas.forEach((t, i) => { if (i) nos.push(el('br')); nos.push(t) })
-  if (versao) nos.push(el('br'), el('small', { text: versao }))
-  $('explica').replaceChildren(...nos)
+  const bloco = (ico, tit, txt) => el('div', { class: 'ex-bloco' }, [el('span', { class: 'ex-ico', 'aria-hidden': 'true', text: ico }), el('b', { text: tit }), el('span', { text: txt })])
+  const fonte = dados.recorte ? 'Partidas do dia de Mestre, Grão-Mestre e Challenger' : `Partidas do ${rec ? rec.curto.toLowerCase() : 'topo'} do ranqueado`
+  $('explica').replaceChildren(
+    el('div', { class: 'ex-cab' }, [el('b', { text: 'Como o tier é feito' })]),
+    el('div', { class: 'ex-grade' }, [
+      bloco('✦', 'Shiny padrão', 'Nv 100 · qualidade 1,1 · IV 20 · P1 · sem refino'),
+      bloco('⚔', 'Meta real', `${fonte}. Sem lendários e míticos.`),
+      bloco('★', 'Score 0–1000', 'O mesmo da calculadora')
+    ]),
+    ...(versao ? [el('small', { class: 'ex-pe', text: versao })] : [])
+  )
 }
 
 async function iniciar() {
