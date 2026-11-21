@@ -19,7 +19,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://iampiscis.github.io/pokepocket/assets/previa-tier.png?d=202611212004" />
   <link rel="icon" href="../assets/icone.png" />
-  <script>document.documentElement.classList.add('sem-vt')</script>
+  <script>document.documentElement.classList.add('sem-vt'); if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed')</script>
   <link rel="stylesheet" href="../calculadora/calc.css" />
   <link rel="stylesheet" href="tier.css" />
   <script type="module" src="tier.js"></script>
@@ -95,10 +95,6 @@
             <button type="button" data-ordem="score" aria-pressed="true">Score</button>
             <button type="button" data-ordem="uso" aria-pressed="false">Uso</button>
           </div>
-          <div class="seg vista" role="group" aria-label="Exibição">
-            <button type="button" data-vista="grade" aria-pressed="true" aria-label="Grade" title="Grade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
-            <button type="button" data-vista="lista" aria-pressed="false" aria-label="Lista" title="Lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="6.5" rx="1.5"/><rect x="3.5" y="13.5" width="17" height="6.5" rx="1.5"/></svg></button>
-          </div>
           <button type="button" id="abre-tipos" class="chip abre-tipos" aria-expanded="false" aria-controls="tipos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></svg>Tipos<span id="n-tipos" class="n-tipos" hidden></span></button>
           <div id="tipos" class="tipos-filtro" role="group" aria-label="Filtrar por tipo" hidden></div>
         </section>
@@ -140,7 +136,7 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && aberto()) { abre(false); botao.focus() } });
       matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches) abre(false) });
     })();
-    (() => {
+    if (!document.documentElement.classList.contains('embed')) (() => {
       const guarda = (k) => { try { const c = JSON.parse(sessionStorage.getItem(k)); if (c && Date.now() - c.t < 600000) return c } catch {} return null };
       const salva = (k, v) => { try { sessionStorage.setItem(k, JSON.stringify({ t: Date.now(), v })) } catch {} };
       (async () => {
@@ -165,6 +161,6 @@
       })();
     })();
   </script>
-  <script data-goatcounter="https://pokepocket.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+  <script>if (!document.documentElement.classList.contains('embed')) { const g = document.createElement('script'); g.async = true; g.src = 'https://gc.zgo.at/count.js'; g.dataset.goatcounter = 'https://pokepocket.goatcounter.com/count'; document.body.append(g) }</script>
 </body>
 </html>

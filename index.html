@@ -32,8 +32,8 @@
       --raio: 22px; --largura: 1180px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--fundo); color: var(--tinta); font-family: var(--texto); font-size: 18px; line-height: 1.55; overflow-x: hidden; }
+    html { scroll-behavior: smooth; --altura-topo: 72px; scroll-padding-top: var(--altura-topo); }
+    body { padding-top: var(--altura-topo); background: var(--fundo); color: var(--tinta); font-family: var(--texto); font-size: 18px; line-height: 1.55; overflow-x: hidden; }
     img, video { display: block; max-width: 100%; }
     a { color: inherit; }
     .ceu { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 45% at 50% 0%, #3d1f2c 0%, transparent 70%), radial-gradient(30% 25% at 82% 30%, rgba(255, 120, 180, 0.08), transparent 70%), radial-gradient(30% 30% at 15% 70%, rgba(120, 160, 255, 0.07), transparent 70%), var(--fundo); }
@@ -42,7 +42,7 @@
     @keyframes deriva { to { background-position: 0 600px; } }
     .envolve { width: min(var(--largura), calc(100% - 40px)); margin: 0 auto; }
 
-    .topo { position: sticky; top: 0; z-index: 20; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
+    .topo { position: fixed; top: 0; left: 0; right: 0; z-index: 20; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
     .topo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 211, 77, 0.28) 25%, rgba(255, 211, 77, 0.28) 75%, transparent); }
     .topo .envolve { position: relative; width: min(1280px, calc(100% - 40px)); display: flex; align-items: center; gap: 16px; height: 72px; }
     .topo a:focus-visible, .topo button:focus-visible { outline: 2px solid var(--ouro); outline-offset: 3px; }

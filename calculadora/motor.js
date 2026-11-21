@@ -591,3 +591,4 @@ export function spritePng(looktype) {
 }
 
 export const TABELA_TIPOS = TABELA
+export const AMPLIACAO_TIPOS = AMPLIACAO

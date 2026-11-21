@@ -10,8 +10,8 @@
   --raio: 22px; --largura: 1180px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { color-scheme: dark; }
-body { min-width: 320px; background: var(--fundo); color: var(--tinta); font-family: var(--texto); font-size: 16px; line-height: 1.5; overflow-x: hidden; overflow-wrap: normal; word-break: normal; hyphens: none; }
+html { color-scheme: dark; --altura-topo: 72px; scroll-padding-top: var(--altura-topo); }
+body { padding-top: var(--altura-topo); min-width: 320px; background: var(--fundo); color: var(--tinta); font-family: var(--texto); font-size: 16px; line-height: 1.5; overflow-x: hidden; overflow-wrap: normal; word-break: normal; hyphens: none; }
 img { display: block; max-width: 100%; }
 a { color: inherit; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -33,7 +33,7 @@ button { cursor: pointer; }
 .botao.vazado:hover { border-color: var(--ouro); box-shadow: none; }
 .botao svg { width: 22px; height: 22px; flex: none; }
 .botao.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); color: #0b2a14; border-color: #0b5323; }
-.topo { position: sticky; top: 0; z-index: 20; line-height: 1.55; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
+.topo { position: fixed; top: 0; left: 0; right: 0; z-index: 20; line-height: 1.55; -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); background: linear-gradient(180deg, rgba(11, 6, 8, 0.88), rgba(11, 6, 8, 0.72)); }
 .topo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 211, 77, 0.28) 25%, rgba(255, 211, 77, 0.28) 75%, transparent); }
 .topo .envolve { position: relative; width: min(1280px, calc(100% - 40px)); display: flex; align-items: center; gap: 16px; height: 72px; }
 .topo a:focus-visible, .topo button:focus-visible { outline: 2px solid var(--ouro); outline-offset: 3px; }
@@ -627,6 +627,7 @@ details[open] .det-seta { transform: rotate(180deg); }
 
 @media (max-width: 560px) {
   .topo .envolve { height: 60px; }
+  html { --altura-topo: 60px; }
   .abre { padding: 8px 0 6px; }
   .abre p { margin-top: 4px; font-size: 14px; line-height: 1.4; }
   .rodape a, .preco-rodape .credito { display: inline-block; padding: 11px 2px; margin: -11px -2px; }

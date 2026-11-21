@@ -1,8 +1,8 @@
 const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
 const NOME_TIPO = { NORMAL: 'Normal', FIRE: 'Fogo', WATER: 'Água', ELECTRIC: 'Elétrico', GRASS: 'Planta', ICE: 'Gelo', FIGHTING: 'Lutador', POISON: 'Veneno', GROUND: 'Terra', FLYING: 'Voador', PSYCHIC: 'Psíquico', BUG: 'Inseto', ROCK: 'Pedra', GHOST: 'Fantasma', DRAGON: 'Dragão', DARK: 'Sombrio', STEEL: 'Aço', FAIRY: 'Fada' }
 const COR_TIPO = { NORMAL: '#9a9a6e', FIRE: '#e8742a', WATER: '#4f7fe6', ELECTRIC: '#d9b51c', GRASS: '#5fae38', ICE: '#5ec2be', FIGHTING: '#b8302a', POISON: '#9a3c98', GROUND: '#c9a24c', FLYING: '#8f78e0', PSYCHIC: '#ec4b7d', BUG: '#94a61a', ROCK: '#a8952f', GHOST: '#6a4f8f', DRAGON: '#6a35ea', DARK: '#6a5345', STEEL: '#8c8cae', FAIRY: '#d0739f' }
-const FAIXAS = [[0, '#f87171'], [300, '#fb923c'], [500, '#facc15'], [700, '#4ade80']]
-const COR_TIER = { 'S+': '#ff5fa8', S: '#ff7ab8', 'S-': '#f9a8d4', 'A+': '#ff9f43', A: '#ffb86b', 'A-': '#ffd08a', 'B+': '#facc15', B: '#fde047', 'B-': '#fef08a', 'C+': '#60a5fa', C: '#93c5fd', 'C-': '#bfdbfe', D: '#a1a1aa' }
+const COR_TIER = { 'S+': '#ff6fae', S: '#ff7676', 'S-': '#b495ff', 'A+': '#f5b13d', A: '#ffa25a', 'A-': '#ffd95e', 'B+': '#8c93f0', B: '#5f9ad6', 'B-': '#3fd4c6', C: '#9aa0aa', D: '#e4e7ec' }
+const EMBED = new URLSearchParams(location.search).has('embed')
 const JANELAS = ['dia', 'semana', 'mes']
 const SPRITES = '../calculadora/jogo/sprites-png/'
 const BOLA = '../assets/pokebola.svg'
@@ -64,19 +64,6 @@ function janelaAtual() {
   return js[estado.janela] || js.dia || js[JANELAS.find((k) => js[k])] || null
 }
 
-function escala(valor) {
-  const v = Math.max(0, Math.min(1000, Number(valor)))
-  return el('span', { class: 'escala', 'aria-hidden': 'true' }, FAIXAS.map(([de, cor], i) => {
-    const ate = FAIXAS[i + 1]?.[0] ?? 1000
-    const cheio = Math.max(0, Math.min(1, (v - de) / (ate - de)))
-    const aqui = v >= de && (v < ate || ate === 1000)
-    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}` }, [
-      el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
-      aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
-    ])
-  }))
-}
-
 function sprite(p) {
   const img = el('img', { alt: '', loading: 'lazy', decoding: 'async' })
   const looks = [p.looktype, p.lookNormal, 60000 + Number(p.speciesId)].filter(ehNum).map(Number)
@@ -96,21 +83,50 @@ const linkCalc = (p) => `../calculadora/#e=${Number(p.speciesId)}&n=100&p=1&q=1.
 function cartao(p) {
   const tipos = (p.tipos || []).filter(Boolean).map((t) => String(t).toUpperCase())
   const nomesTipos = tipos.map((t) => NOME_TIPO[t] || t).join(' e ')
-  const uso = []
-  if (Number(p.uso) > 0) uso.push('uso ', el('b', { text: `${fmtPct.format(p.uso)}%` }))
   const score = ehNum(p.score) ? Math.round(p.score) : null
-  return el('a', { class: 'poke', href: linkCalc(p), 'data-id': String(p.speciesId), title: `${p.nome} shiny${nomesTipos ? ` (${nomesTipos})` : ''}${score != null ? ` · score ${fmt.format(score)}` : ''}` }, [
-    el('span', { class: 'poke-img' }, [sprite(p)]),
-    el('span', { class: 'poke-cab' }, [
-      el('span', { class: 'poke-nome', text: p.nome }),
-      nomesTipos ? el('span', { class: 'so-leitor', text: nomesTipos }) : null
-    ]),
-    score != null ? el('b', { class: 'poke-val', text: fmt.format(score) }) : null,
-    tipos.length ? el('span', { class: 'pontos', 'aria-hidden': 'true' }, tipos.map((t) => el('i', { style: `--c:${COR_TIPO[t] || '#777'}` }))) : null,
-    el('span', { class: 'poke-uso' }, uso),
-    el('span', { class: 'poke-esc' }, [score != null ? escala(score) : null])
+  return el('a', { class: 'poke', href: linkCalc(p), 'data-id': String(p.speciesId), title: `${p.nome} shiny${nomesTipos ? ` (${nomesTipos})` : ''}${score != null ? ` · score ${fmt.format(score)}` : ''}${Number(p.uso) > 0 ? ` · uso ${fmtPct.format(p.uso)}%` : ''}` }, [
+    el('span', { class: 'poke-img' }, [sprite(p), el('i', { class: 'poke-shiny', 'aria-hidden': 'true', text: '✦' })]),
+    el('span', { class: 'poke-nome', text: p.nome }),
+    nomesTipos ? el('span', { class: 'so-leitor', text: nomesTipos }) : null,
+    el('b', { class: 'poke-val', text: score != null ? fmt.format(score) : '—' })
   ])
 }
+
+const CARTAO_MIN = 104
+const CELULAR = matchMedia('(max-width: 560px)')
+
+function equilibrarRaias() {
+  for (const g of document.querySelectorAll('.faixa-cartoes')) {
+    g.style.gridTemplateColumns = ''
+    for (const c of g.children) c.style.gridColumnStart = ''
+    if (CELULAR.matches) continue
+    const cs = getComputedStyle(g)
+    const gap = parseFloat(cs.columnGap) || 0
+    const largura = g.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0)
+    const maxCols = Math.max(1, Math.floor((largura + gap) / (CARTAO_MIN + gap)))
+    if (maxCols <= 4) continue
+    const n = g.children.length
+    const linhas = Math.ceil(n / maxCols)
+    const cols = Math.ceil(n / linhas)
+    const cartao = Math.floor(((largura - gap * (maxCols - 1)) / maxCols) * 100) / 100
+    g.style.gridTemplateColumns = `repeat(${cols}, minmax(0, ${cartao}px))`
+    const base = Math.floor(n / linhas)
+    let i = 0
+    for (let l = 0; l < linhas; l++) {
+      if (l) g.children[i].style.gridColumnStart = '1'
+      i += base + (l < n % linhas ? 1 : 0)
+    }
+  }
+}
+
+let esperaRaias = 0
+let larguraRaias = innerWidth
+addEventListener('resize', () => {
+  if (innerWidth === larguraRaias) return
+  larguraRaias = innerWidth
+  cancelAnimationFrame(esperaRaias)
+  esperaRaias = requestAnimationFrame(equilibrarRaias)
+})
 
 const PASSOS_NOME = ['n1', 'n2', 'n3']
 
@@ -212,7 +228,7 @@ function pintar() {
   if (!j) { $('faixas').replaceChildren(); $('vazio').hidden = false; return }
   pintarPeriodo(j)
   const cortes = new Map((j.cortes || []).map((c) => [c.tier, c.min]))
-  const faixas = (j.tiers || []).map((t) => faixa(t.tier, t.itens, cortes)).filter(Boolean)
+  const faixas = (j.tiers || []).map((t, i) => faixa(t.tier, t.itens, cortes, false, i < 2)).filter(Boolean)
   $('faixas').replaceChildren(...faixas)
   let foraFaixas = []
   const buscando = normalizar(estado.busca) !== ''
@@ -232,17 +248,18 @@ function pintar() {
   }
   $('fora-faixas').replaceChildren(...foraFaixas)
   $('fora').hidden = !foraFaixas.length
+  equilibrarRaias()
   ajustarNomes()
   $('vazio').hidden = faixas.length + foraFaixas.length > 0
   $('vazio').textContent = buscando && !estado.tipos.length ? 'Nenhum shiny com esse nome no tier' : 'Nenhum pokémon com esses filtros.'
 }
 
-function faixa(tier, lista, cortes, apagada = false) {
+function faixa(tier, lista, cortes, apagada = false, destaque = false) {
   const itens = ordenar(filtrar(lista || []))
   if (!itens.length) return null
   const min = cortes.get(tier)
-  return el('section', { class: `faixa${tier === 'S+' ? ' topo-s' : ''}${apagada ? ' apagada' : ''}`, style: `--cor:${COR_TIER[tier] || '#a1a1aa'}`, 'aria-label': `${apagada ? 'Fora do meta, tier' : 'Tier'} ${tier}` }, [
-    el('div', { class: 'faixa-rot' }, [el('b', { text: tier }), ehNum(min) && Number(min) > 0 ? el('small', { text: `${fmt.format(min)}+` }) : null]),
+  return el('section', { class: `faixa${destaque ? ' destaque' : ''}${apagada ? ' apagada' : ''}`, style: `--cor:${COR_TIER[tier] || '#8b919c'}`, 'aria-label': `${apagada ? 'Fora do meta, tier' : 'Tier'} ${tier}`, title: ehNum(min) && Number(min) > 0 ? `Tier ${tier}: score ${fmt.format(min)} ou mais` : null }, [
+    el('div', { class: 'faixa-rot' }, [el('b', { text: tier })]),
     el('div', { class: 'faixa-cartoes' }, itens.map(cartao))
   ])
 }
@@ -271,18 +288,6 @@ function montarFiltros() {
   document.querySelectorAll('[data-janela]').forEach((b) => b.addEventListener('click', () => { estado.janela = b.dataset.janela; muda() }))
   document.querySelectorAll('[data-ordem]').forEach((b) => b.addEventListener('click', () => { estado.ordem = b.dataset.ordem; muda() }))
   $('todas').addEventListener('click', () => { estado.todas = !estado.todas; muda() })
-  const vista = (v) => {
-    $('tier').classList.toggle('lista', v === 'lista')
-    document.querySelectorAll('[data-vista]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === v)))
-    ajustarNomes()
-  }
-  let vistaSalva = 'grade'
-  try { vistaSalva = localStorage.getItem('pp-tier-vista') === 'lista' ? 'lista' : 'grade' } catch {}
-  vista(vistaSalva)
-  document.querySelectorAll('[data-vista]').forEach((b) => b.addEventListener('click', () => {
-    vista(b.dataset.vista)
-    try { localStorage.setItem('pp-tier-vista', b.dataset.vista) } catch {}
-  }))
   let espera = 0
   $('busca').addEventListener('input', (e) => {
     estado.busca = e.target.value
@@ -300,7 +305,7 @@ function montarFiltros() {
   montarFicha()
 }
 
-const STATS = [['hp', 'HP'], ['atk', 'ATK'], ['def', 'DEF'], ['spAtk', 'SP.ATK'], ['spDef', 'SP.DEF'], ['speed', 'VEL']]
+const STATS = [['hp', 'HP'], ['atk', 'Atk'], ['def', 'Def'], ['spAtk', 'SpA'], ['spDef', 'SpD'], ['speed', 'Vel']]
 const ICO = {
   fechar: '<path d="M6 6l12 12M18 6 6 18"/>',
   evo: '<path d="M4 12h11M11 7l5 5-5 5"/><circle cx="19" cy="12" r="1.6"/>',
@@ -309,7 +314,6 @@ const ICO = {
   calc: '<rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/>',
   link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/>'
 }
-const MULT_TXT = new Map([[4, '×4'], [2, '×2'], [0.5, '×½'], [0.25, '×¼'], [0, 'imune']])
 let motorP = null
 let motorPronto = null
 let fichaSeq = 0
@@ -353,36 +357,6 @@ function carregarMotor() {
   return motorPronto
 }
 
-function defesas(tipos, tabela) {
-  const fraco = [], resiste = []
-  for (const atq of TIPOS) {
-    const linha = tabela[atq] || {}
-    let v = 1
-    for (const d of tipos) v *= linha[d] ?? 1
-    if (v > 1) fraco.push([atq, v])
-    else if (v < 1) resiste.push([atq, v])
-  }
-  fraco.sort((a, b) => b[1] - a[1])
-  resiste.sort((a, b) => a[1] - b[1])
-  return { fraco, resiste }
-}
-
-function listaDefesa(rot, itens, cls) {
-  const grupos = new Map()
-  for (const [t, v] of itens) {
-    if (!grupos.has(v)) grupos.set(v, [])
-    grupos.get(v).push(t)
-  }
-  const rotMult = (v) => (v === 0 ? 'imune' : MULT_TXT.get(v) || `×${fmtPct.format(v)}`)
-  const nivel = (v) => (v === 0 ? 'zero' : v >= 4 ? 'forte' : v > 1 ? 'medio' : v <= 0.25 ? 'forte' : 'medio')
-  return el('div', { class: `def-l ${cls}` }, [
-    el('span', { class: 'def-rot', text: rot }),
-    itens.length
-      ? el('div', { class: 'def-grupos' }, [...grupos].map(([v, ts]) => el('div', { class: `def-g ${nivel(v)}` }, [el('span', { class: 'def-mult', text: rotMult(v) }), el('span', { class: 'def-tipos' }, ts.map(chipTipo))])))
-      : el('span', { class: 'def-nada', text: 'nenhum' })
-  ])
-}
-
 function bloco(icone, titulo, conteudo, cls = '') {
   return el('section', { class: `f-bloco ${cls}`.trim() }, [el('h3', {}, [ico(icone), titulo]), conteudo])
 }
@@ -418,55 +392,71 @@ function pintarFicha({ p, tier, fora }) {
   const seq = ++fichaSeq
   const tipos = tiposDoItem(p)
   const score = ehNum(p.score) ? Math.round(p.score) : null
-  const num = (rot, v, suf = '') => el('div', { class: 'f-num' }, [el('span', { text: rot }), el('b', { text: ehNum(v) ? `${fmtPct.format(v)}${suf}` : '—' })])
-  const evo = el('div', { class: 'f-evo', 'aria-busy': 'true' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
-  const defs = el('div', { class: 'f-defs' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
-  const stats = el('div', { class: 'f-stats' }, [el('span', { class: 'f-carga', text: 'Carregando…' })])
-  const corTier = COR_TIER[tier] || '#a1a1aa'
+  const carga = () => el('span', { class: 'f-carga', text: 'Carregando…' })
+  const defs = el('div', { class: 'f-defs' }, [carga()])
+  const stats = el('div', { class: 'f-stats' }, [carga()])
+  const topo = janelaAtual()?.topo ?? dados.topo
+  const noTopo = ehNum(topo) ? `top ${fmt.format(topo)}` : 'topo do ranqueado'
+  const uso = [
+    Number(p.uso) > 0 ? `Uso ${fmtPct.format(p.uso)}% no ${noTopo}` : `Sem uso no ${noTopo}`,
+    ehNum(p.vitorias) ? `${fmtPct.format(p.vitorias)}% de vitórias` : null,
+    Number(p.n) > 0 ? plural(p.n, 'partida', 'partidas') : null
+  ].filter(Boolean).join(' · ')
   $('ficha-corpo').replaceChildren(
     el('button', { type: 'button', class: 'f-fechar', 'aria-label': 'Fechar', title: 'Fechar (Esc)', 'data-fechar': '' }, [ico('fechar')]),
-    el('header', { class: 'f-cab', style: `--cor:${corTier}` }, [
-      el('div', { class: 'f-sprites' }, [
-        el('span', { class: 'f-shiny' }, [imgDe([p.looktype, p.lookNormal, 60000 + Number(p.speciesId)])]),
-        ehNum(p.lookNormal) && Number(p.lookNormal) !== Number(p.looktype) ? el('span', { class: 'f-normal', title: 'Normal' }, [imgDe([p.lookNormal])]) : null
-      ]),
+    el('header', { class: 'f-cab', style: `--cor:${COR_TIER[tier] || '#8b919c'}` }, [
+      el('span', { class: 'f-arte' }, [imgDe([p.looktype, p.lookNormal, 60000 + Number(p.speciesId)]), el('i', { class: 'f-brilho', 'aria-hidden': 'true', text: '✦' })]),
       el('div', { class: 'f-id' }, [
-        el('h2', { id: 'ficha-nome' }, [p.nome, el('span', { class: 'f-shiny-rot', text: 'shiny' })]),
-        tipos.length ? el('span', { class: 'tipos' }, tipos.map(chipTipo)) : null,
-        el('div', { class: 'f-score' }, [
-          el('span', { class: `f-tier${tier === 'S+' ? ' topo-s' : ''}`, text: tier || '?' }),
-          score != null ? el('b', { class: 'f-val', text: fmt.format(score) }) : null,
-          score != null ? escala(score) : null
+        el('h2', { id: 'ficha-nome', text: p.nome }),
+        el('div', { class: 'f-linha' }, [
+          el('span', { class: 'f-tier', text: tier || '?', title: fora ? 'Tier pelo score; fora do meta no período' : `Tier ${tier}` }),
+          el('span', { class: 'f-score' }, [el('b', { text: score != null ? fmt.format(score) : '—' }), el('small', { text: 'Score PvP' })])
         ]),
-        fora ? el('span', { class: 'f-fora', text: 'fora do meta no período' }) : null
+        tipos.length ? el('span', { class: 'tipos' }, tipos.map(chipTipo)) : null
       ])
     ]),
-    el('div', { class: 'f-nums' }, [num('uso', p.uso, '%'), num('aparições', p.n)]),
-    bloco('evo', 'Linha evolutiva', evo, 'f-bloco-evo'),
-    el('div', { class: 'f-duas' }, [bloco('escudo', 'Tipos contra', defs), bloco('stats', 'Stats base', stats)])
+    bloco('escudo', 'Contra tipos', defs),
+    bloco('stats', 'Atributos base', stats),
+    el('p', { class: 'f-uso', text: fora ? `${uso} · fora do meta no período` : uso }),
+    el('div', { class: 'f-pe' }, [el('a', { class: 'botao pequeno', href: linkCalc(p) }, [ico('calc'), 'Abrir na calculadora'])])
   )
   carregarMotor().then((m) => {
     if (seq !== fichaSeq) return
-    defs.replaceChildren(...pintarDefesas(tipos, m.TABELA_TIPOS))
-    const esp = m.especie(p.speciesId)
-    stats.replaceChildren(...pintarStats(esp?.base))
-    const formas = m.formas(p.base?.speciesId ?? p.speciesId)
-    evo.removeAttribute('aria-busy')
-    evo.replaceChildren(...pintarEvo(formas.length ? formas : [esp].filter(Boolean), p.speciesId, m))
+    defs.replaceChildren(...pintarDefesas(tipos, m.TABELA_TIPOS, m.AMPLIACAO_TIPOS || {}))
+    stats.replaceChildren(...pintarStats(m.especie(p.speciesId)?.base))
   }).catch(() => {
     if (seq !== fichaSeq) return
-    for (const n of [evo, defs, stats]) n.replaceChildren(el('span', { class: 'f-carga', text: 'Não deu para carregar.' }))
+    for (const n of [defs, stats]) n.replaceChildren(el('span', { class: 'f-carga', text: 'Não deu para carregar.' }))
   })
 }
 
-function pintarDefesas(tipos, tabela) {
+const fmtMult = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 })
+
+function pintarDefesas(tipos, tabela, ampliacao) {
   if (!tabela || !tipos.length) return [el('span', { class: 'f-carga', text: 'Sem dados de tipo.' })]
-  const { fraco, resiste } = defesas(tipos, tabela)
-  return [listaDefesa('Fraco a', fraco, 'fraco'), listaDefesa('Resiste a', resiste, 'resiste')]
+  const grupos = { fraco: [], resiste: [], imune: [] }
+  for (const atq of TIPOS) {
+    const linha = tabela[atq] || {}
+    let v = 1
+    for (const t of tipos) v *= linha[t] ?? 1
+    if (v === 1) continue
+    const real = ampliacao[v] ?? v
+    ;(v === 0 ? grupos.imune : v > 1 ? grupos.fraco : grupos.resiste).push([atq, real])
+  }
+  grupos.fraco.sort((a, b) => b[1] - a[1])
+  grupos.resiste.sort((a, b) => a[1] - b[1])
+  const chip = ([t, v]) => el('span', { class: 'tipo f-mult', style: `--c:${COR_TIPO[t] || '#777'}` }, [NOME_TIPO[t] || t, el('small', { text: `×${fmtMult.format(v)}` })])
+  const grupo = (rot, itens, cls) => el('div', { class: `f-def ${cls}` }, [el('span', { class: 'f-def-rot', text: rot }), itens.length ? el('span', { class: 'f-def-tipos' }, itens.map(chip)) : el('span', { class: 'f-def-nada', text: 'nenhuma' })])
+  return [
+    grupo('Fraquezas', grupos.fraco, 'fraco'),
+    grupo('Resistências', grupos.resiste, 'resiste'),
+    grupo('Imunidades', grupos.imune, 'imune'),
+    el('p', { class: 'f-def-nota', text: 'Multiplicadores do combate do jogo: ×2 vale ×2,5 e ×4 vale ×5,5; ×½ vale ×0,33 e ×¼ vale ×0,17.' })
+  ]
 }
 
 function pintarStats(base) {
-  if (!base) return [el('span', { class: 'f-carga', text: 'Sem stats.' })]
+  if (!base) return [el('span', { class: 'f-carga', text: 'Sem atributos.' })]
   const max = Math.max(160, ...STATS.map(([k]) => Number(base[k]) || 0))
   return STATS.map(([k, rot]) => {
     const v = Number(base[k]) || 0
@@ -475,30 +465,10 @@ function pintarStats(base) {
   })
 }
 
-function pintarEvo(formas, atual, m) {
-  const nos = []
-  formas.forEach((f, i) => {
-    if (i) nos.push(el('span', { class: 'f-seta', 'aria-hidden': 'true', text: '›' }))
-    const png = m.spritePng(f.lookShiny ?? f.looktype)
-    const looks = [f.lookShiny, f.looktype]
-    const img = png ? imgDe([]) : imgDe(looks)
-    if (png) { img.onerror = () => { img.onerror = null; img.src = `${SPRITES}${f.looktype}.png` }; img.src = `../calculadora/${png.url}`; img.classList.remove('bola') }
-    const noTier = acharItem(Number(f.speciesId))
-    const atualCls = Number(f.speciesId) === Number(atual) ? ' atual' : ''
-    const filhos = [el('span', { class: 'f-evo-img' }, [img]), el('span', { class: 'f-evo-nome', text: f.nome })]
-    nos.push(noTier && !atualCls
-      ? el('button', { type: 'button', class: `f-evo-no${atualCls}`, 'data-id': String(f.speciesId), title: `Ver ${f.nome}` }, filhos)
-      : el('span', { class: `f-evo-no${atualCls}`, 'aria-current': atualCls ? 'true' : null }, filhos))
-  })
-  return nos
-}
-
 function montarFicha() {
   const d = $('ficha')
   d.addEventListener('click', (e) => {
     if (e.target === d || e.target.closest('[data-fechar]')) return fecharFicha()
-    const no = e.target.closest('.f-evo-no[data-id]')
-    if (no) abrirFicha(Number(no.dataset.id))
   })
   d.addEventListener('cancel', (e) => { e.preventDefault(); fecharFicha() })
   d.addEventListener('close', () => { if (estado.ficha != null) fecharFicha() })
@@ -552,6 +522,7 @@ async function iniciar() {
     carga.classList.add('falhou')
     $('carga-erro-txt').textContent = 'Não deu para carregar o tier agora.'
     $('carga-erro').hidden = false
+    avisarPainel('falhou')
     return
   }
   pintarCabecalho()
@@ -559,8 +530,20 @@ async function iniciar() {
   $('tier').hidden = false
   pintar()
   sincronizarFicha()
+  avisarPainel('pronto')
 }
 
+function avisarPainel(estadoCarga) {
+  if (EMBED && parent !== window) parent.postMessage({ pokepocketTier: estadoCarga, geradoEm: dados?.geradoEm ?? null }, '*')
+}
+
+if (EMBED) {
+  document.documentElement.classList.add('embed')
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]')
+    if (a && !a.closest('.poke') && !a.getAttribute('href').startsWith('#')) a.target = '_blank'
+  }, true)
+}
 lerHash()
 montarFiltros()
 $('carga-tentar').addEventListener('click', () => location.reload())

@@ -2,7 +2,9 @@ name: Atualizar meta PvP e tier
 
 on:
   schedule:
-    - cron: '30 14 * * *'
+    - cron: '7 14 * * *'
+    - cron: '37 15 * * *'
+    - cron: '17 17 * * *'
   workflow_dispatch:
 
 permissions:
@@ -19,19 +21,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Ver se o tier de hoje já saiu
+        id: hoje
+        run: |
+          feito=nao
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            gerado=$(jq -r '.geradoEm // empty' tier/tier.json 2>/dev/null || true)
+            if [ -n "$gerado" ] && [ "$(TZ=America/Sao_Paulo date -d "$gerado" +%F)" = "$(TZ=America/Sao_Paulo date +%F)" ]; then
+              feito=sim
+              echo "o tier de hoje já saiu ($gerado); nada a fazer"
+            fi
+          fi
+          echo "feito=$feito" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-node@v4
+        if: steps.hoje.outputs.feito != 'sim'
         with:
           node-version: 20
 
       - name: Coletar ranqueado e recalcular
+        if: steps.hoje.outputs.feito != 'sim'
         run: node ferramentas/atualizar-meta.mjs
 
       - name: Gerar prévia do tier
+        if: steps.hoje.outputs.feito != 'sim'
         continue-on-error: true
         run: node ferramentas/previa-tier.mjs
 
       - name: Esperar até 12h de Brasília
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' && steps.hoje.outputs.feito != 'sim'
         run: |
           alvo=$(date -u -d "$(date -u +%Y-%m-%d) 15:00:00" +%s)
           agora=$(date -u +%s)
@@ -42,6 +60,7 @@ jobs:
           fi
 
       - name: Publicar se mudou
+        if: steps.hoje.outputs.feito != 'sim'
         run: |
           git add -A calculadora/meta-pvp.json tier/tier.json tier/dados assets/previa-tier.png tier/index.html
           if git diff --cached --quiet; then
