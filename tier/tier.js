@@ -556,6 +556,37 @@ if (EMBED) {
     }
     new ResizeObserver(medir).observe(document.body)
     addEventListener('load', medir)
+    if (matchMedia('(pointer: coarse)').matches) {
+      let x0 = 0, y0 = 0, yAnt = 0, tAnt = 0, vel = 0, modo = null
+      const rolavel = (el) => { for (let e = el; e && e !== document.body; e = e.parentElement) { const c = getComputedStyle(e); if (/(auto|scroll)/.test(c.overflowY) && e.scrollHeight > e.clientHeight + 1) return true } return false }
+      addEventListener('touchstart', (e) => {
+        const t = e.touches[0]
+        x0 = t.clientX; y0 = yAnt = t.clientY; tAnt = performance.now(); vel = 0
+        modo = e.touches.length > 1 || rolavel(e.target) ? 'livre' : null
+        parent.postMessage({ pokepocketTier: 'parar' }, '*')
+      }, { passive: true })
+      addEventListener('touchmove', (e) => {
+        if (modo === 'livre') return
+        const t = e.touches[0]
+        if (!modo) {
+          const dx = Math.abs(t.clientX - x0), dy = Math.abs(t.clientY - y0)
+          if (dx < 6 && dy < 6) return
+          modo = dy > dx ? 'vertical' : 'livre'
+          if (modo === 'livre') return
+        }
+        e.preventDefault()
+        const agora = performance.now()
+        const d = yAnt - t.clientY
+        const dt = Math.max(1, agora - tAnt)
+        vel = 0.8 * (d / dt) + 0.2 * vel
+        yAnt = t.clientY; tAnt = agora
+        parent.postMessage({ pokepocketTier: 'rolar', dy: d }, '*')
+      }, { passive: false })
+      addEventListener('touchend', () => {
+        if (modo === 'vertical' && performance.now() - tAnt < 80) parent.postMessage({ pokepocketTier: 'soltar', v: vel }, '*')
+        modo = null
+      }, { passive: true })
+    }
   }
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]')
