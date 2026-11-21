@@ -458,7 +458,7 @@ function rodape(c, d) {
   c.fillStyle = 'rgba(255, 233, 163, 0.12)'
   c.fillRect(500, y - 26, 660, 1.5)
   const w = texto(c, 'Calculadora PokePocket', 500, y + 6, { fonte: `24px ${DISPLAY}`, cor: '#ffd34d' })
-  const fim = 500 + w + 14 + texto(c, 'by Piscis', 500 + w + 14, y + 5, { fonte: `800 20px ${TEXTO}`, cor: '#a88e86' })
+  const fim = 500 + w
   const n = Number(d.vendas)
   const opcoes = n > 0 ? [`Valores simulados · preço com base em ${fmt.format(n)} vendas`, `Valores simulados · ${fmt.format(n)} vendas`] : ['Valores simulados']
   const livre = 1160 - fim - 24

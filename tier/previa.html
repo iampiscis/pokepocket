@@ -106,7 +106,7 @@ async function montar() {
   const painel = document.getElementById('painel')
   const pe = el('div', 'pe')
   const assinatura = el('span')
-  assinatura.append('Tier PvP ', Object.assign(el('em'), { textContent: 'PokePocket' }), ' by Piscis')
+  assinatura.append('Tier PvP ', Object.assign(el('em'), { textContent: 'PokePocket' }))
   pe.append(assinatura, el('span', '', 'iampiscis.github.io/pokepocket'))
   painel.append(pe)
   for (const t of (j.tiers || []).filter((t) => t.itens?.length)) {

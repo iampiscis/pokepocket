@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PokePocket · seu Pokéidle no automático</title>
-  <meta name="description" content="Painel grátis para Pokéidle no Windows: hunt e troca de hunt no automático, Top Catch, compras de itens, lives da Twitch e da Kick, score PvP exclusivo e precificador. Até 4 contas num lugar só." />
+  <meta name="description" content="Painel grátis para Pokéidle no Windows, agora também no celular: hunt no automático, Top Catch, Prey, Mercado com Score PvP e lives da Twitch e da Kick. Até 4 contas num lugar só." />
   <meta name="theme-color" content="#0b0608" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="PokePocket" />
   <meta property="og:locale" content="pt_BR" />
   <meta property="og:title" content="PokePocket · seu Pokéidle no automático" />
-  <meta property="og:description" content="Hunt, Top Catch, compras e lives rodando sozinhos nas 4 contas. Grátis, no seu PC." />
+  <meta property="og:description" content="Hunt, Top Catch, Prey e lives nas 4 contas. Grátis, no seu PC e no celular." />
   <meta property="og:url" content="https://iampiscis.github.io/pokepocket/" />
   <meta property="og:image" content="https://iampiscis.github.io/pokepocket/assets/previa-site.png" />
   <meta property="og:image:width" content="1200" />
@@ -176,10 +176,6 @@
     .tela { margin: 40px auto 0; max-width: 1040px; padding: 14px; border-radius: 26px; background: linear-gradient(var(--madeira-esc) 0 10px, var(--madeira) 10px calc(100% - 14px), var(--madeira-luz) calc(100% - 14px) calc(100% - 7px), var(--madeira) calc(100% - 7px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 40px 90px rgba(0, 0, 0, 0.6); }
     .tela video, .tela img { width: 100%; border-radius: 14px; box-shadow: 0 0 0 3px #480e1e; background: #000; }
 
-    .numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 44px auto 0; }
-    .numero { padding: 24px 16px; text-align: center; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.6), rgba(43, 26, 34, 0.6)); border: 1px solid rgba(255, 233, 163, 0.1); }
-    .numero b { display: block; font-family: var(--display); font-weight: 400; font-size: 54px; line-height: 1; color: var(--ouro); text-shadow: 0 4px 0 var(--linha); }
-    .numero span { display: block; margin-top: 8px; font-weight: 800; font-size: 15px; color: var(--suave); }
 
     section.bloco { padding: 76px 0 10px; }
     .rotulo { display: inline-block; padding: 5px 14px; border-radius: 999px; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
@@ -199,42 +195,9 @@
     .cab.centro { margin: 0 auto; text-align: center; }
     .cab p { margin-top: 14px; color: var(--suave); font-size: 19px; }
 
-    .placa { position: relative; border-radius: var(--raio); padding: 26px; background: linear-gradient(var(--madeira-esc) 0 12px, var(--madeira) 12px calc(100% - 16px), var(--madeira-luz) calc(100% - 16px) calc(100% - 8px), var(--madeira) calc(100% - 8px)); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 6px var(--friso), inset 0 0 0 9px var(--madeira), 0 8px 0 var(--base), 0 12px 0 #480e1e, 0 30px 60px rgba(0, 0, 0, 0.5); }
     .vao { border-radius: 16px; background: var(--vao); box-shadow: inset 0 0 0 3px #480e1e, 0 3px 0 #e7a86d; }
-    .ciclo { display: grid; grid-template-columns: 1fr 340px 1fr; grid-template-rows: auto auto; gap: 26px 30px; align-items: center; margin-top: 50px; }
-    .no { display: grid; grid-template-columns: 70px 1fr; gap: 16px; align-items: center; padding: 20px 22px; }
-    .no .ico { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 18px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); font-family: var(--display); font-size: 32px; color: #2a1a12; }
-    .no .ico img { width: 46px; height: 46px; image-rendering: pixelated; }
-    .no h3 { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.05; text-transform: uppercase; }
-    .no p { font-size: 15px; color: var(--suave); margin-top: 4px; }
-    .centro-ciclo { grid-column: 2; grid-row: 1 / span 2; position: relative; display: grid; place-items: center; aspect-ratio: 1; }
-    .centro-ciclo .anel { position: absolute; inset: 0; border-radius: 50%; border: 3px dashed rgba(255, 211, 77, 0.45); animation: gira 40s linear infinite; }
-    .centro-ciclo .anel::before, .centro-ciclo .anel::after { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--ouro); box-shadow: 0 0 16px var(--ouro); top: -10px; left: calc(50% - 9px); }
-    .centro-ciclo .anel::after { top: auto; bottom: -10px; }
-    .centro-ciclo .miolo { width: 72%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; text-align: center; background: radial-gradient(circle, rgba(255, 233, 163, 0.25), rgba(255, 90, 95, 0.08) 60%, transparent 72%); }
-    .centro-ciclo img { width: 120px; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.6)); }
-    .centro-ciclo b { display: block; margin-top: 10px; font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; color: var(--ouro); }
-    .centro-ciclo small { color: var(--suave); font-weight: 800; font-size: 14px; }
 
-    .duas h2 { font-size: clamp(32px, 3.4vw, 46px); }
-    .duas { display: grid; grid-template-columns: 1.05fr 1fr; gap: 50px; align-items: center; }
-    .duas.inv { grid-template-columns: 1fr 1.05fr; }
-    .duas.inv .midia { order: -1; }
-    .midia { padding: 12px; border-radius: 22px; background: linear-gradient(var(--madeira-esc) 0 8px, var(--madeira) 8px); box-shadow: inset 0 0 0 3px #480e1e, inset 0 0 0 5px var(--friso), 0 6px 0 var(--base), 0 24px 50px rgba(0, 0, 0, 0.55); }
-    .midia img { border-radius: 12px; box-shadow: 0 0 0 3px #480e1e; }
-    .fluxo { display: grid; gap: 14px; margin-top: 30px; }
-    .passo { position: relative; display: grid; grid-template-columns: 54px 1fr; gap: 16px; align-items: start; padding: 16px 18px; }
-    .passo .n { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; font-family: var(--display); font-size: 26px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
-    .passo b { display: block; font-family: var(--display); font-weight: 400; font-size: 22px; text-transform: uppercase; }
-    .passo span { font-size: 15px; color: var(--suave); }
-    .passo + .passo::before { content: ""; position: absolute; left: 44px; top: -16px; width: 3px; height: 18px; background: repeating-linear-gradient(180deg, var(--ouro) 0 4px, transparent 4px 8px); }
-    .criterios { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .criterios span { padding: 4px 12px; border-radius: 10px; font-family: var(--display); font-size: 15px; color: #fff; }
 
-    .escada { display: flex; align-items: flex-end; gap: 14px; height: 230px; margin-top: 30px; padding: 0 6px; }
-    .degrau { flex: 1; display: grid; align-content: end; justify-items: center; gap: 8px; }
-    .degrau .barra { width: 100%; border-radius: 14px 14px 6px 6px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: inset 0 0 0 3px var(--ouro-esc), 0 4px 0 var(--ouro-esc); display: grid; place-items: start center; padding-top: 10px; font-family: var(--display); font-size: 30px; color: #2a1a12; }
-    .degrau small { font-weight: 800; font-size: 13px; color: var(--suave); text-align: center; }
 
     .auto4 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 34px; }
     .auto { display: grid; grid-template-rows: auto 1fr; gap: 14px; align-content: start; padding: 14px; border-radius: 22px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
@@ -244,40 +207,7 @@
     .auto p { margin-top: 6px; font-size: 15px; color: var(--suave); }
     .auto p b { color: #fff; }
     .lide b { color: #fff6ef; font-weight: 800; }
-    .novo-tag { display: inline-block; margin-bottom: 6px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: #0b2a14; background: var(--verde); }
-    .avaliar { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 34px; }
-    .avaliar .placa h3 { font-family: var(--display); font-weight: 400; font-size: 32px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
-    .avaliar .placa > p { margin-top: 6px; color: #fff3df; opacity: 0.9; font-weight: 700; }
-    .medidores { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
-    .medidor { padding: 18px 10px 16px; text-align: center; }
-    .medidor svg { width: 100%; max-width: 220px; height: auto; overflow: visible; }
-    .medidor .v { margin-top: -54px; font-family: var(--display); font-size: 52px; line-height: 1; }
-    .medidor small { display: block; margin-top: 6px; font-family: var(--display); font-size: 16px; letter-spacing: 0.06em; color: #e9d5ff; }
-    .formula { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 14px; font-family: var(--display); font-size: 15px; text-transform: uppercase; }
-    .formula span { padding: 6px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); }
-    .formula i { font-style: normal; color: var(--ouro); font-size: 26px; }
-    .precos { display: grid; gap: 12px; margin-top: 20px; }
-    .preco { display: grid; grid-template-columns: 140px 1fr 110px; align-items: center; gap: 14px; padding: 14px 18px; }
-    .preco b { font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; }
-    .preco .trilho { height: 14px; border-radius: 7px; background: #1a0d12; overflow: hidden; }
-    .preco .trilho i { display: block; height: 100%; border-radius: 7px; background: linear-gradient(90deg, #f9a8d4, #ec4899); }
-    .preco strong { text-align: right; font-family: var(--display); font-weight: 400; font-size: 24px; color: #fbcfe8; }
-    .preco.meio { box-shadow: inset 0 0 0 3px #f472b6, 0 0 24px rgba(236, 72, 153, 0.35); }
-    .credito { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 16px; border-radius: 999px; font-weight: 900; font-size: 14px; text-decoration: none; color: #fff; background: linear-gradient(180deg, #f472b6, #be185d); box-shadow: inset 0 0 0 2px #4a0d3a, 0 4px 0 #4a0d3a; }
 
-    .soma { display: grid; grid-template-columns: 1fr 1fr auto 1.3fr; gap: 18px; align-items: center; margin-top: 34px; }
-    .contas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; grid-column: 1 / span 2; }
-    .conta { padding: 16px; text-align: center; }
-    .conta b { display: block; font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; color: var(--suave); }
-    .conta strong { display: block; font-family: var(--display); font-weight: 400; font-size: 28px; color: #c4b5fd; }
-    .conta span { font-family: var(--display); font-size: 18px; color: var(--ouro); }
-    .seta { font-family: var(--display); font-size: 70px; color: var(--ouro); text-shadow: 0 0 24px rgba(255, 211, 77, 0.6); }
-    .total { text-align: center; }
-    .total h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
-    .total .grande { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-    .total .grande div { padding: 16px 8px; }
-    .total .grande small { display: block; font-family: var(--display); font-size: 15px; letter-spacing: 0.05em; color: var(--friso); text-transform: uppercase; }
-    .total .grande strong { font-family: var(--display); font-weight: 400; font-size: 42px; line-height: 1.1; }
 
     .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
     .extra { padding: 16px 18px; text-align: center; transition: transform 0.2s; }
@@ -289,12 +219,6 @@
     .gema { display: inline-block; width: 38px; height: 38px; background: url("assets/gema.svg") center / contain no-repeat; }
     .pix { image-rendering: pixelated; }
 
-    .galeria { display: grid; gap: 18px; margin-top: 46px; }
-    .linha-g { display: flex; gap: 18px; align-items: flex-start; }
-    .linha-g figure { min-width: 0; }
-    .galeria figure { padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 233, 163, 0.1); }
-    .galeria img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.08); }
-    .galeria figcaption { padding: 10px 4px 2px; font-weight: 800; font-size: 15px; color: var(--suave); }
 
     .seguranca { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
     .seg { padding: 18px; border-radius: var(--raio); background: linear-gradient(180deg, rgba(74, 36, 51, 0.55), rgba(43, 26, 34, 0.55)); border: 1px solid rgba(255, 233, 163, 0.1); }
@@ -303,34 +227,16 @@
     .seg h3 { margin-top: 14px; font-family: var(--display); font-weight: 400; font-size: 21px; text-transform: uppercase; }
     .seg p { margin-top: 6px; font-size: 15px; color: var(--suave); }
 
-    .instalar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; counter-reset: p; }
-    .inst { position: relative; padding: 30px 24px 26px; }
-    .inst .n { position: absolute; top: -22px; left: 24px; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; font-family: var(--display); font-size: 26px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
-    .inst h3 { font-family: var(--display); font-weight: 400; font-size: 24px; text-transform: uppercase; color: #fff3df; text-shadow: 0 3px 0 var(--linha); }
-    .inst p { margin-top: 8px; color: #fff3df; font-weight: 700; font-size: 15px; }
-    .aviso { margin-top: 22px; padding: 16px 20px; border-radius: 16px; background: rgba(125, 211, 252, 0.07); border: 1px solid rgba(125, 211, 252, 0.25); color: #d6eefe; font-size: 15px; }
-    .aviso b { color: #fff; }
     .hash { margin-top: 12px; font-size: 13px; color: var(--apagado); word-break: break-all; }
     .hash code { color: var(--suave); }
 
-    .trilha-inst { list-style: none; position: relative; display: grid; gap: 22px; margin-top: 46px; }
-    .trilha-inst::before { content: ""; position: absolute; left: 31px; top: 30px; bottom: 30px; width: 4px; border-radius: 2px; background: repeating-linear-gradient(180deg, var(--ouro) 0 10px, transparent 10px 18px); opacity: 0.55; }
-    .etapa { position: relative; display: grid; grid-template-columns: 66px 1fr 1.05fr; gap: 24px; align-items: center; padding: 24px 26px 24px 0; border-radius: 24px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
-    .etapa > .n { position: relative; z-index: 1; justify-self: center; display: grid; place-items: center; width: 62px; height: 62px; margin-left: 26px; border-radius: 50%; font-family: var(--display); font-size: 30px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc), 0 0 0 6px var(--fundo); }
-    .etapa .txt { padding-left: 18px; }
-    .etapa h3 { font-family: var(--display); font-weight: 400; font-size: 26px; text-transform: uppercase; }
-    .etapa p { margin-top: 6px; color: var(--suave); font-size: 16px; }
-    .etapa p b { color: #fff; }
-    .mock { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 150px; padding: 18px; border-radius: 16px; background: #0f0a0d; border: 1px solid rgba(255, 255, 255, 0.06); }
     .alvo { position: relative; display: inline-block; padding: 7px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; color: #fff; background: #0067c0; box-shadow: 0 0 0 3px #ffd34d, 0 0 22px rgba(255, 211, 77, 0.7); animation: pisca 1.6s ease-in-out infinite; }
     @keyframes pisca { 50% { box-shadow: 0 0 0 5px #ffd34d, 0 0 34px rgba(255, 211, 77, 0.9); } }
-    .cinza, .cinza-b { display: inline-block; padding: 7px 14px; border-radius: 6px; font-weight: 800; font-size: 14px; color: #ccc; background: #3a3a3a; }
     .nav-barra { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 440px; padding: 12px 14px; border-radius: 12px; background: #2b2b2b; font-family: system-ui, sans-serif; }
     .nav-barra > div { flex: 1; min-width: 0; }
     .nav-barra b { display: block; font-size: 14px; color: #fff; }
     .nav-barra small { font-size: 12px; color: #f8b4b4; }
     .nav-ico { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; color: #2b2b2b; background: #fbbf24; }
-    .mock-smart { flex-wrap: nowrap; gap: 8px; }
     .smart { width: 196px; flex: none; min-height: 150px; display: flex; flex-direction: column; padding: 14px; border-radius: 4px; background: #0b6bc8; color: #fff; font-family: "Segoe UI", system-ui, sans-serif; }
     .smart b { font-size: 14px; font-weight: 600; }
     .smart p { margin-top: 6px; font-size: 11px; line-height: 1.35; color: #d6e8fa; }
@@ -339,17 +245,6 @@
     .smart-rodape { display: flex; justify-content: flex-end; gap: 6px; margin-top: auto; padding-top: 12px; }
     .smart-rodape span { white-space: nowrap; font-size: 10px !important; padding: 6px 7px !important; }
     .smart-rodape .alvo { background: #fff; color: #0b3a6b; font-size: 11px; padding: 6px 8px; }
-    .smart-rodape .cinza-b { background: transparent; border: 1px solid #fff; color: #fff; font-size: 11px; padding: 5px 8px; }
-    .seta-mock { font-family: var(--display); font-size: 34px; color: var(--ouro); }
-    .mock-wizard { flex-direction: column; }
-    .wiz { width: 100%; max-width: 360px; border-radius: 8px; overflow: hidden; background: #f3f3f3; font-family: system-ui, sans-serif; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4); }
-    .wiz-topo { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #ddd; }
-    .wiz-topo img { width: 22px; height: 22px; }
-    .wiz-corpo { display: grid; gap: 7px; padding: 14px; }
-    .wiz-corpo i { height: 8px; border-radius: 4px; background: #d4d4d4; }
-    .wiz-botoes { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 12px; background: #e9e9e9; }
-    .wiz-ordem { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-family: var(--display); font-size: 15px; color: var(--ouro); }
-    .wiz-ordem span { padding: 4px 10px; border-radius: 8px; color: var(--tinta); background: rgba(255, 255, 255, 0.08); }
     .mock-abrir { flex-direction: column; gap: 8px; background: radial-gradient(60% 80% at 50% 30%, #3d1f2c, #0f0a0d 75%); }
     .mock-abrir img { width: 54px; }
     .mock-abrir b { font-weight: 900; font-size: 30px; letter-spacing: -0.02em; }
@@ -406,12 +301,38 @@
     .copiar.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); border-color: #0b5323; box-shadow: 0 5px 0 #0b5323; }
     .alerta-rede { margin-top: 12px; font-size: 14px; font-weight: 700; color: #fbbf24; text-align: center; }
     .final { margin: 70px 0 0; padding: 40px 20px 34px; text-align: center; border-top: 1px solid rgba(255, 233, 163, 0.08); background: radial-gradient(50% 80% at 50% 0%, rgba(255, 233, 163, 0.08), transparent 70%); }
-    .final .assinatura { display: inline-flex; align-items: flex-end; gap: 10px; margin-top: 22px; }
-    .final .assinatura em { font-style: italic; font-weight: 900; font-size: 22px; color: var(--suave); padding-bottom: 4px; }
-    .final .assinatura b { position: relative; font-family: var(--display); font-weight: 400; font-size: 40px; letter-spacing: 0.03em; text-transform: uppercase; background: linear-gradient(100deg, #e2a93f, #ffe066 50%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 var(--linha)); }
-    .final .assinatura svg { position: absolute; left: -12px; top: -16px; width: 30px; transform: rotate(-20deg); }
     .rodape { margin-top: 26px; color: var(--apagado); font-size: 14px; }
     .rodape a { color: var(--suave); }
+
+    .cel { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; align-items: center; margin-top: 34px; }
+    .cel-fone { justify-self: center; width: 100%; max-width: 300px; padding: 10px; border-radius: 42px; background: linear-gradient(180deg, #2b1c23, #150b10); box-shadow: inset 0 0 0 2px #51323d, inset 0 0 0 5px #0b0608, 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 233, 163, 0.14); }
+    .cel-fone img { width: 100%; height: auto; border-radius: 32px; }
+    .cel-lado { display: grid; gap: 18px; min-width: 0; }
+    .cel-passos { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .cel-passos li { position: relative; display: grid; gap: 12px; align-content: start; padding: 12px 12px 16px; border-radius: 20px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.5), rgba(43, 26, 34, 0.5)); border: 1px solid rgba(255, 233, 163, 0.12); }
+    .cel-passos img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.12); }
+    .cel-passos .n { position: absolute; top: -14px; left: -10px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-family: var(--display); font-size: 20px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 4px 0 var(--ouro-esc); }
+    .cel-passos h3 { font-family: var(--display); font-weight: 400; font-size: 21px; line-height: 1.1; text-transform: uppercase; }
+    .cel-passos p { margin-top: 4px; font-size: 15px; color: var(--suave); }
+    .cel-regras { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .cel-regras li { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; font-weight: 800; font-size: 15px; color: var(--tinta); background: rgba(74, 222, 128, 0.07); border: 1px solid rgba(74, 222, 128, 0.22); }
+    .cel-regras li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); }
+    .cel-video { max-width: 860px; }
+    .cel-video video { aspect-ratio: 16 / 9; object-fit: contain; }
+    .todas { margin-top: 16px; text-align: center; font-weight: 800; font-size: 15px; }
+    .todas a { color: var(--suave); }
+    .auto4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 1180px) { .auto4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 980px) {
+      .cel { grid-template-columns: 1fr; gap: 30px; }
+      .cel-fone { max-width: 280px; }
+    }
+    @media (max-width: 640px) {
+      .cel-passos { grid-template-columns: 1fr; gap: 20px; }
+      .cel-passos li { grid-template-columns: 120px minmax(0, 1fr); align-items: center; }
+      .cel-regras { grid-template-columns: 1fr; }
+    }
+
 
     .revela { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
     .revela.ok { opacity: 1; transform: none; }
@@ -420,18 +341,12 @@
     .sem-vt main { animation: entra 0.18s ease-out backwards; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .revela { opacity: 1; transform: none; } }
     @media (max-width: 980px) {
-      .numeros, .seguranca { grid-template-columns: 1fr 1fr; }
-      .ciclo { grid-template-columns: 1fr; }
-      .centro-ciclo { grid-column: auto; grid-row: auto; max-width: 300px; margin: 0 auto; order: -1; }
-      .duas, .duas.inv, .avaliar, .extras, .instalar, .creditos, .auto4, .auto { grid-template-columns: 1fr; }
-      .duas.inv .midia { order: 0; }
-      .soma { grid-template-columns: 1fr; }
-      .contas { grid-column: auto; }
-      .seta { transform: rotate(90deg); text-align: center; }
+      .seguranca { grid-template-columns: 1fr 1fr; }
+      .extras, .creditos, .auto4, .auto { grid-template-columns: 1fr; }
       .passos4 { grid-template-columns: 1fr 1fr; gap: 30px 16px; }
-      .linha-g { flex-direction: column; }
-      .linha-g figure { width: 100%; }
     }
+    .autor b { font-size: clamp(34px, 5vw, 46px); }
+    @media (max-width: 640px) { .passos4 { grid-template-columns: minmax(0, 1fr); gap: 34px; } .seguranca { grid-template-columns: minmax(0, 1fr); } }
   </style>
 </head>
 <body>
@@ -442,9 +357,9 @@
       <a class="marca" href="#"><img src="assets/icone.png" alt="" /><span><span class="p">Poke</span>Pocket</span></a>
       <nav class="secoes" aria-label="Seções">
         <span class="marcador" aria-hidden="true"></span>
-        <a href="#automatico" data-secao="automatico">No automático</a>
-        <a href="#avaliar" data-secao="avaliar">Score e preço</a>
-        <a href="#contas" data-secao="contas">4 contas</a>
+        <a href="#celular" data-secao="celular">No celular</a>
+        <a href="#recursos" data-secao="recursos">Recursos</a>
+        <a href="#seguranca" data-secao="seguranca">Segurança</a>
         <a href="#instalar" data-secao="instalar">Instalar</a>
         <a href="#duvidas" data-secao="duvidas">Dúvidas</a>
       </nav>
@@ -458,9 +373,9 @@
       </div>
       <div class="painel-menu" id="painel-secoes">
         <nav aria-label="Seções">
-          <a href="#automatico" data-secao="automatico"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-3.9M4 4v4h4M4 13a8 8 0 0 0 14.9 3.9M20 20v-4h-4"/></svg></span>No automático</a>
-          <a href="#avaliar" data-secao="avaliar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/></svg></span>Score e preço</a>
-          <a href="#contas" data-secao="contas"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.8a3.2 3.2 0 0 1 0 6.4M17.5 13.8c2.1.6 3.5 2.6 3.5 5.2"/></svg></span>4 contas</a>
+          <a href="#celular" data-secao="celular"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>No celular</a>
+          <a href="#recursos" data-secao="recursos"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span>Recursos</a>
+          <a href="#seguranca" data-secao="seguranca"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg></span>Segurança</a>
           <a href="#instalar" data-secao="instalar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span>Instalar</a>
           <a href="#duvidas" data-secao="duvidas"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.8M12 17.2h.01"/></svg></span>Dúvidas</a>
         </nav>
@@ -479,111 +394,74 @@
       <div class="raios" aria-hidden="true"></div>
       <div class="envolve">
         <img class="bola" src="assets/pokebola.svg" alt="" />
-        <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Twitch e Kick</span><span><i></i>Windows</span></div>
+        <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Windows</span><span><i></i>Android e iPhone</span></div>
         <h1>Seu Pokéidle no <em>automático</em>.</h1>
-        <p class="lide">Não só mostra os números: joga por você,<br /><b>nas 4 contas ao mesmo tempo</b>.</p>
+        <p class="lide">Joga por você <b>nas 4 contas</b>.<br />E agora cabe no <b>celular</b>.</p>
         <div class="acoes">
           <a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-heroi" data-goatcounter-title="baixar-instalador-heroi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zm8.5-1.2L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zm8.5 0H21V21l-9.5-1.3z"/></svg>Baixar para Windows</a>
           <a class="botao vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil" data-goatcounter-title="baixar-portatil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 7h4M12 17h.01"/></svg>Versão portátil</a>
         </div>
         <div class="contador-dl" id="contador-dl" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><b id="dl-total">0</b><span>downloads</span></div>
-        <p class="nota">Grátis · sem cadastro e sem licença · Windows 10 e 11 · versão 1.0.3 · a portátil roda sem instalar · <a href="#video">ver o vídeo</a> · <a href="calculadora/" data-goatcounter-click="calculadora-heroi" data-goatcounter-title="calculadora-heroi">calculadora online</a> · <a href="https://github.com/iampiscis/pokepocket/releases">todas as versões</a></p>
+        <p class="nota">Grátis · sem cadastro · Windows 10 e 11 · versão 1.0.4 · <a href="#video">ver o vídeo</a> · <a href="https://github.com/iampiscis/pokepocket/releases">todas as versões</a></p>
         <div class="tela revela" id="video">
           <video src="assets/pokepocket-v6.mp4" poster="assets/capa.jpg" controls preload="none" playsinline></video>
         </div>
-        <div class="numeros revela">
-          <div class="numero"><b>4</b><span>contas num painel só</span></div>
-          <div class="numero"><b>4</b><span>critérios para escolher a hunt</span></div>
-          <div class="numero"><b>2</b><span>lives por conta, ao mesmo tempo</span></div>
-          <div class="numero"><b>0</b><span>cliques para repor os itens</span></div>
+      </div>
+    </section>
+
+    <section class="bloco" id="celular">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Novo · 1.0.4</span>
+          <h2>No celular</h2>
+          <p>O painel inteiro no Android e no iPhone, no Wi-Fi ou no 4G/5G.</p>
+        </div>
+        <div class="cel">
+          <div class="cel-fone revela"><img src="assets/prints/celular-equipe.webp" alt="Painel do PokePocket no celular, aba Equipe" loading="lazy" width="780" height="1688" /></div>
+          <div class="cel-lado">
+            <ol class="cel-passos">
+              <li class="revela"><img src="assets/prints/celular-passo1.webp" alt="QR Code em Abrir no celular" loading="lazy" width="640" height="480" /><span class="n">1</span><div><h3>Abra o QR Code</h3><p>Configurações › Abrir no celular.</p></div></li>
+              <li class="revela"><img src="assets/prints/celular-passo2.webp" alt="Celular esperando a confirmação" loading="lazy" width="640" height="480" /><span class="n">2</span><div><h3>Aponte a câmera</h3><p>Do celular para o QR Code.</p></div></li>
+              <li class="revela"><img src="assets/prints/celular-passo3.webp" alt="Pedido de acesso com o botão Permitir" loading="lazy" width="640" height="480" /><span class="n">3</span><div><h3>Permita no PC</h3><p>Toque em Permitir.</p></div></li>
+            </ol>
+            <ul class="cel-regras revela">
+              <li>PC ligado e PokePocket aberto.</li>
+              <li>Reabriu o app? Escaneie de novo.</li>
+              <li>Só permita aparelhos seus.</li>
+              <li>Desconecte quando quiser.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tela cel-video revela">
+          <video src="assets/pokepocket-celular.mp4" poster="assets/celular-capa.jpg" controls playsinline muted preload="metadata"></video>
         </div>
       </div>
     </section>
 
-    <section class="bloco" id="automatico">
+    <section class="bloco" id="recursos">
       <div class="envolve">
         <div class="cab centro revela">
           <span class="rotulo">Não só mostra. Faz.</span>
-          <h2>No automático, nas 4 contas</h2>
+          <h2>Principais recursos</h2>
         </div>
         <div class="auto4">
-          <div class="auto revela"><img src="assets/prints/hunt-automatica.webp" alt="Automação de hunt com XP por hora e Coins por hora medidos" loading="lazy" width="1600" height="1000" /><div><h3>Hunt automática</h3><p>Mede o <b>XP/h</b> e os <b>Coins/h</b> reais de cada hunt e troca para a melhor pelo critério que você escolher. Também faz Top Catch.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/prey.webp" alt="Prey com região recomendada e cartela" loading="lazy" width="1600" height="1000" /><div><h3>Prey</h3><p>Recomenda a <b>região</b> e diz <b>o que girar</b>. Só gira o que não vale e leva direto à hunt do escolhido.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/compra-em-massa.webp" alt="Regra de compra de item em massa com preço máximo" loading="lazy" width="1600" height="1000" /><div><h3>Compra em massa</h3><p>Compra o item que você quiser, em quantidade, até o <b>preço máximo</b> que você definir, em qualquer conta.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/mercado.webp" alt="Mercado com desconto e Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Mercado</h3><p>Mostra o <b>desconto</b> e o <b>Score PvP por Gema</b> de cada anúncio, com filtros por nota, nível e preço.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/lives.webp" alt="Lives da Twitch e da Kick com troca de pontos" loading="lazy" width="1600" height="1000" /><div><h3>Multi lives</h3><p>Lives da <b>Twitch</b> e da <b>Kick</b> ao mesmo tempo em cada conta, com os pontos trocados por bônus sozinhos.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/ritmo.webp" alt="Ritmo da conta com notas por área" loading="lazy" width="1600" height="1000" /><div><h3>Ritmo da conta</h3><p>Nota de S a D em cada área da conta: evolução, Coins, Prey, Mega, bestiário e mais.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/ficha.webp" alt="Ficha do pokémon com Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Ficha</h3><p><b>Score PvP</b>, efetividade, linha de evolução até a <b>Mega</b> e histórico de cada pokémon.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/ganhos.webp" alt="Ganhos por hora e por conta" loading="lazy" width="1600" height="1000" /><div><h3>Ganhos</h3><p>XP, Coins, compras, vendas e lucro por hora, somados ou conta por conta.</p></div></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="bloco" id="avaliar">
-      <div class="envolve">
-        <div class="cab centro revela">
-          <span class="rotulo">Exclusivo</span>
-          <h2>Quão forte ele fica? Quanto ele vale?</h2>
-          <p>Um score próprio, pensado no meta do PvP, e o preço sugerido de cada pokémon, direto na ficha.</p>
-        </div>
-        <div class="avaliar">
-          <div class="placa revela">
-            <h3>Score PvP e PvE</h3>
-            <p>Um número de 0 a 1.000 que diz o quanto o pokémon rende de verdade.</p>
-            <div class="medidores">
-              <div class="medidor vao"><svg viewBox="0 0 220 130"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ef4444"/><stop offset=".45" stop-color="#facc15"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="18" stroke-linecap="round"/><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="url(#g)" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="96 100"/></svg><div class="v">960</div><small>Score PvP</small></div>
-              <div class="medidor vao"><svg viewBox="0 0 220 130"><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="18" stroke-linecap="round"/><path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="url(#g)" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="88.3 100"/></svg><div class="v">883</div><small>Score PvE</small></div>
-            </div>
-            <div class="formula vao"><span>Ataque real em 60 s</span><i>+</i><span>Resistência ao meta</span><i>=</i><span style="color:var(--verde)">Score</span></div>
-          </div>
-          <div class="placa revela">
-            <h3>Precificador integrado</h3>
-            <p>O projeto do Brião dentro do painel, ajustado pelas vendas parecidas no Mercado.</p>
-            <div class="precos">
-              <div class="preco vao"><b>Rápido</b><div class="trilho"><i style="width:80%"></i></div><strong>5.800</strong></div>
-              <div class="preco vao meio"><b>Na média</b><div class="trilho"><i style="width:90%"></i></div><strong>6.500</strong></div>
-              <div class="preco vao"><b>Conservador</b><div class="trilho"><i style="width:100%"></i></div><strong>7.200</strong></div>
-            </div>
-            <a class="credito" href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">♥ Precificador by briaoAle</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="bloco" id="contas">
-      <div class="envolve">
-        <div class="cab centro revela">
-          <span class="rotulo">Tudo num lugar só</span>
-          <h2>4 contas, um resumo</h2>
-          <p>XP, coins e capturas de cada conta somados ao vivo, sem trocar de aba.</p>
-        </div>
-        <div class="soma revela">
-          <div class="contas">
-            <div class="conta vao"><b>Conta 1</b><strong>1,42 bi</strong><span>41,8 mi coins</span></div>
-            <div class="conta vao"><b>Conta 2</b><strong>1,31 bi</strong><span>38,6 mi coins</span></div>
-            <div class="conta vao"><b>Conta 3</b><strong>1,22 bi</strong><span>35,2 mi coins</span></div>
-            <div class="conta vao"><b>Conta 4</b><strong>1,17 bi</strong><span>33,9 mi coins</span></div>
-          </div>
-          <div class="seta" aria-hidden="true">›</div>
-          <div class="total placa">
-            <h3>Total por hora</h3>
-            <div class="grande"><div class="vao"><small>XP</small><strong style="color:#c4b5fd">5,1 bi</strong></div><div class="vao"><small>Coins</small><strong style="color:var(--ouro)">149,5 mi</strong></div></div>
-          </div>
+          <div class="auto revela"><img src="assets/prints/equipe.webp" alt="Equipe com as 4 contas, nível, XP por hora e saldo" loading="lazy" width="1600" height="1000" /><div><h3>Equipe</h3><p>As <b>4 contas</b> num painel: nível, XP/h, Coins/h e saldo ao vivo.</p></div></div>
+          <div class="auto revela"><img src="assets/prints/prey.webp" alt="Prey com região recomendada e cartela" loading="lazy" width="1600" height="1000" /><div><h3>Prey</h3><p>Recomenda a <b>região</b> e diz <b>o que girar</b>.</p></div></div>
+          <div class="auto revela"><img src="assets/prints/mercado.webp" alt="Mercado com desconto e Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Mercado</h3><p><b>Desconto</b> e <b>Score PvP</b> por anúncio. Ordem de compra e compra manual.</p></div></div>
+          <div class="auto revela"><img src="assets/prints/ficha.webp" alt="Ficha do pokémon com Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Ficha</h3><p><b>Score PvP</b>, efetividade, evolução e <b>preço sugerido</b>.</p></div></div>
+          <div class="auto revela"><img src="assets/prints/ritmo.webp" alt="Ritmo da conta com notas por área" loading="lazy" width="1600" height="1000" /><div><h3>Ritmo da conta</h3><p>Nota de <b>S a D</b> em cada área da conta.</p></div></div>
+          <div class="auto revela"><img src="assets/prints/ganhos.webp" alt="Ganhos por hora e por conta" loading="lazy" width="1600" height="1000" /><div><h3>Ganhos</h3><p>XP, Coins, compras e vendas por hora.</p></div></div>
         </div>
         <div class="extras">
-          <div class="extra vao revela"><div class="ico"><span class="moeda">C</span><span class="gema"></span><img src="assets/pokebola.svg" alt="" style="width:42px" /></div><h3>Transferências</h3><p>Coins, gemas e pokémons entre as suas contas.</p></div>
-          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z" fill="#ffd34d" stroke="#7d5313" stroke-width="1.4" stroke-linejoin="round"/></svg></div><h3>Filtros específicos</h3><p>Nota, score, nível, shiny e mais, para achar o que importa.</p></div>
-          <div class="extra vao revela"><div class="ico"><span style="display:grid;place-items:center;width:60px;height:60px;border-radius:16px;font-family:var(--display);font-size:30px;background:linear-gradient(180deg,#f472b6,#db2777);box-shadow:0 5px 0 #831843">S+</span></div><h3>Tier PvP diário</h3><p>Atualizado todo dia com o meta do ranqueado.</p></div>
-          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/salamence.png" alt="" style="width:76px;height:auto" /><span style="font-family:var(--display);font-size:34px;color:var(--ouro)">24h</span></div><h3>Shinies do servidor</h3><p>Tudo o que saiu no jogo nas últimas 24 horas.</p></div>
-          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 48 32" width="90" height="60"><polyline points="2,26 12,18 20,22 30,9 38,13 46,4" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="4" r="3.5" fill="#bbf7d0"/></svg></div><h3>Mercado com histórico</h3><p>Preços e tendências de cada item.</p></div>
-          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/hyper_potion.png" alt="" style="width:34px;height:54px" /><img class="pix" src="assets/itens/ball-ultra.png" alt="" style="width:50px;height:50px" /><img class="pix" src="assets/itens/max_revive.png" alt="" style="width:36px;height:50px" /></div><h3>Mochila das 4 contas</h3><p>Todos os itens num lugar só.</p></div>
-          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></div><h3>Atualiza sozinho</h3><p>O launcher baixa a versão nova e abre o painel já atualizado.</p></div>
-          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60"><path d="M4 6h3M4 12h3M4 18h3" stroke="#f1d3b7" stroke-width="2" stroke-linecap="round"/><path d="M10 6h10M10 12h7M10 18h9" stroke="#ec4899" stroke-width="2.4" stroke-linecap="round"/></svg></div><h3>Histórico do pokémon</h3><p>Preços ofertados, vendas e cada melhoria que ele recebeu.</p></div>
-          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="#2b1a22" stroke="#ffd34d" stroke-width="1.6"/><path d="M6 9h3M6 12h3M15 9h3M15 12h3" stroke="#ffd34d" stroke-width="1.6" stroke-linecap="round"/></svg></div><h3>Bestiário claro</h3><p>Dano extra por tipo e o próximo marco de cada conta.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ffd34d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><path d="M3 20l6-12 4 7 3-4 5 9z"/><circle cx="17" cy="5" r="2"/></svg></div><h3>Hunt automática</h3><p>Troca para a melhor hunt e faz Top Catch.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><rect x="3" y="5" width="18" height="13" rx="2.5"/><path d="M10 9.5v4.5l4-2.25z" fill="#c4b5fd"/><path d="M8 21h8"/></svg></div><h3>Multi lives</h3><p>Twitch e Kick com pontos virando bônus.</p></div>
+          <div class="extra vao revela"><div class="ico"><span class="moeda">C</span><span class="gema"></span><img src="assets/pokebola.svg" alt="" style="width:42px" /></div><h3>Transferências</h3><p>Coins, gemas e pokémons entre contas.</p></div>
+          <div class="extra vao revela"><div class="ico"><span style="display:grid;place-items:center;width:60px;height:60px;border-radius:16px;font-family:var(--display);font-size:30px;background:linear-gradient(180deg,#f472b6,#db2777);box-shadow:0 5px 0 #831843">S+</span></div><h3>Tier PvP diário</h3><p>O meta do ranqueado, todo dia.</p></div>
+          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/salamence.png" alt="" style="width:76px;height:auto" /><span style="font-family:var(--display);font-size:34px;color:var(--ouro)">24h</span></div><h3>Shinies do servidor</h3><p>Tudo o que saiu nas últimas 24 h.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></div><h3>Atualiza sozinho</h3><p>A versão nova chega sem reinstalar.</p></div>
         </div>
       </div>
     </section>
-
 
     <section class="bloco" id="seguranca">
       <div class="envolve">
@@ -592,10 +470,10 @@
           <h2>Seu jogo, seu computador</h2>
         </div>
         <div class="seguranca">
-          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Roda no seu PC</h3><p>O painel funciona no seu computador, sem servidor do PokePocket no meio.</p></div>
-          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><h3>Logins com você</h3><p>As contas ficam salvas só no seu computador.</p></div>
-          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><h3>Sem cadastro</h3><p>Nada de conta, licença ou assinatura. Instalou, usou.</p></div>
-          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div><h3>Termos claros</h3><p>Os termos de uso aparecem antes de começar, linha a linha.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Roda no seu PC</h3><p>Sem servidor do PokePocket no meio.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><h3>Logins com você</h3><p>As contas ficam só no seu computador.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></div><h3>Celular com permissão</h3><p>QR de uso único. Nenhum aparelho entra sem você permitir.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><h3>Sem cadastro</h3><p>Sem conta, licença ou assinatura.</p></div>
         </div>
       </div>
     </section>
@@ -605,7 +483,7 @@
         <div class="cab centro revela">
           <span class="rotulo">Instalar</span>
           <h2>Instale em 4 passos</h2>
-          <p>O aviso azul do passo 3 é normal em programa novo.</p>
+          <p>O aviso azul do passo 3 é normal.</p>
         </div>
         <div class="passos4">
           <div class="p4 revela"><span class="n">1</span><div class="mini"><a class="botao pequeno" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-passo" data-goatcounter-title="baixar-instalador-passo">Instalador</a><a class="botao pequeno vazado" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Portatil.exe" data-goatcounter-click="baixar-portatil-passo" data-goatcounter-title="baixar-portatil-passo">Portátil</a></div><h3>Baixe</h3><p>Instalador ou portátil (sem instalar).</p></div>
@@ -613,6 +491,7 @@
           <div class="p4 revela"><span class="n">3</span><div class="mini"><div class="smart mini-smart"><b>O Windows protegeu o computador</b><span class="link alvo-link">Mais informações</span><div class="smart-rodape"><span class="alvo">Executar assim mesmo</span></div></div></div><h3>Libere</h3><p>Mais informações › Executar assim mesmo.</p></div>
           <div class="p4 revela"><span class="n">4</span><div class="mini mock-abrir"><img src="assets/pokebola.svg" alt="" /><span class="botao pequeno" style="pointer-events:none">Começar</span></div><h3>Pronto</h3><p>Instale, abra e entre nas suas contas.</p></div>
         </div>
+        <!-- 1.0.4: hashes -->
         <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.3: <code>8cebea6e91a2e308fe32d4b44bda0249609e7ded251468e447e7fa2c9c90f1cb</code><br />Portátil 1.0.3: <code>036cd006139826e680f30a90671a418a07fed8b74a06d3961752aed9aa6f1c6a</code></p></details>
       </div>
     </section>
@@ -624,30 +503,18 @@
           <h2>O que mudou</h2>
         </div>
         <div class="versoes">
-          <article class="versao revela"><div class="versao-tag"><b>1.0.3</b><small>21/11/2026</small><span class="atual">atual</span></div><ul>
-            <li><b>Visual novo</b> em todo o painel: mais limpo, organizado e fácil de ler.</li>
-            <li><b>Prey:</b> abre no cartão de cada conta, recomenda as regiões e mostra o que girar e quanto custa.</li>
-            <li><b>Mercado:</b> desconto e Score PvP por Gema explicados ao passar o mouse; pedras e Boss Tokens comprados ficam presos à conta.</li>
-            <li><b>Ficha do pokémon</b> em abas, cabendo numa tela.</li>
-            <li><b>Atualiza sozinho:</b> o launcher baixa a versão nova e o painel avisa com um botão.</li>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.4</b><small>21/11/2026</small><span class="atual">atual</span></div><ul>
+            <li><b>No celular:</b> Android e iPhone pelo QR Code, com layout próprio.</li>
+            <li><b>Seguro:</b> você permite cada aparelho no PC e desconecta quando quiser.</li>
+            <li><b>Mercado:</b> a compra automática saiu. Ficam a ordem de compra e a compra manual.</li>
           </ul></article>
-          <article class="versao revela"><div class="versao-tag"><b>1.0.2</b><small>20/11/2026</small></div><ul>
-            <li><b>Prey:</b> indicadores mostram se a cartela vale, gira só o quadrado ruim e um clique leva à hunt do escolhido.</li>
-            <li><b>Bestiário:</b> dano extra por tipo de cada conta e quanto falta para o próximo marco.</li>
-            <li><b>Histórico do pokémon:</b> preços ofertados, vendas e cada melhoria com o custo.</li>
-            <li><b>Calculadora:</b> nota, PvP, PvE e preço justo sempre à vista, nas cores do jogo.</li>
-            <li><b>PvP:</b> escolha de conta com tier, ranking e fila.</li>
-            <li><b>Atualização do jogo:</b> o app recarrega sozinho quando sai versão nova.</li>
-          </ul></article>
-          <article class="versao revela"><div class="versao-tag"><b>1.0.1</b><small>19/11/2026</small></div><ul>
-            <li><b>Primeiro uso:</b> as 4 contas já aparecem prontas, só esperando o login.</li>
-            <li><b>Tour guiado</b> aponta para o lugar certo.</li>
-            <li><b>Login:</b> Discord ou e-mail (o Google bloqueia login dentro de apps).</li>
-          </ul></article>
-          <article class="versao revela"><div class="versao-tag"><b>1.0.0</b><small>19/11/2026</small></div><ul>
-            <li>Primeira versão pública: 4 contas, troca de hunt e top catch, score PvP, compras e bônus automáticos, lives da Twitch e da Kick.</li>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.3</b><small>21/11/2026</small></div><ul>
+            <li><b>Visual novo</b> em todo o painel.</li>
+            <li><b>Prey</b> no cartão de cada conta, com regiões recomendadas.</li>
+            <li><b>Ficha</b> em abas e <b>atualização</b> pelo launcher.</li>
           </ul></article>
         </div>
+        <p class="todas revela"><a href="https://github.com/iampiscis/pokepocket/releases">Todas as versões</a></p>
       </div>
     </section>
 
@@ -658,10 +525,10 @@
           <h2>Perguntas rápidas</h2>
         </div>
         <div class="faq">
-          <details><summary>É grátis mesmo?</summary><p>Sim. Sem assinatura, sem licença e sem cadastro.</p></details>
-          <details><summary>Preciso deixar o computador ligado?</summary><p>Sim. O PokePocket roda no seu PC, então a hunt, as compras e as lives seguem enquanto ele estiver aberto.</p></details>
-          <details><summary>Qual a diferença entre o instalador e a portátil?</summary><p>O instalador coloca o PokePocket no PC com atalho na área de trabalho. A portátil é um arquivo só: abre direto, sem instalar, e dá para levar num pendrive.</p></details>
-          <details><summary>Funciona no celular?</summary><p>Esta versão é para Windows 10 e 11.</p></details>
+          <details><summary>É grátis mesmo?</summary><p>Sim. Sem assinatura, licença ou cadastro.</p></details>
+          <details><summary>Preciso deixar o PC ligado?</summary><p>Sim. O PokePocket roda no seu PC e precisa estar aberto.</p></details>
+          <details><summary>Funciona no celular?</summary><p>Sim, no Android e no iPhone, pelo QR Code em Configurações › Abrir no celular. O PC continua ligado.</p></details>
+          <details><summary>Instalador ou portátil?</summary><p>O instalador cria atalho. A portátil abre direto, sem instalar.</p></details>
           <details><summary>É oficial do Pokéidle?</summary><p>Não. É um projeto de fã, sem vínculo com o Pokéidle.</p></details>
         </div>
       </div>
@@ -671,8 +538,8 @@
       <div class="envolve">
         <div class="cab centro revela">
           <span class="rotulo">Créditos</span>
-          <h2>Gostou? Apoie o projeto</h2>
-          <p>É grátis e continua grátis. Se ajudar, uma doação mantém as melhorias chegando.</p>
+          <h2>Feito por fãs</h2>
+          <p>É grátis e continua grátis.</p>
         </div>
         <div class="creditos">
           <div class="cartao-autor revela">
@@ -687,9 +554,8 @@
               </div>
             </div>
             <div class="autor">
-              <small>Feito com carinho por</small>
-              <b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Piscis</b>
-              <span>Criador e dev do PokePocket</span>
+              <small>Feito com carinho pela</small>
+              <b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Equipe PokePocket</b>
             </div>
           </div>
           <div class="cartao-doar revela">
@@ -709,7 +575,6 @@
 
     <section class="final">
       <div class="acoes"><a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-final" data-goatcounter-title="baixar-instalador-final">Baixar para Windows</a></div>
-      <div class="assinatura"><em>by</em><b><svg viewBox="0 0 64 40"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Piscis</b></div>
       <p class="rodape">Projeto de fã, sem vínculo com o Pokéidle · Precificador por <a href="https://briaoale.github.io/precificador-pokemon/" target="_blank" rel="noopener">briaoAle</a> (MIT) · <a href="https://github.com/iampiscis/pokepocket/releases">Versões</a><br />Esta página conta visitas e downloads de forma anônima (GoatCounter): sem cookies e sem guardar o seu IP.</p>
       <p class="visitas" id="visitas" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><b></b> <span>visitantes</span></p>
     </section>
