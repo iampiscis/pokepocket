@@ -197,3 +197,4 @@ html.embed .tier { margin-top: 0; }
 .ex-ico { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: rgba(226, 169, 63, 0.14); color: #ffd34d; font-size: 14px; }
 .ex-pe { color: var(--apagado, #c9b8b1); font-size: 11px; }
 @media (max-width: 560px) { .ex-grade { grid-template-columns: minmax(0, 1fr); } .ex-bloco { grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; } .ex-bloco .ex-ico { grid-row: span 2; } }
+html.embed, html.embed body { overflow: hidden; overscroll-behavior: none; height: auto; }

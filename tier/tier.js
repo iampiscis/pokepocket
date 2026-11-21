@@ -548,6 +548,15 @@ function avisarPainel(estadoCarga) {
 
 if (EMBED) {
   document.documentElement.classList.add('embed')
+  if (parent !== window && typeof ResizeObserver === 'function') {
+    let ultima = 0
+    const medir = () => {
+      const h = Math.ceil(document.documentElement.scrollHeight)
+      if (Math.abs(h - ultima) > 1) { ultima = h; parent.postMessage({ pokepocketTier: 'altura', altura: h }, '*') }
+    }
+    new ResizeObserver(medir).observe(document.body)
+    addEventListener('load', medir)
+  }
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]')
     if (a && !a.closest('.poke') && !a.getAttribute('href').startsWith('#')) a.target = '_blank'
