@@ -192,7 +192,7 @@ const ui = {
   base: $('seg-base'), modo: $('seg-modo'), bonusSeg: $('seg-bonus'),
   nivel: $('nivel'), pct: $('pct'), xp: $('xp'), xph: $('xph'), bonus: $('bonus'), alvo: $('alvo'), data: $('data'), partida: $('partida'),
   grupoNivel: $('grupo-nivel'), grupoXp: $('grupo-xp'), grupoAlvo: $('grupo-alvo'), grupoData: $('grupo-data'), atalhos: $('atalhos'),
-  monte: $('monte'), ceu: $('ceu'), cena: $('cena'), cab: $('cab'), ritmo: $('ritmo'), marcos: $('marcos'), vazio: $('vazio'), resultado: $('resultado')
+  monte: $('monte'), ceu: $('ceu'), voo: $('voo'), cena: $('cena'), cab: $('cab'), ritmo: $('ritmo'), marcos: $('marcos'), vazio: $('vazio'), resultado: $('resultado')
 }
 
 const PADRAO = { base: 'nivel', nivel: '1.200', pct: '', xp: '', xph: '300 mi', bonus: '1', modo: 'nivel', alvo: '1.500', data: '', partida: '' }
@@ -398,7 +398,7 @@ function agendarVoo(ms) {
 
 function iniciarCeu() {
   ui.ceu.innerHTML = CEU
-  if (window.ppCresselia && !window.ppCresselia.bloqueado()) cresselia = window.ppCresselia.montar(ui.ceu)
+  if (window.ppCresselia && !window.ppCresselia.bloqueado()) cresselia = window.ppCresselia.montar(ui.voo)
   ui.ceu.querySelector('.nl-lua').addEventListener('click', voar)
   if ('IntersectionObserver' in window) {
     new IntersectionObserver((itens) => { for (const it of itens) visivel = it.isIntersecting; pausar() }).observe(ui.monte)
