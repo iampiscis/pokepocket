@@ -54,10 +54,10 @@ function pagina({ titulo, descricao, cor }, destino, proprio, imagem) {
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>${esc(titulo)} · Calculadora PokePocket</title>
+<title>${esc(titulo)} · Calculadora Pokémon · PokePocket</title>
 <meta name="description" content="${esc(descricao)}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Calculadora PokePocket">
+<meta property="og:site_name" content="Calculadora Pokémon · PokePocket">
 <meta property="og:title" content="${esc(titulo)}">
 <meta property="og:description" content="${esc(descricao)}">
 <meta property="og:url" content="${esc(proprio)}">
