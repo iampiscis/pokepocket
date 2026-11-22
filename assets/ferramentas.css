@@ -1,0 +1,33 @@
+.ferramentas { position: relative; flex: none; }
+.ferr-botao { font: inherit; font-weight: 900; font-size: 14px; line-height: 1; cursor: pointer; }
+.ferr-botao .seta { width: 14px; height: 14px; margin-left: -2px; color: var(--suave); transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+.ferr-botao[aria-expanded="true"] { color: #fff; border-color: rgba(255, 211, 77, 0.75); background: linear-gradient(180deg, rgba(255, 233, 163, 0.24), rgba(255, 211, 77, 0.07)); }
+.ferr-botao[aria-expanded="true"] .seta { transform: rotate(180deg); color: var(--ouro); }
+.ferr-lista { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; gap: 2px; width: 300px; padding: 8px; border-radius: 18px; background: linear-gradient(180deg, #28161f, #150b10); border: 1px solid rgba(255, 233, 163, 0.16); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 246, 239, 0.05); transform-origin: top right; opacity: 0; visibility: hidden; transform: translateY(-6px) scale(0.98); transition: opacity 0.18s, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s 0.22s; }
+.ferr-lista.aberta { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.ferr-lista a { display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 11px; padding: 8px; border-radius: 12px; text-decoration: none; color: var(--suave); }
+.ferr-lista a:hover, .ferr-lista a:focus-visible { outline: none; color: var(--tinta); background: rgba(255, 233, 163, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 211, 77, 0.3); }
+.ferr-ic { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; color: var(--ouro); background: rgba(255, 233, 163, 0.08); box-shadow: inset 0 0 0 1px rgba(255, 211, 77, 0.18); }
+.ferr-ic svg { width: 20px; height: 20px; }
+.ferr-txt { display: grid; min-width: 0; line-height: 1.25; }
+.ferr-txt b { display: flex; align-items: center; gap: 7px; font-weight: 900; font-size: 15px; color: #fff3df; white-space: nowrap; }
+.ferr-txt small { font-size: 12.5px; font-weight: 700; color: var(--apagado); }
+.ferr-lista .selo-novo { position: static; width: auto; height: auto; padding: 2px 7px 1px; font-size: 10.5px; border-radius: 999px; box-shadow: 0 2px 0 var(--ouro-esc); }
+.ferr-lista a[aria-current="page"] { background: rgba(255, 233, 163, 0.09); }
+.ferr-lista a[aria-current="page"] .ferr-ic { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc); }
+
+.painel-pe .pe-ferr { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.painel-pe .pe-ferr a { flex-direction: column; gap: 5px; padding: 10px 4px 9px; font-size: 13.5px; line-height: 1.15; text-align: center; white-space: normal; }
+.painel-pe .pe-ferr a svg { width: 20px; height: 20px; }
+.pe-rot { grid-column: 1 / -1; padding: 0 4px; font-family: var(--display); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }
+
+@media (max-width: 799px), (min-width: 1181px) and (max-width: 1359px) {
+  .ferr-botao .seta { display: none; }
+}
+@media (max-width: 560px) {
+  .ferramentas { position: static; }
+  .ferr-lista { width: min(320px, 100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ferr-lista, .ferr-botao .seta { transition: none; }
+}
