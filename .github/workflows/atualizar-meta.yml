@@ -6,6 +6,11 @@ on:
     - cron: '37 15 * * *'
     - cron: '17 17 * * *'
   workflow_dispatch:
+    inputs:
+      so_se_faltar:
+        description: Pular se o tier de hoje já saiu
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -26,7 +31,7 @@ jobs:
         id: hoje
         run: |
           feito=nao
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.so_se_faltar }}" = "true" ]; then
             gerado=$(jq -r '.geradoEm // empty' tier/tier.json 2>/dev/null || true)
             if [ -n "$gerado" ] && [ "$(TZ=America/Sao_Paulo date -d "$gerado" +%F)" = "$(TZ=America/Sao_Paulo date +%F)" ]; then
               feito=sim

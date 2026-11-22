@@ -1,0 +1,44 @@
+name: Relógio das coletas
+
+on:
+  schedule:
+    - cron: '41 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: relogio
+  cancel-in-progress: false
+
+jobs:
+  relogio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Disparar coleta e tier no horário
+        run: |
+          fim=$(( $(date +%s) + 5*3600 + 30*60 ))
+          ultima_coleta=0
+          while [ "$(date +%s)" -lt "$fim" ]; do
+            agora=$(date +%s)
+            if [ $(( agora - ultima_coleta )) -ge 3600 ]; then
+              gh workflow run coletar-pvp.yml --repo "$REPO" && ultima_coleta=$agora && echo "coleta disparada $(date -u +%H:%M)"
+            fi
+            hora=$(date -u +%H)
+            if [ "$hora" -ge 14 ] && [ "$hora" -le 20 ]; then
+              gh workflow run atualizar-meta.yml --repo "$REPO" -f so_se_faltar=true && echo "tier disparado (só se faltar) $(date -u +%H:%M)"
+            fi
+            sleep 1800
+          done
+      - name: Continuar o relógio
+        if: always()
+        run: |
+          ativos=$(gh run list --repo "$REPO" --workflow relogio.yml --status in_progress --json databaseId --jq 'length')
+          fila=$(gh run list --repo "$REPO" --workflow relogio.yml --status queued --json databaseId --jq 'length')
+          if [ "$fila" -eq 0 ] && [ "$ativos" -le 1 ]; then gh workflow run relogio.yml --repo "$REPO"; fi
