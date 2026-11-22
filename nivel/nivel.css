@@ -153,6 +153,13 @@ html.embed, html.embed body { background: transparent; }
 html.embed body { padding-top: 0; }
 html.embed .ceu, html.embed .topo, html.embed .abre, html.embed .final { display: none; }
 
+@media (min-width: 1001px) {
+  .nv-grade { align-items: stretch; }
+  .nv-saida { display: flex; flex-direction: column; }
+  .nv-saida > .nv-res { flex: 1; grid-template-rows: minmax(270px, 1fr) auto auto; }
+  .nv-saida .nl-monte { height: auto; min-height: 270px; }
+}
+
 @media (max-width: 1000px) {
   .nv-grade { grid-template-columns: minmax(0, 1fr); }
   .nv-entrada { max-width: 640px; width: 100%; margin: 0 auto; }
