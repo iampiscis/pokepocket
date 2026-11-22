@@ -17234,6 +17234,84 @@ export const GOLPES_MEGAS_2026_11_15 = {
   ],
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GOLPES_ARTE_NOVA_2026_11_21 = {
+  4076: [
+    ['Rock Blast',      'ROCK',     'PHYSICAL',  25],
+    ['Smack Down',      'ROCK',     'PHYSICAL',  45],
+    ['Rock Throw',      'ROCK',     'PHYSICAL',  50],
+    ['Rock Tomb',       'ROCK',     'PHYSICAL',  60],
+    ['Rock Slide',      'ROCK',     'PHYSICAL',  75],
+    ['Zing Zap',        'ELECTRIC', 'PHYSICAL',  80],
+    ['Diamond Storm',   'ROCK',     'PHYSICAL', 100],
+    ['Volt Tackle',     'ELECTRIC', 'PHYSICAL', 120],
+    ['Stone Edge',      'ROCK',     'PHYSICAL', 120],
+    ['Rock Wrecker',    'ROCK',     'PHYSICAL', 150],
+    ['Static Overload', 'ELECTRIC', 'PHYSICAL', 600],
+    ['Crumbling Rain',  'ROCK',     'PHYSICAL', 600],
+  ],
+  8800: [
+    ['Stored Power',       'PSYCHIC',  'SPECIAL',   25],
+    ['Twin Beam',          'PSYCHIC',  'SPECIAL',   40],
+    ['Confusion',          'PSYCHIC',  'SPECIAL',   50],
+    ['Hex',                'GHOST',    'SPECIAL',   65],
+    ['Mystical Power',     'PSYCHIC',  'SPECIAL',   70],
+    ['Glitzy Glow',        'PSYCHIC',  'SPECIAL',   90],
+    ['Psychic',            'PSYCHIC',  'SPECIAL',   90],
+    ['Psystrike',          'PSYCHIC',  'SPECIAL',  100],
+    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
+    ['Moongeist Beam',     'GHOST',    'SPECIAL',  120],
+    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
+    ['Prismatic Laser',    'PSYCHIC',  'SPECIAL',  600],
+    ['Astral Barrage',     'GHOST',    'SPECIAL',  600],
+  ],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GOLPES_ARTE_NOVA_2026_11_22 = {
+  9800: [
+    ['Stored Power',       'PSYCHIC',  'PHYSICAL',  25],
+    ['Twin Beam',          'PSYCHIC',  'PHYSICAL',  40],
+    ['Confusion',          'PSYCHIC',  'PHYSICAL',  50],
+    ['Psybeam',            'PSYCHIC',  'PHYSICAL',  65],
+    ['Mystical Power',     'PSYCHIC',  'PHYSICAL',  70],
+    ['Glitzy Glow',        'PSYCHIC',  'PHYSICAL',  90],
+    ['Psychic',            'PSYCHIC',  'PHYSICAL',  90],
+    ['Sunsteel Strike',    'STEEL',    'PHYSICAL', 100],
+    ['Future Sight',       'PSYCHIC',  'PHYSICAL', 120],
+    ['Heavy Slam',         'STEEL',    'PHYSICAL', 120],
+    ['Mental Singularity', 'PSYCHIC',  'PHYSICAL', 600],
+    ['Prismatic Laser',    'PSYCHIC',  'PHYSICAL', 600],
+    ['Steel Beam',         'STEEL',    'PHYSICAL', 600],
+  ],
+};
+
 const TABELAS = [
   GOLPES_INICIAIS,
   GOLPES_PSEUDO_LENDARIOS,
@@ -17262,6 +17340,8 @@ const TABELAS = [
   GOLPES_DUAS_FORMAS_2026_11_05,
   GOLPES_SEM_EVOLUCAO_2026_11_05,
   GOLPES_ARTE_NOVA_2026_11_15,
+  GOLPES_ARTE_NOVA_2026_11_21,
+  GOLPES_ARTE_NOVA_2026_11_22,
 ];
 
 

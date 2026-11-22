@@ -199,6 +199,17 @@ export const EVOLUCOES_RAMIFICADAS = {
   217: [{ para: 901, nivel: 46_150 }, { para: 8901, nivel: 160_300 }],
 
   680: [{ para: 681, nivel: 16_000 }, { para: 8681, nivel: 21_200 }],
+
+
+
+
+
+
+
+
+
+
+  800: [{ para: 8800, nivel: 35_150 }, { para: 9800, nivel: 35_150 }],
 };
 
 

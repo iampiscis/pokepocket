@@ -155,6 +155,12 @@ export const EVOLUCOES_ENTRE_GERACOES = {
 
 
   1017: { para: 9017, nivel: 160_300 },
+
+
+
+
+
+  800: { para: 8800, nivel: 35_150 },
 };
 
 
