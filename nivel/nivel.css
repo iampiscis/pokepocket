@@ -179,3 +179,7 @@ html.embed .ceu, html.embed .topo, html.embed .abre, html.embed .final { display
   .nv-bonus { grid-template-columns: minmax(0, 1fr) 64px; }
   .nv-bonus .seg button { font-size: 13px; padding: 6px 2px; }
 }
+
+.nv-saida.vao { padding: 0; background: none; box-shadow: none; }
+.nl-monte { border-radius: 0; background: radial-gradient(60% 55% at 76% 10%, rgba(226, 169, 63, 0.1), transparent 70%); -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%), linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%), linear-gradient(180deg, transparent 62%, #000 80%); -webkit-mask-composite: source-in, source-over; mask-image: linear-gradient(180deg, transparent 0, #000 16%), linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%), linear-gradient(180deg, transparent 62%, #000 80%); mask-composite: intersect, add; }
+.nl-monte::after { display: none; }
