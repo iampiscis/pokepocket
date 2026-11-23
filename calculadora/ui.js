@@ -884,7 +884,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   }
   if (ehNum(ds.coins?.justo)) detalhes.push(el('span', { class: 'pd-txt', text: `em Coins ${grande(ds.coins.justo)}` }))
   if (Number(ds.vendas) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendas)} vendas da espécie` }))
-  if (/^\d{4}-\d{2}-\d{2}$/.test(ds.atualizadoEm || '')) detalhes.push(el('span', { class: 'pd-txt', text: `vendas até ${ds.atualizadoEm.slice(8, 10)}/${ds.atualizadoEm.slice(5, 7)}` }))
+  if (/^\d{4}-\d{2}-\d{2}$/.test(ds.atualizadoEm || '')) detalhes.push(el('span', { class: 'pd-txt', text: `modelo de ${ds.atualizadoEm.slice(8, 10)}/${ds.atualizadoEm.slice(5, 7)}`, ...(ds.versaoModelo ? { title: `versão ${ds.versaoModelo}` } : {}) }))
   for (const a of ds.adicionais || []) {
     if (!(Number(a?.total) > 0)) continue
     const nome = String(a.nome || '').replace(/Z-Move ([A-Z]+)/, (_, t) => `Z-\u2060Move ${nomeTipo(t)}`)

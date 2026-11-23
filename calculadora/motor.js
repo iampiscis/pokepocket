@@ -1,9 +1,11 @@
 import './preco-mercado.js'
+import './preco-mercado-entrada.js'
 import { lerTextoFicha } from './leitor-ficha.js'
 
 const BASE = new URL('./', import.meta.url)
 const JOGO = new URL('jogo/', BASE)
 const CATALOGOS = ['creatures', 'creatures-novos', 'creatures-outland-novos', 'creatures-formas', 'creatures-audit-overrides']
+const E = globalThis.PrecoMercadoEntrada
 const MODULOS = {
   gi: 'ginasios.mjs', ramificadas: 'evolucoes-ramificadas.mjs', evolucoes: 'evolucoes-cruzadas.mjs', megas: 'megas.mjs',
   outland: 'outland.mjs', planilhas: 'golpes-planilhas.mjs', especiais: 'golpes-especiais.mjs', baseOutland: 'herdar-base-outland.mjs',
@@ -73,94 +75,9 @@ async function lerTexto(url, opcional = false) {
   }
 }
 
-function montarCatalogoJogo(m, f) {
-  const lista = [...(f.creatures?.creatures ?? [])]
-  for (const k of ['creatures-novos', 'creatures-outland-novos', 'creatures-formas']) if (f[k]?.creatures?.length) lista.push(...f[k].creatures)
-  m.outland.aplicarRemapOutlandLista(lista)
-  aplicarOverrides(lista, f['creatures-audit-overrides'])
-  m.ajustes?.aplicarAjustesTipos?.((id) => lista.filter((c) => c.pokeId === id))
-  m.planilhas.aplicarGolpesDasPlanilhas((id) => lista.filter((c) => c.pokeId === id))
-  m.baseOutland.herdarBaseOutland(lista)
-  m.evolucoes.aplicarCadeiasTruncadas(lista)
-  m.evolucoes.normalizarEvolveLevel600(lista)
-  m.ajustes?.aplicarAjustesHuntLevel?.((id) => lista.find((c) => c.pokeId === id))
-  const especies = new Map()
-  for (const c of lista) {
-    if (m.outland.isEspelhoFantasmaPokeId(c.pokeId)) continue
-    m.especiais.injetarGolpesEspeciais(c)
-    especies.set(c.pokeId, c)
-  }
-  m.golpesOrre.herdarGolpesOrre(lista)
-  for (const mega of m.megas.criarEspeciesMega(lista)) especies.set(mega.pokeId, mega)
-  const todas = [...especies.values()]
-  m.teto.aplicarTetoDeCaptura(todas, (id) => especies.get(id))
-  m.linhagem.anotarLinhagemDaNota(todas, (id) => especies.get(id), m.megas.elosMegaDaNota(todas))
-  return especies
-}
-
-function montarCatalogoIndicador(m, f) {
-  const lista = [...(f.creatures?.creatures ?? [])]
-  for (const k of ['creatures-novos', 'creatures-outland-novos', 'creatures-formas']) if (f[k]?.creatures?.length) lista.push(...f[k].creatures)
-  m.outland.aplicarRemapOutlandLista(lista)
-  aplicarOverrides(lista, f['creatures-audit-overrides'])
-  m.ajustes.aplicarAjustesTipos((id) => lista.filter((c) => c.pokeId === id))
-  m.planilhas.aplicarGolpesDasPlanilhas((id) => lista.filter((c) => c.pokeId === id))
-  m.baseOutland.herdarBaseOutland(lista)
-  m.evolucoes.aplicarCadeiasTruncadas(lista)
-  m.evolucoes.normalizarEvolveLevel600(lista)
-  m.ajustes.aplicarAjustesHuntLevel((id) => lista.find((c) => c.pokeId === id))
-  const especies = new Map()
-  for (const c of lista) {
-    if (m.outland.isEspelhoFantasmaPokeId(c.pokeId)) continue
-    m.especiais.injetarGolpesEspeciais(c)
-    if (m.outland.isOutlandPokeId(c.pokeId)) {
-      c.evolvesToId = 0
-      c.evolveLevel = 0
-    }
-    especies.set(c.pokeId, c)
-  }
-  m.golpesOrre.herdarGolpesOrre(lista)
-  m.evolucoes.aplicarEvolucoesEntreGeracoes(lista)
-  m.ramificadas.alinharNivelPadraoRamificado(lista)
-  m.evolucoes.corrigirNiveisDeEvolucao(lista)
-  for (const mega of m.megas.criarEspeciesMega(lista)) {
-    lista.push(mega)
-    especies.set(mega.pokeId, mega)
-  }
-  return especies
-}
-
-function aplicarOverrides(lista, fonte) {
-  for (const o of fonte?.overrides ?? []) {
-    const c = lista.find((x) => x.pokeId === o.pokeId)
-    if (!c) continue
-    for (const k of Object.values(BASE_DE)) if (typeof o[k] === 'number') c[k] = o[k]
-    if (Array.isArray(o.attacks)) c.attacks = o.attacks.map((a) => ({ ...a }))
-  }
-}
-
-function formasAlcancaveis(esp, especies, m) {
-  const pega = (id) => especies.get(Number(id))
-  const vistos = new Map([[esp.pokeId, esp]])
-  const fila = [esp]
-  while (fila.length) {
-    const x = fila.shift()
-    for (const d of m.ramificadas.destinosDeEvolucao(x, pega)) {
-      const alvo = d.especie || pega(d.pokeId)
-      if (!alvo || vistos.has(alvo.pokeId)) continue
-      vistos.set(alvo.pokeId, alvo)
-      fila.push(alvo)
-    }
-    for (const mg of m.megas.megasDaEspecie(x.pokeId)) {
-      const alvo = pega(m.megas.pokeIdDaMega(mg))
-      if (alvo && !vistos.has(alvo.pokeId)) {
-        vistos.set(alvo.pokeId, alvo)
-        fila.push(alvo)
-      }
-    }
-  }
-  return [...vistos.values()]
-}
+const montarCatalogoJogo = E.catalogoJogo
+const montarCatalogoIndicador = E.catalogoIndicador
+const formasAlcancaveis = E.formasAlcancaveis
 
 const tiposDe = (esp) => [...new Set([esp?.type1, esp?.type2].filter(Boolean).map((t) => String(t).toUpperCase()))]
 
@@ -232,18 +149,9 @@ function melhorForcaPvp(c, pk, esp, nivel) {
   return melhor
 }
 
-const escalaDoNivel = (n) => ((2 * n) / 5 + 2) * n ** 3
-const pokemonBase = (pk) => ({ potencia: Math.max(1, Math.round(Number(pk.potencia) || 1)), quality: Number(pk.quality ?? pk.qualidade) || 1, shiny: !!pk.shiny, ivs: pk.ivs })
-
-function poderPadrao(gi, pk, esp, nivel, pvp) {
-  let melhor = 0
-  for (const tmFisico of [true, false]) {
-    const como = { ...pokemonBase(pk), speciesId: esp.pokeId, level: nivel, refino: {}, tmElemental: esp.type1 || 'NORMAL', tmFisico }
-    const v = gi.poderNoNivel(como, esp, nivel, { pvp })
-    if (v > melhor) melhor = v
-  }
-  return melhor
-}
+const escalaDoNivel = E.escalaDoNivel
+const pokemonBase = E.pokemonBase
+const poderPadrao = E.poderPadrao
 
 function scorePoder(v, tipo) {
   if (!(Number(v) > 0)) return null
@@ -325,12 +233,9 @@ async function iniciar(aoProgresso) {
   const m = Object.fromEntries(mods)
   const fontes = () => Object.fromEntries(CATALOGOS.map((c, i) => [c, textos[i] ? JSON.parse(textos[i]) : null]))
   if (!textos[0]) throw new Error('catálogo do jogo vazio')
-  const indicador = montarCatalogoIndicador(m, fontes())
-  const jogo = montarCatalogoJogo(m, fontes())
-  const c = { gi: m.gi, m, meta, indicador, jogo, atlas, sprites, extras, versao, formaPorId: new Map(m.formas.FORMAS.map((f) => [f.pokeId, f])) }
-  c.lista = [...jogo.values()].filter((e) => e?.name).map((e) => ({ esp: e, chave: normalizar(e.name), ...resumo(c, e) }))
-  c.porNome = new Map()
-  for (const x of c.lista) if (!c.porNome.has(x.chave)) c.porNome.set(x.chave, x.esp)
+  const base = E.contexto(m, fontes)
+  const c = { ...base, meta, atlas, sprites, extras, versao, formaPorId: new Map(m.formas.FORMAS.map((f) => [f.pokeId, f])) }
+  c.lista = [...c.jogo.values()].filter((e) => e?.name).map((e) => ({ esp: e, chave: normalizar(e.name), ...resumo(c, e) }))
   ctx = c
   avisar(1, 'Pronto')
   return { versaoJogo: versao?.versaoJogo ?? null, atualizadoEm: versao?.atualizadoEm ?? null, especies: c.lista.length }
@@ -380,20 +285,7 @@ export function formas(speciesId) {
   return formasAlcancaveis(esp, c.indicador, c.m).map((f) => c.jogo.get(f.pokeId) || f).map((f) => resumo(c, f))
 }
 
-function normalizarPk(pk) {
-  const ref = pk?.refino && typeof pk.refino === 'object' ? pk.refino : {}
-  return {
-    speciesId: Number(pk?.speciesId),
-    level: Math.max(1, Math.round(Number(pk?.level) || 1)),
-    refino: Object.fromEntries(STATS.map((k) => [k, Math.max(0, Math.round(Number(ref[k]) || 0))])),
-    tmElemental: pk?.tmElemental ? String(pk.tmElemental).toUpperCase() : null,
-    tmFisico: !!pk?.tmFisico,
-    shiny: !!pk?.shiny,
-    potencia: Math.min(5, Math.max(1, Math.round(Number(pk?.potencia) || 1))),
-    quality: Number(pk?.quality ?? pk?.qualidade) || 1,
-    ivs: Object.fromEntries(STATS.map((k) => [k, Math.max(0, Math.min(32, Math.round(Number(pk?.ivs?.[k]) || 0)))]))
-  }
-}
+const normalizarPk = E.normalizar
 
 function scoreDe(c, p) {
   const chave = JSON.stringify([p.speciesId, p.potencia, p.quality, p.shiny, STATS.map((k) => p.ivs[k])])
@@ -478,45 +370,42 @@ export function lerFicha(texto) {
   }
 }
 
+async function versaoDoCodigo(nome) {
+  const r = await fetch(new URL(nome, BASE), { cache: 'no-cache' })
+  if (!r.ok) throw new Error(`${nome}: HTTP ${r.status}`)
+  const texto = (await r.text()).replace(/\r\n/g, '\n')
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto))
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 12)
+}
+
 async function carregarModeloPreco() {
   const pub = await lerJson(new URL('preco-mercado.json', BASE))
   if (!pub || pub.formato !== globalThis.PrecoMercadoPublico?.FORMATO) throw new Error('modelo de preço em formato inesperado')
+  const [prever, entrada] = await Promise.all([versaoDoCodigo('preco-mercado.js'), versaoDoCodigo('preco-mercado-entrada.js')])
+  if ((pub.versaoPrevisor && pub.versaoPrevisor !== prever) || (pub.versaoEntrada && pub.versaoEntrada !== entrada)) throw new Error('o preço de mercado está sendo atualizado; recarregue a página em alguns minutos')
   return pub
 }
 
-export async function preco(pk, resultadoSimular) {
+export async function preco(pk) {
   try {
     modeloPreco ??= carregarModeloPreco().catch((err) => {
       modeloPreco = null
       throw err
     })
     const pub = await modeloPreco
-    const p = normalizarPk(pk)
-    const sim = resultadoSimular && !resultadoSimular.erro ? resultadoSimular : simular(p)
-    if (sim?.erro) return { erro: sim.erro }
-    const temIvs = STATS.some((k) => p.ivs[k] > 0)
-    const ficha = {
-      speciesId: p.speciesId,
-      shiny: p.shiny,
-      level: p.level,
-      nota: temIvs && Number.isFinite(Number(sim.nota)) && sim.nota != null ? Number(sim.nota) : null,
-      potencia: p.potencia,
-      quality: p.quality,
-      ivs: temIvs ? p.ivs : null,
-      pve: temIvs ? sim.score?.pveNv100 ?? null : null,
-      tmElemental: p.tmElemental,
-      tmAoe: pk?.tmAoe === true || pk?.tmAoe === 1
-    }
+    const c = exigirCarregado()
+    if (!E.especieDe(c, pk)) return { erro: 'espécie desconhecida' }
     const faixa = (r) => (r ? { rapido: r.p20, justo: r.p50, esperar: r.p80, confianca: r.confianca } : null)
-    const g = globalThis.PrecoMercadoPublico.prever(pub, ficha, 'orb')
-    const c = globalThis.PrecoMercadoPublico.prever(pub, ficha, 'gold')
+    const g = E.prever(globalThis.PrecoMercadoPublico, pub, c, pk, 'orb')
+    const o = E.prever(globalThis.PrecoMercadoPublico, pub, c, pk, 'gold')
     return {
       gemas: faixa(g),
-      coins: faixa(c),
+      coins: faixa(o),
       confianca: g?.confianca ?? null,
       vendas: g?.grupo ?? 0,
       adicionais: [],
-      atualizadoEm: pub.dadosAte
+      atualizadoEm: pub.dadosAte,
+      versaoModelo: pub.versaoModelo ?? null
     }
   } catch (err) {
     return { erro: String(err?.message || err) }
