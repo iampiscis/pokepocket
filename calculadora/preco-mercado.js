@@ -87,6 +87,38 @@
     return { classe, horas: Math.round((Math.exp(est) / 60) * 10) / 10 }
   }
 
+  function fraco(pub, x) {
+    if (!pub.loc || pub.opcoes?.kLocal == null) return false
+    return !!(x.sh || x.attr.mega || x.attr.raro === 2 || (x.orb && (pub.grupos[x.g]?.[0] ?? 0) < 20))
+  }
+
+  function local(pub, x) {
+    const c = pub.loc[`${x.g}|${x.orb}|${x.pot}`] || pub.loc[`${x.g}|${x.orb}|0`]
+    if (!c) return { corr: 0, neff: 0 }
+    const v = c[0] + c[1] * (LN(Math.max(1, x.lv)) - 7) + c[2] * (x.nota != null ? x.nota - 4 : 0)
+    const lim = Math.max(-LN(5), Math.min(LN(5), v))
+    return { corr: lim * (c[3] / (c[3] + pub.opcoes.kLocal)), neff: c[3] }
+  }
+
+  function grade(pub, x) {
+    const t = pub.vzg?.[`${x.g}|${x.orb}|${x.pot}`]
+    if (!t || x.nota == null) return null
+    const fl = LN(Math.max(1, x.lv)) / 0.2
+    const fnb = x.nota / 0.15
+    const lb = Math.round(fl)
+    const nb = Math.round(fnb)
+    let melhor = null
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        const v = t[`${lb + i}|${nb + j}`]
+        if (!v) continue
+        const d = (lb + i - fl) ** 2 + (nb + j - fnb) ** 2
+        if (!melhor || d < melhor.d) melhor = { d, v }
+      }
+    }
+    return melhor ? { corr: melhor.v[0], neff: melhor.v[1] } : null
+  }
+
   function vizinhanca(pub, x) {
     const v = pub.viz[`${x.g}|${x.orb}|${faixaNivel(x.lv)}`] || pub.viz[`${x.g}|${x.orb}|*`]
     return v ? { corr: v[1], neff: v[2] } : { corr: 0, neff: 0 }
@@ -98,7 +130,7 @@
     const fa = coefDe(pub.familias[x.fam])
     const base = atributos(x, pub.opcoes, pub.ttsTipico)
     const h = somaProduto(pub.beta, base) + (fa ? somaProduto(fa.coef, z) : 0) + (g ? somaProduto(g.coef, z) : 0)
-    const viz = vizinhanca(pub, x)
+    const viz = fraco(pub, x) ? local(pub, x) : grade(pub, x) || vizinhanca(pub, x)
     let ajuste = 0
     if (pub.arv) {
       const atrib = [...base, LN(1 + viz.neff), viz.corr, h - 17, LN(1 + (g?.n || 0)), LN(1 + (fa?.n || 0)), g ? g.coef[1] : 0, g ? g.coef[2] : 0]
