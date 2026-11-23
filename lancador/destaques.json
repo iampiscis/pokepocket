@@ -1,0 +1,12 @@
+{
+  "destaques": [
+    { "imagem": "telas.jpg", "titulo": "4 telas ao vivo", "texto": "As 4 contas na tela ao mesmo tempo, em Mapa ou Completo.", "novo": true },
+    { "imagem": "notificacoes.jpg", "titulo": "Notificações", "texto": "Avisos no PC e no celular, só do que você escolher.", "novo": true },
+    { "imagem": "treino.jpg", "titulo": "Treino automático", "texto": "Casas por bônus de XP, fila do Exp. Share e evolução.", "novo": true },
+    { "imagem": "transferir.jpg", "titulo": "Transferir", "texto": "Coins, gemas e pokémon entre as suas contas.", "novo": false },
+    { "imagem": "ranking.jpg", "titulo": "Ranking novo", "texto": "Pódio, suas contas e prêmios de cada ranking.", "novo": false },
+    { "imagem": "outfits.jpg", "titulo": "Outfits na loja", "texto": "Outfits com diamantes, direto no painel.", "novo": false },
+    { "imagem": "calculadora.jpg", "titulo": "Calculadora", "texto": "Nota, score, tier e preço de qualquer pokémon.", "novo": false },
+    { "imagem": "tier.jpg", "titulo": "Tier PvP", "texto": "Os pokémon mais fortes do PvP, todo dia.", "novo": false }
+  ]
+}
