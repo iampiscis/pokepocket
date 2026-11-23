@@ -1,8 +1,8 @@
+import './preco-mercado.js'
+import { lerTextoFicha } from './leitor-ficha.js'
+
 const BASE = new URL('./', import.meta.url)
 const JOGO = new URL('jogo/', BASE)
-const PRECIFICADOR = 'https://briaoale.github.io/precificador-pokemon/'
-const SCRIPTS_PRECO = ['catalogo/especies.js', 'catalogo/pve-power.js', 'motor/market-bonuses.js', 'motor/pve-pricing.js', 'js/central.js']
-const SCRIPT_FICHA = 'js/ficha.js'
 const CATALOGOS = ['creatures', 'creatures-novos', 'creatures-outland-novos', 'creatures-formas', 'creatures-audit-overrides']
 const MODULOS = {
   gi: 'ginasios.mjs', ramificadas: 'evolucoes-ramificadas.mjs', evolucoes: 'evolucoes-cruzadas.mjs', megas: 'megas.mjs',
@@ -52,7 +52,7 @@ let carregando = null
 let ctx = null
 const cacheScore = new Map()
 const cacheSimular = new Map()
-let precificador = null
+let modeloPreco = null
 
 const normalizar = (t) => String(t ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()
 
@@ -319,8 +319,7 @@ async function iniciar(aoProgresso) {
     lerJson(new URL('meta-pvp.json', BASE)),
     lerJson(new URL('marker-atlas.json', JOGO)).catch(() => null),
     lerJson(new URL('sprites.json', JOGO)).catch(() => null),
-    lerJson(new URL('especies-extras.json', BASE)).catch(() => null),
-    carregarScript(PRECIFICADOR + SCRIPT_FICHA).catch(() => null)
+    lerJson(new URL('especies-extras.json', BASE)).catch(() => null)
   ])
   avisar(0.6, 'Montando o catálogo de espécies')
   const m = Object.fromEntries(mods)
@@ -405,8 +404,8 @@ function scoreDe(c, p) {
     cacheScore.set(chave, r)
   }
   const r = cacheScore.get(chave)
-  if (!r) return { pvp: null, pve: null, formaPvp: null, formaPve: null, ataque: null, resistencia: null }
-  return { pvp: scorePoder(r.pvp.v, 'pvp'), pve: scorePoder(r.pve.v, 'pve'), formaPvp: r.pvp.nome, formaPve: r.pve.nome, ataque: r.pvp.ataque ?? null, resistencia: r.pvp.resistencia ?? null }
+  if (!r) return { pvp: null, pve: null, formaPvp: null, formaPve: null, ataque: null, resistencia: null, pveNv100: null }
+  return { pvp: scorePoder(r.pvp.v, 'pvp'), pve: scorePoder(r.pve.v, 'pve'), formaPvp: r.pvp.nome, formaPve: r.pve.nome, ataque: r.pvp.ataque ?? null, resistencia: r.pvp.resistencia ?? null, pveNv100: r.pve.v ?? null }
 }
 
 export function simular(pk) {
@@ -460,11 +459,8 @@ function especiePorFicha(c, texto, nome) {
 
 export function lerFicha(texto) {
   const c = exigirCarregado()
-  const leitor = globalThis.PokeIdleFicha
-  if (!leitor?.parse || !String(texto ?? '').trim()) return null
-  let f
-  try { f = leitor.parse(texto) } catch { return null }
-  if (!f || (!f.nome && !Object.keys(f.ivs || {}).length)) return null
+  const f = lerTextoFicha(texto)
+  if (!f || (!f.nome && !Object.keys(f.ivs).length)) return null
   const esp = especiePorFicha(c, String(texto), f.nome)
   return {
     speciesId: esp?.pokeId ?? null,
@@ -473,99 +469,54 @@ export function lerFicha(texto) {
     potencia: f.potencia ?? null,
     quality: f.quality ?? null,
     nota: f.nota ?? null,
-    shiny: !!f.shiny || /✨/.test(String(texto)),
+    shiny: f.shiny,
     ivs: { ...f.ivs },
-    refino: Object.fromEntries(STATS.map((k) => [k, Number(f.refinoActual?.[k]) || 0]))
+    refino: Object.fromEntries(STATS.map((k) => [k, Number(f.refino[k]) || 0])),
+    tmElemental: f.tmElemental,
+    tmFisico: f.tmFisico,
+    tmAoe: f.tmAoe
   }
 }
 
-function carregarScript(url) {
-  if (typeof document === 'undefined') {
-    return lerTexto(url).then((codigo) => {
-      globalThis.window ??= globalThis
-      ;(0, eval)(codigo)
-    })
-  }
-  return new Promise((ok, falha) => {
-    const s = document.createElement('script')
-    s.src = url
-    s.async = false
-    s.onload = () => ok()
-    s.onerror = () => falha(new Error(`não consegui carregar ${url}`))
-    document.head.append(s)
-  })
-}
-
-function complementarEspecies(lista, extras) {
-  if (!Array.isArray(lista) || !extras) return
-  const porId = new Map(lista.map((e) => [e.id, e]))
-  for (const e of extras.especies || []) if (!porId.has(e.id)) { lista.push(e); porId.set(e.id, e) }
-  for (const [id, destinos] of Object.entries(extras.evo || {})) {
-    const e = porId.get(Number(id))
-    if (e) e.evo = [...new Set([...(e.evo || []), ...destinos])]
-  }
-}
-
-async function iniciarPrecificador() {
-  const c = exigirCarregado()
-  const [precos] = await Promise.all([
-    lerJson(PRECIFICADOR + 'precos.json'),
-    (async () => {
-      for (const s of SCRIPTS_PRECO) {
-        await carregarScript(PRECIFICADOR + s)
-        if (s === 'catalogo/especies.js') complementarEspecies(globalThis.PI_ESPECIES, c.extras)
-      }
-    })()
-  ])
-  const v = precos?.vendas
-  const temVendas = Array.isArray(v) ? v.length > 0 : v?.formato === 2 && v.n > 0 && !!v.campos
-  if (!temVendas || !Array.isArray(precos.itens) || !Number.isFinite(Date.parse(precos.geradoEm))) throw new Error('arquivo de preços em formato inesperado')
-  const w = globalThis
-  return {
-    central: w.PokeIdleCentral.create(w),
-    precificar: w.PokeIdlePvePricing.priceSheet,
-    linhas: w.PokeIdleCentral.linhas(precos),
-    precos
-  }
+async function carregarModeloPreco() {
+  const pub = await lerJson(new URL('preco-mercado.json', BASE))
+  if (!pub || pub.formato !== globalThis.PrecoMercadoPublico?.FORMATO) throw new Error('modelo de preço em formato inesperado')
+  return pub
 }
 
 export async function preco(pk, resultadoSimular) {
   try {
-    precificador ??= iniciarPrecificador().catch((err) => {
-      precificador = null
+    modeloPreco ??= carregarModeloPreco().catch((err) => {
+      modeloPreco = null
       throw err
     })
-    const mp = await precificador
+    const pub = await modeloPreco
     const p = normalizarPk(pk)
     const sim = resultadoSimular && !resultadoSimular.erro ? resultadoSimular : simular(p)
     if (sim?.erro) return { erro: sim.erro }
+    const temIvs = STATS.some((k) => p.ivs[k] > 0)
     const ficha = {
-      nome: sim.nome,
+      speciesId: p.speciesId,
+      shiny: p.shiny,
       level: p.level,
+      nota: temIvs && Number.isFinite(Number(sim.nota)) && sim.nota != null ? Number(sim.nota) : null,
       potencia: p.potencia,
       quality: p.quality,
-      nota: Number.isFinite(Number(sim.nota)) && sim.nota != null ? Number(sim.nota) : null,
-      shiny: p.shiny,
-      ivs: p.ivs,
-      refinoActual: Object.fromEntries(STATS.filter((k) => p.refino[k] > 0).map((k) => [k, p.refino[k]])),
+      ivs: temIvs ? p.ivs : null,
+      pve: temIvs ? sim.score?.pveNv100 ?? null : null,
       tmElemental: p.tmElemental,
       tmAoe: pk?.tmAoe === true || pk?.tmAoe === 1
     }
-    const r = mp.precificar(mp.central, ficha, {
-      rows: mp.linhas,
-      itemPrices: mp.precos.itens,
-      currentItems: {},
-      now: Date.parse(mp.precos.geradoEm),
-      ...(Number.isFinite(mp.precos.correcao?.bias) ? { bias: mp.precos.correcao.bias } : {})
-    })
+    const faixa = (r) => (r ? { rapido: r.p20, justo: r.p50, esperar: r.p80, confianca: r.confianca } : null)
+    const g = globalThis.PrecoMercadoPublico.prever(pub, ficha, 'orb')
+    const c = globalThis.PrecoMercadoPublico.prever(pub, ficha, 'gold')
     return {
-      gemas: r.available ? { rapido: r.low ?? null, justo: r.median ?? null, esperar: r.high ?? null } : null,
-      coins: null,
-      confianca: r.confidence?.percent ?? null,
-      vendasFamilia: r.familyCount ?? 0,
-      familia: r.family || null,
-      adicionais: (r.parts || []).map((x) => ({ nome: x.label, total: x.total ?? null })),
-      atualizadoEm: mp.precos.geradoEm
+      gemas: faixa(g),
+      coins: faixa(c),
+      confianca: g?.confianca ?? null,
+      vendas: g?.grupo ?? 0,
+      adicionais: [],
+      atualizadoEm: pub.dadosAte
     }
   } catch (err) {
     return { erro: String(err?.message || err) }

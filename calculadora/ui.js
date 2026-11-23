@@ -882,7 +882,9 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     const c = Math.max(0, Math.min(100, Math.round(ds.confianca)))
     detalhes.push(el('span', { class: 'pd-conf' }, ['Confiança', el('span', { class: 'pd-barra', 'aria-hidden': 'true' }, [el('i', { style: `width:${c}%` })]), el('b', { text: `${c}%` })]))
   }
-  if (Number(ds.vendasFamilia) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendasFamilia)} vendas da família${ds.familia ? ` ${ds.familia}` : ''}` }))
+  if (ehNum(ds.coins?.justo)) detalhes.push(el('span', { class: 'pd-txt', text: `em Coins ${grande(ds.coins.justo)}` }))
+  if (Number(ds.vendas) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendas)} vendas da espécie` }))
+  if (/^\d{4}-\d{2}-\d{2}$/.test(ds.atualizadoEm || '')) detalhes.push(el('span', { class: 'pd-txt', text: `vendas até ${ds.atualizadoEm.slice(8, 10)}/${ds.atualizadoEm.slice(5, 7)}` }))
   for (const a of ds.adicionais || []) {
     if (!(Number(a?.total) > 0)) continue
     const nome = String(a.nome || '').replace(/Z-Move ([A-Z]+)/, (_, t) => `Z-\u2060Move ${nomeTipo(t)}`)
@@ -1229,7 +1231,7 @@ async function dadosCompartilhar() {
   try {
     const p = await precoDe(pkDe(st.sim), s)
     if (ehNum(p?.gemas?.justo)) justo = Math.round(p.gemas.justo)
-    if (Number(p?.vendasFamilia) > 0) vendas = Number(p.vendasFamilia)
+    if (Number(p?.vendas) > 0) vendas = Number(p.vendas)
   } catch {}
   const faixaTxt = (v) => (ehNum(v) ? ` · ${faixaDe(Number(v))[1]}` : '')
   const linhas = [`**${s.nome}${st.sim.shiny ? ' shiny' : ''}** · Nv ${fmt.format(st.sim.level)} · P${st.sim.potencia}`]
