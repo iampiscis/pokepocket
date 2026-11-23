@@ -328,8 +328,6 @@
     .cel-regras { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .cel-regras li { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; font-weight: 800; font-size: 15px; color: var(--tinta); background: rgba(74, 222, 128, 0.07); border: 1px solid rgba(74, 222, 128, 0.22); }
     .cel-regras li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); }
-    .cel-video { max-width: 860px; }
-    .cel-video video { aspect-ratio: 16 / 9; object-fit: contain; }
     .todas { margin-top: 16px; text-align: center; font-weight: 800; font-size: 15px; }
     .todas a { color: var(--suave); }
     .auto4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -473,9 +471,6 @@
             </ul>
           </div>
         </div>
-        <div class="tela cel-video revela">
-          <video src="assets/pokepocket-celular.mp4" poster="assets/celular-capa.jpg" controls playsinline muted preload="metadata"></video>
-        </div>
       </div>
     </section>
 
@@ -486,11 +481,11 @@
           <h2>Principais recursos</h2>
         </div>
         <div class="auto4">
+          <div class="auto revela"><img src="assets/prints/treino.webp" alt="Treino com casas por bônus de XP e fila do Exp. Share" loading="lazy" width="1600" height="1000" /><div><h3>Treino</h3><p>Casas por <b>bônus de XP</b> e fila do <b>Exp. Share</b> sozinha.</p></div></div>
           <div class="auto revela"><img src="assets/prints/equipe.webp" alt="Equipe com as 4 contas, nível, XP por hora e saldo" loading="lazy" width="1600" height="1000" /><div><h3>Equipe</h3><p>As <b>4 contas</b> num painel: nível, XP/h, Coins/h e saldo ao vivo.</p></div></div>
           <div class="auto revela"><img src="assets/prints/prey.webp" alt="Prey com região recomendada e cartela" loading="lazy" width="1600" height="1000" /><div><h3>Prey</h3><p>Recomenda a <b>região</b> e diz <b>o que girar</b>.</p></div></div>
           <div class="auto revela"><img src="assets/prints/mercado.webp" alt="Mercado com desconto e Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Mercado</h3><p><b>Desconto</b> e <b>Score PvP</b> por anúncio. Ordem de compra e compra manual.</p></div></div>
           <div class="auto revela"><img src="assets/prints/ficha.webp" alt="Ficha do pokémon com Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Ficha</h3><p><b>Score PvP</b>, efetividade, evolução e <b>preço sugerido</b>.</p></div></div>
-          <div class="auto revela"><img src="assets/prints/ritmo.webp" alt="Ritmo da conta com notas por área" loading="lazy" width="1600" height="1000" /><div><h3>Ritmo da conta</h3><p>Nota de <b>S a D</b> em cada área da conta.</p></div></div>
           <div class="auto revela"><img src="assets/prints/ganhos.webp" alt="Ganhos por hora e por conta" loading="lazy" width="1600" height="1000" /><div><h3>Ganhos</h3><p>XP, Coins, compras e vendas por hora.</p></div></div>
         </div>
         <div class="extras">
