@@ -64,8 +64,23 @@
       x.vel - 2, 0, x.orb * x.sh,
       temFicha, temFicha ? (ivs - 99) / 50 : 0, temFicha && f.q ? f.q - 1.3 : 0,
       temFicha && f.pve > 0 ? LN(f.pve) - 10 : 0, 0,
-      temFicha && f.z ? 1 : 0, temFicha && f.a ? 1 : 0
+      temFicha && f.z ? 1 : 0, temFicha && f.a ? 1 : 0,
+      x.sh * L, x.sh * L * L, (a.mega || 0) * L, x.sh * N, x.sh * N * N
     ]
+  }
+
+  const GEMAS_ALTO_CAL = 50
+  const MIN_SINAL = 5
+  const pesoSinal = (n) => (n >= MIN_SINAL ? n / (n + 3) : 0)
+  const ajusteSinais = (s) => (s ? pesoSinal(s[0]) * Math.min(0, s[1]) + pesoSinal(s[2]) * Math.max(0, s[3]) : 0)
+
+  function liquidez(pub, x) {
+    const L = pub.liq
+    if (!L) return null
+    const g = L.g[`${x.g}|${x.orb}`]
+    const est = g != null ? g : L.global
+    const classe = est <= L.cortes[0] ? 'rapido' : est >= L.cortes[1] ? 'devagar' : 'normal'
+    return { classe, horas: Math.round((Math.exp(est) / 60) * 10) / 10 }
   }
 
   function vizinhanca(pub, x) {
@@ -86,8 +101,13 @@
       ajuste = pub.arv.base
       for (const a of pub.arv.nos) ajuste += avaliar(a, atrib)
     }
-    const centro = h + viz.corr + ajuste
-    const c = pub.cal[`${x.orb}|${faixaNeff(viz.neff)}`] || pub.cal[`${x.orb}|*`] || null
+    const centro = h + viz.corr + ajuste + ajusteSinais(pub.sin?.[x.g])
+    const liq = liquidez(pub, x)
+    const l = liq ? liq.classe[0] : ''
+    const fn = faixaNeff(viz.neff)
+    const c0 = pub.cal[`${x.orb}|${fn}${l}`] || pub.cal[`${x.orb}|${fn}`] || pub.cal[`${x.orb}|*`] || null
+    const alto = x.orb && Math.exp(centro) / x.taxa >= GEMAS_ALTO_CAL ? pub.cal[`1|A${l}`] || pub.cal['1|A'] : null
+    const c = c0 && alto ? alto.map((v, i) => (i === 2 ? c0[2] : c0[2] + v - alto[2])) : c0
     const desloca = (q) => (c ? c[ORDEM_Q.indexOf(q)] : PADRAO_Q[q])
     const nativo = (v) => Math.exp(v) / x.taxa
     const larg = c ? c[3] - c[1] : 0.7
