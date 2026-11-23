@@ -41,7 +41,7 @@
       lv: Number(pk.level) || 1,
       nota,
       pot: Number(pk.potencia) || 1,
-      f: ivs ? { iv: ivs, q: Number(pk.quality ?? pk.qualidade) || null, pve: Number(pk.pve) > 0 ? Number(pk.pve) : null, z: pk.tmElemental || null, a: pk.tmAoe ? 1 : 0 } : null,
+      f: ivs ? { iv: ivs, q: Number(pk.quality ?? pk.qualidade) || null, pve: Number(pk.pve) > 0 ? Number(pk.pve) : null, z: pk.tmElemental || null, a: pk.tmAoe ? 1 : 0, efr: Number.isFinite(Number(pk.efr)) && pk.efr != null ? Number(pk.efr) : null } : null,
       vel: LN(1 + (pub.vel[g] || 0)),
       attr: { raro: esp[1], caca: esp[2], mega: esp[3] }
     }
@@ -51,11 +51,13 @@
     const tts = opcoes?.tts !== false
     const L = LN(Math.max(1, x.lv)) - 5
     const temNota = x.nota != null
-    const N = temNota ? x.nota - 3.5 : 0
     const a = x.attr
     const f = x.f
     const temFicha = f && Array.isArray(f.iv) ? 1 : 0
+    const N0 = temNota ? x.nota - 3.5 : 0
+    const N = temFicha ? N0 * (opcoes?.alfaNota ?? 1) : N0
     const ivs = temFicha ? f.iv.reduce((s, n) => s + n, 0) : 99
+    const efr = temFicha && Number.isFinite(f.efr) ? Math.max(-2, Math.min(0.5, f.efr)) : null
     return [
       1, x.orb, x.sh, L, L * L, N, N * N, temNota ? 0 : 1,
       x.pot === 2 ? 1 : 0, x.pot === 3 ? 1 : 0, x.pot === 4 ? 1 : 0, x.pot === 5 ? 1 : 0,
@@ -65,7 +67,9 @@
       temFicha, temFicha ? (ivs - 99) / 50 : 0, temFicha && f.q ? f.q - 1.3 : 0,
       temFicha && f.pve > 0 ? LN(f.pve) - 10 : 0, 0,
       temFicha && f.z ? 1 : 0, temFicha && f.a ? 1 : 0,
-      x.sh * L, x.sh * L * L, (a.mega || 0) * L, x.sh * N, x.sh * N * N
+      x.sh * L, x.sh * L * L, (a.mega || 0) * L, x.sh * N, x.sh * N * N,
+      efr ?? 0, temFicha ? ((f.iv[0] + f.iv[2] + f.iv[4]) / 3 - 16) / 16 : 0,
+      efr != null ? Math.max(0, N0 - 0.5) * Math.max(0, -efr - 0.1) : 0
     ]
   }
 
@@ -108,9 +112,10 @@
     const c0 = pub.cal[`${x.orb}|${fn}${l}`] || pub.cal[`${x.orb}|${fn}`] || pub.cal[`${x.orb}|*`] || null
     const alto = x.orb && Math.exp(centro) / x.taxa >= GEMAS_ALTO_CAL ? pub.cal[`1|A${l}`] || pub.cal['1|A'] : null
     const c = c0 && alto ? alto.map((v, i) => (i === 2 ? c0[2] : c0[2] + v - alto[2])) : c0
+    const semFicha = !(x.f && Array.isArray(x.f.iv))
     const desloca = (q) => (c ? c[ORDEM_Q.indexOf(q)] : PADRAO_Q[q])
     const nativo = (v) => Math.exp(v) / x.taxa
-    const larg = c ? c[3] - c[1] : 0.7
+    const larg = desloca('q80') - desloca('q20')
     return {
       p10: nativo(centro + desloca('q10')),
       p20: nativo(centro + desloca('q20')),
@@ -119,7 +124,7 @@
       p90: nativo(centro + desloca('q90')),
       neff: viz.neff,
       grupo: g?.n || 0,
-      confianca: Math.round(100 * Math.max(0.05, Math.min(0.95, Math.exp(-larg) * ((viz.neff / (viz.neff + 2)) * 0.6 + 0.4))))
+      confianca: Math.round(100 * Math.max(0.05, Math.min(0.95, Math.exp(-larg) * ((viz.neff / (viz.neff + 2)) * 0.6 + 0.4) * (semFicha ? 0.85 : 1))))
     }
   }
 

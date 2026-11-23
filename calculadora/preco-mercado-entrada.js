@@ -145,6 +145,14 @@
     return r
   }
 
+  const IVS_IDEAIS = Object.fromEntries(STATS.map((k) => [k, 32]))
+  function eficiencia(ctx, p) {
+    const nivel = ctx.gi.nivelNoGinasio ? ctx.gi.nivelNoGinasio(NIVEL_REFERENCIA) : NIVEL_REFERENCIA
+    const r = melhorEm(ctx, p, nivel, true)
+    const ideal = melhorEm(ctx, { ...p, ivs: IVS_IDEAIS }, nivel, true)
+    return r?.v > 0 && ideal?.v > 0 ? Math.round(Math.log(r.v / ideal.v) * 1e4) / 1e4 : null
+  }
+
   function pveNv100(ctx, p) {
     const r = melhorEm(ctx, p, NIVEL_REFERENCIA, false)
     return r ? Math.round((r.v * escalaDoNivel(NIVEL_INDICADOR)) / escalaDoNivel(NIVEL_REFERENCIA)) : null
@@ -197,6 +205,7 @@
       quality: p.quality,
       ivs: temIvs ? p.ivs : null,
       pve: temIvs ? pveNv100(ctx, p) : null,
+      efr: temIvs ? eficiencia(ctx, p) : null,
       tmElemental: p.tmElemental,
       tmAoe: pk.tmAoe === true || pk.tmAoe === 1
     }
@@ -210,6 +219,6 @@
   return {
     MODULOS, CATALOGOS, STATS, NIVEL_INDICADOR, NIVEL_REFERENCIA,
     contexto, catalogoJogo, catalogoIndicador, aplicarOverrides, formasAlcancaveis, escalaDoNivel, pokemonBase, poderPadrao,
-    melhorEm, pveNv100, normalizar, normalizarTexto, especieDe, entrada, prever
+    melhorEm, pveNv100, eficiencia, normalizar, normalizarTexto, especieDe, entrada, prever
   }
 })
