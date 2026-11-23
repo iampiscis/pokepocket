@@ -1015,6 +1015,7 @@ async function executar(imagem, opcoes) {
     ivSomado = achou.soma
   }
   STATS.forEach((k, i) => { if (escolha.ivs[i] != null) ficha.ivs[k] = escolha.ivs[i] })
+  if (ivSomado != null) ficha.ivSomado = ivSomado
   if (escolha.deduzido != null) avisos.push(`IV de ${ROTULOS[STATS[escolha.deduzido]]} deduzido pelo IV somado`)
   if (escolha.bate === false) {
     const s = STATS.reduce((a, k) => a + (ficha.ivs[k] ?? 0), 0)

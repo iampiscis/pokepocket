@@ -992,6 +992,46 @@ function conferirLeitura(r) {
   if (ivs) document.querySelector('.cartao-hoje').classList.add('conferir-ivs')
 }
 
+const CHAVES_IV = ['hp', 'atk', 'def', 'spAtk', 'spDef', 'speed']
+function estimarIvs(pk) {
+  const soma = Number(pk.ivSomado)
+  const faltam = CHAVES_IV.filter((k) => !(Number(pk.ivs?.[k]) > 0))
+  if (!faltam.length || !(soma > 0)) return null
+  const ivs = { ...pk.ivs }
+  const conhecida = CHAVES_IV.reduce((a, k) => a + (faltam.includes(k) ? 0 : Number(ivs[k]) || 0), 0)
+  let resto = soma - conhecida
+  if (resto < faltam.length || resto > faltam.length * 32) return null
+  faltam.forEach((k, i) => {
+    const v = Math.min(32, Math.max(1, Math.round(resto / (faltam.length - i))))
+    ivs[k] = v
+    resto -= v
+  })
+  const alvo = Number(pk.nota)
+  if (!(alvo > 0) || faltam.length < 2) return ivs
+  const erro = (x) => {
+    const r = motor.simular({ ...pk, ivs: x })
+    return Number.isFinite(r?.nota) ? Math.abs(r.nota - alvo) : Infinity
+  }
+  let atual = erro(ivs)
+  for (let volta = 0; volta < 400 && atual > 0.0005; volta++) {
+    let melhor = null
+    for (const de of faltam) for (const para of faltam) {
+      if (de === para || ivs[de] <= 1 || ivs[para] >= 32) continue
+      for (const passo of [4, 1]) {
+        const d = Math.min(passo, ivs[de] - 1, 32 - ivs[para])
+        if (d < 1) continue
+        const x = { ...ivs, [de]: ivs[de] - d, [para]: ivs[para] + d }
+        const e = erro(x)
+        if (e < atual - 1e-9 && (!melhor || e < melhor.e)) melhor = { x, e }
+      }
+    }
+    if (!melhor) break
+    Object.assign(ivs, melhor.x)
+    atual = melhor.e
+  }
+  return ivs
+}
+
 async function lerImagem(arquivo) {
   if (!st.pronto || !arquivo) return
   statusFicha('')
@@ -1025,8 +1065,11 @@ async function lerImagem(arquivo) {
     if (deduzido) refino = deduzido
     else refinoAviso = ' Não deu para conferir o refino; ajuste à mão.'
   }
-  trocarPokemon({ ...f, speciesId: sid, refino })
-  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}${refinoAviso ? `.${refinoAviso}` : ''}`, 'ok')
+  let ivsEstimados = null
+  try { ivsEstimados = estimarIvs({ ...f, speciesId: sid, refino }) } catch {}
+  trocarPokemon({ ...f, speciesId: sid, refino, ...(ivsEstimados ? { ivs: ivsEstimados } : {}) })
+  const avisoIvs = ivsEstimados ? ' IVs estimados pela soma e pela nota; confira.' : ''
+  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}${refinoAviso ? `.${refinoAviso}` : ''}${avisoIvs ? `.${avisoIvs}` : ''}`, 'ok')
   conferirLeitura(r)
 }
 
