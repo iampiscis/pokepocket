@@ -368,6 +368,7 @@
       <a class="marca" href="#"><img src="assets/icone.png" alt="" /><span><span class="p">Poke</span>Pocket</span></a>
       <nav class="secoes" aria-label="Seções">
         <span class="marcador" aria-hidden="true"></span>
+        <a href="#treino" data-secao="treino">Treino</a>
         <a href="#celular" data-secao="celular">No celular</a>
         <a href="#recursos" data-secao="recursos">Recursos</a>
         <a href="#seguranca" data-secao="seguranca">Segurança</a>
@@ -390,6 +391,7 @@
       </div>
       <div class="painel-menu" id="painel-secoes">
         <nav aria-label="Seções">
+          <a href="#treino" data-secao="treino"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></span>Treino</a>
           <a href="#celular" data-secao="celular"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>No celular</a>
           <a href="#recursos" data-secao="recursos"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span>Recursos</a>
           <a href="#seguranca" data-secao="seguranca"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg></span>Segurança</a>
@@ -417,14 +419,33 @@
         <img class="bola" src="assets/pokebola.svg" alt="" />
         <div class="selos"><span><i></i>Pokéidle</span><span><i></i>Até 4 contas</span><span><i></i>Windows</span><span><i></i>Android e iPhone</span></div>
         <h1>Seu Pokéidle no <em>automático</em>.</h1>
-        <p class="lide">Joga por você <b>nas 4 contas</b>.<br />E agora cabe no <b>celular</b>.</p>
+        <p class="lide">Joga por você <b>nas 4 contas</b>.<br />E agora <b>treina sozinho</b>.</p>
         <div class="acoes">
           <a class="botao" href="https://github.com/iampiscis/pokepocket/releases/latest/download/PokePocket-Setup.exe" data-goatcounter-click="baixar-instalador-heroi" data-goatcounter-title="baixar-instalador-heroi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zm8.5-1.2L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zm8.5 0H21V21l-9.5-1.3z"/></svg>Baixar para Windows</a>
         </div>
         <div class="contador-dl" id="contador-dl" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><b id="dl-total">0</b><span>downloads</span></div>
-        <p class="nota">Grátis · sem cadastro · Windows 10 e 11 · versão 1.0.5 · <a href="#video">ver o vídeo</a> · <a href="https://github.com/iampiscis/pokepocket/releases">todas as versões</a></p>
+        <p class="nota">Grátis · sem cadastro · Windows 10 e 11 · versão 1.0.6 · <a href="#video">ver o vídeo</a> · <a href="https://github.com/iampiscis/pokepocket/releases">todas as versões</a></p>
         <div class="tela revela" id="video">
           <video src="assets/pokepocket-v6.mp4" poster="assets/capa.jpg" controls preload="none" playsinline></video>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="treino">
+      <div class="envolve">
+        <div class="cab centro revela">
+          <span class="rotulo">Novo · 1.0.6</span>
+          <h2>Treino automático</h2>
+          <p>Chega de vender no NPC por quase nada e de tirar e pôr pokémon na mão.</p>
+        </div>
+        <div class="tela revela">
+          <video src="assets/pokepocket-treino.mp4" poster="assets/treino-capa.jpg" controls playsinline preload="metadata"></video>
+        </div>
+        <div class="seguranca">
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-5h4v5"/></svg></div><h3>Cada um na casa certa</h3><p>Casas por bônus de XP, por Score PvP, Nível ou do seu jeito.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h11M4 17h7"/><path d="M17 14l3 3-3 3"/><path d="M13 17h7"/></svg></div><h3>Fila que anda sozinha</h3><p>Chegou no nível, troca no Exp. Share. Sem troca recusada.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5 5.6.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.6-.8z"/></svg></div><h3>Captura vira lucro</h3><p>Captura boa treina até evoluir e fica pronta para o Mercado.</p></div>
+          <div class="seg revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V7a4 4 0 0 1 8 0"/><rect x="4" y="11" width="16" height="10" rx="2"/></svg></div><h3>Você manda</h3><p>Mexeu na mão? Sua ação tem prioridade.</p></div>
         </div>
       </div>
     </section>
@@ -432,7 +453,7 @@
     <section class="bloco" id="celular">
       <div class="envolve">
         <div class="cab centro revela">
-          <span class="rotulo">Novo · 1.0.4</span>
+          <span class="rotulo">Desde a 1.0.4</span>
           <h2>No celular</h2>
           <p>O painel inteiro no Android e no iPhone, no Wi-Fi ou no 4G/5G.</p>
         </div>
@@ -519,7 +540,7 @@
           <div class="p4 revela"><span class="n">3</span><div class="mini"><div class="smart mini-smart"><b>O Windows protegeu o computador</b><span class="link alvo-link">Mais informações</span><div class="smart-rodape"><span class="alvo">Executar assim mesmo</span></div></div></div><h3>Libere</h3><p>Mais informações › Executar assim mesmo.</p></div>
           <div class="p4 revela"><span class="n">4</span><div class="mini mock-abrir"><img src="assets/pokebola.svg" alt="" /><span class="botao pequeno" style="pointer-events:none">Começar</span></div><h3>Pronto</h3><p>Instale, abra e entre nas suas contas.</p></div>
         </div>
-        <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.5: <code>9dbecea350eae8bd2289ca625eeb37f6b341c4fdf6933f8834faa629741659f7</code></p></details>
+        <details class="verificar revela"><summary>Verificar o arquivo (opcional)</summary><p>Quer conferir se o arquivo é o original? No PowerShell, rode <code>Get-FileHash .\PokePocket-Setup.exe</code> e compare com o código abaixo.</p><p class="hash">Instalador 1.0.6: <code>dbac4ea3332cdb6eb09981fa6acf626a6a4da7229e1436d36eb0edd404597fea</code></p></details>
       </div>
     </section>
 
@@ -530,7 +551,12 @@
           <h2>O que mudou</h2>
         </div>
         <div class="versoes">
-          <article class="versao revela"><div class="versao-tag"><b>1.0.5</b><small>22/11/2026</small><span class="atual">atual</span></div><ul>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.6</b><small>23/11/2026</small><span class="atual">atual</span></div><ul>
+            <li><b>Treino:</b> casas por bônus de XP, fila do Exp. Share automática e Evoluir capturas.</li>
+            <li><b>Transferir e Ranking:</b> transferências entre contas de volta e Ranking com visual novo.</li>
+            <li><b>Correções:</b> conta logada aparecendo fora do jogo, Twitch e Kick deslogadas e sprites shiny.</li>
+          </ul></article>
+          <article class="versao revela"><div class="versao-tag"><b>1.0.5</b><small>22/11/2026</small></div><ul>
             <li><b>Nível:</b> nova tela com previsão mais sólida até o nível que você quer.</li>
             <li><b>Hunt:</b> recomendação que considera Prey, tipos e fraquezas, e objetivo Bestiário.</li>
             <li><b>Mais:</b> filtro por Coins ou Gemas no Mercado, celular na vertical e login guardado.</li>
