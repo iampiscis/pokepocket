@@ -378,11 +378,20 @@ async function versaoDoCodigo(nome) {
   return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 12)
 }
 
+const MODELO_RAMO = 'https://raw.githubusercontent.com/iampiscis/pokepocket/modelo/preco-mercado.json'
+
 async function carregarModeloPreco() {
+  const [prever, entrada] = await Promise.all([versaoDoCodigo('preco-mercado.js'), versaoDoCodigo('preco-mercado-entrada.js')])
+  const casado = (pub) => !!pub && pub.formato === globalThis.PrecoMercadoPublico?.FORMATO && (!pub.versaoPrevisor || pub.versaoPrevisor === prever) && (!pub.versaoEntrada || pub.versaoEntrada === entrada)
+  let ramo = null
+  try {
+    const r = await fetch(MODELO_RAMO, { cache: 'no-cache' })
+    if (r.ok) ramo = await r.json()
+  } catch {}
+  if (casado(ramo)) return ramo
   const pub = await lerJson(new URL('preco-mercado.json', BASE))
   if (!pub || pub.formato !== globalThis.PrecoMercadoPublico?.FORMATO) throw new Error('modelo de preço em formato inesperado')
-  const [prever, entrada] = await Promise.all([versaoDoCodigo('preco-mercado.js'), versaoDoCodigo('preco-mercado-entrada.js')])
-  if ((pub.versaoPrevisor && pub.versaoPrevisor !== prever) || (pub.versaoEntrada && pub.versaoEntrada !== entrada)) throw new Error('o preço de mercado está sendo atualizado; recarregue a página em alguns minutos')
+  if (!casado(pub)) throw new Error('o preço de mercado está sendo atualizado; recarregue a página em alguns minutos')
   return pub
 }
 
