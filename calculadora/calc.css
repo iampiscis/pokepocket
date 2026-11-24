@@ -664,3 +664,5 @@ details[open] .det-seta { transform: rotate(180deg); }
   .visor-topo { top: 66px; }
   .passos { grid-template-columns: 40px minmax(0, 1fr) 40px; }
 }
+.calc-incerto .visor-topo { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7), inset 0 0 0 2px rgba(251, 191, 36, 0.55), 0 16px 36px rgba(0, 0, 0, 0.55); }
+.calc-incerto .visor-topo::after { content: "Pode não ser fiel"; position: absolute; top: -10px; right: 14px; z-index: 2; padding: 2px 9px; border-radius: 99px; background: #fbbf24; color: #2a1a04; font-size: 11.5px; font-weight: 800; line-height: 16px; white-space: nowrap; pointer-events: none; }

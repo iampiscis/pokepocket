@@ -977,21 +977,26 @@ function mostrarLeitura(frac) {
 function limparConferir() {
   $('conferir').hidden = true
   document.querySelector('.cartao-hoje')?.classList.remove('conferir-ivs')
+  document.body.classList.remove('calc-incerto')
 }
 
 const NOMES_FALTA = { especie: 'a espécie', level: 'o nível', potencia: 'a potência', quality: 'a qualidade', nota: 'a nota' }
 
-function conferirLeitura(r) {
+function conferirLeitura(r, { refino = false, ivsEstimados = false } = {}) {
   const faltas = (r?.faltando || []).filter((k) => k !== 'nota')
   const avisos = r?.avisos || []
-  const ivs = faltas.some((k) => k.startsWith('ivs.')) || avisos.some((a) => /iv/i.test(a))
+  const somaErrada = avisos.some((a) => /soma/i.test(a))
+  const ivs = ivsEstimados || faltas.some((k) => k.startsWith('ivs.')) || avisos.some((a) => /iv/i.test(a))
   const itens = [...new Set(faltas.filter((k) => !k.startsWith('ivs.')).map((k) => NOMES_FALTA[k]).filter(Boolean))]
   if (ivs) itens.unshift('os IVs')
-  if (!itens.length) return
-  const txt = avisos.some((a) => /soma/i.test(a)) ? 'A soma dos IVs não bateu. Confira' : 'Confira'
-  $('conferir-txt').textContent = `${txt} ${itens.join(', ').replace(/, ([^,]*)$/, ' e $1')}.`
+  if (refino) itens.push('o refino')
+  if (!itens.length) return false
+  const lista = itens.join(', ').replace(/, ([^,]*)$/, ' e $1')
+  $('conferir-txt').textContent = `${somaErrada ? 'A soma dos IVs não bateu' : `Faltou ${lista} no print`}. O cálculo pode não ser fiel: ${somaErrada ? `confira ${lista}` : 'complete à mão'}, ou use um print da ficha inteira.`
   $('conferir').hidden = false
+  document.body.classList.add('calc-incerto')
   if (ivs) document.querySelector('.cartao-hoje').classList.add('conferir-ivs')
+  return true
 }
 
 const CHAVES_IV = ['hp', 'atk', 'def', 'spAtk', 'spDef', 'speed']
@@ -1070,9 +1075,8 @@ async function lerImagem(arquivo) {
   let ivsEstimados = null
   try { ivsEstimados = estimarIvs({ ...f, speciesId: sid, refino }) } catch {}
   trocarPokemon({ ...f, speciesId: sid, refino, ...(ivsEstimados ? { ivs: ivsEstimados } : {}) })
-  const avisoIvs = ivsEstimados ? ' IVs estimados pela soma e pela nota; confira.' : ''
-  statusFicha(`Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}${refinoAviso ? `.${refinoAviso}` : ''}${avisoIvs ? `.${avisoIvs}` : ''}`, 'ok')
-  conferirLeitura(r)
+  const incompleto = conferirLeitura(r, { refino: !!refinoAviso, ivsEstimados: !!ivsEstimados })
+  statusFicha(incompleto ? '' : `Lido do print: ${st.nomeHoje}, Nv ${fmt.format(st.hoje.level)}`, 'ok')
 }
 
 function imagemDe(lista) {
@@ -1338,6 +1342,7 @@ function ligarEventos() {
     $('arquivo-print').value = ''
     if (f) lerImagem(f)
   })
+  for (const ev of ['input', 'change']) $('editor-hoje').addEventListener(ev, () => { if (document.body.classList.contains('calc-incerto')) limparConferir() })
   $('conferir-editar').addEventListener('click', () => {
     abrirEntrada(true)
     trocarAba('mao')
