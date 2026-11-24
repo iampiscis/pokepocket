@@ -220,52 +220,6 @@
     .online-links a:hover { transform: translateY(-2px); box-shadow: 0 0 22px rgba(255, 211, 77, 0.3); }
     .online-links svg { flex: none; width: 20px; height: 20px; color: var(--ouro); }
     @media (max-width: 479px) { .online-links a { height: 42px; padding: 0 14px 0 11px; font-size: 14.5px; } }
-    .novos { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-rows: auto auto; gap: 16px; margin-top: 30px; }
-    .novo { position: relative; display: grid; gap: 14px; align-content: start; padding: 14px; border-radius: 22px; background: linear-gradient(180deg, rgba(74, 36, 51, 0.6), rgba(43, 26, 34, 0.55)); border: 1px solid rgba(255, 233, 163, 0.16); transition: transform 0.2s, border-color 0.2s; }
-    .novo:hover { transform: translateY(-4px); border-color: rgba(255, 211, 77, 0.45); }
-    .n-telas { grid-row: span 2; }
-    .n-notif, .n-pvp { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: stretch; align-content: stretch; }
-    .n-notif .txt, .n-pvp .txt { align-self: center; }
-    .novo .txt { padding: 0 6px 4px; }
-    .novo .selo-novo { display: inline-block; }
-    .novo h3 { margin-top: 8px; font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.05; text-transform: uppercase; background: linear-gradient(180deg, #fffbe0, #ffd34d 60%, #e8650f); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .novo p { margin-top: 6px; font-size: 15px; color: var(--suave); }
-    .novo p b { color: #fff; }
-    .ilus { position: relative; border-radius: 14px; background: #120a0e; box-shadow: 0 0 0 3px #480e1e, 0 0 0 5px rgba(241, 211, 183, 0.35); overflow: hidden; }
-    .telas { aspect-ratio: 16 / 10; padding: 10px; display: grid; grid-template-rows: 1fr auto; gap: 10px; }
-    .grade4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .tl { position: relative; display: block; border-radius: 8px; overflow: hidden; background: radial-gradient(circle at 30% 35%, #2f6b3a 0 18%, transparent 19%), radial-gradient(circle at 72% 65%, #1f4f7a 0 16%, transparent 17%), linear-gradient(135deg, #3f7f45, #2b5a35); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
-    .tl2 { filter: hue-rotate(40deg) saturate(0.9); } .tl3 { filter: hue-rotate(-35deg); } .tl4 { filter: hue-rotate(160deg) saturate(0.7); }
-    .tl b { position: absolute; left: 48%; top: 46%; width: 9px; height: 9px; border-radius: 50%; background: #ffd34d; box-shadow: 0 0 0 2px #2a1a12, 0 0 10px #ffd34d; animation: anda 4s ease-in-out infinite alternate; }
-    .tl2 b { animation-delay: -1s; } .tl3 b { animation-delay: -2s; } .tl4 b { animation-delay: -3s; }
-    @keyframes anda { 0% { transform: translate(-18px, -6px); } 50% { transform: translate(10px, 8px); } 100% { transform: translate(16px, -10px); } }
-    .alterna { justify-self: center; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); font-weight: 800; font-size: 13px; color: var(--apagado); }
-    .alterna span { padding: 4px 14px; border-radius: 999px; }
-    .alterna .on { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
-    .notif, .pvp { height: 100%; min-height: 128px; padding: 12px; display: grid; align-content: center; gap: 8px; }
-    .toast { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .toast i { flex: none; width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
-    .toast.t2 i { background: linear-gradient(180deg, #86efac, #22c55e); }
-    .toast.t2 { opacity: 0.7; transform: scale(0.96); }
-    .toast span { display: grid; line-height: 1.15; min-width: 0; }
-    .toast b { font-size: 13px; color: #fff; white-space: nowrap; }
-    .toast small { font-size: 12px; color: var(--apagado); }
-    .rank { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 800; color: var(--suave); font-size: 13px; }
-    .rank b { font-family: var(--display); font-weight: 400; font-size: 24px; color: #fff; }
-    .rank .pos { font-family: var(--display); font-size: 20px; color: var(--ouro); }
-    .barra { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
-    .barra i { display: block; width: 72%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f472b6, #ffd34d); }
-    .pvp small { font-size: 12px; color: var(--apagado); }
-    .recs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
-    .rec { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: rgba(43, 26, 34, 0.55); border: 1px solid rgba(255, 233, 163, 0.1); transition: transform 0.2s, border-color 0.2s; }
-    .rec:hover { transform: translateY(-3px); border-color: rgba(255, 233, 163, 0.3); }
-    .chip { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent); }
-    .chip svg { width: 26px; height: 26px; }
-    .rec h3 { font-family: var(--display); font-weight: 400; font-size: 19px; line-height: 1.1; text-transform: uppercase; }
-    .rec p { margin-top: 2px; font-size: 14px; color: var(--suave); }
-    @media (max-width: 980px) { .recs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 760px) { .novos { grid-template-columns: 1fr; } .n-telas { grid-row: auto; } .recs { grid-template-columns: 1fr; } }
-    @media (max-width: 520px) { .n-notif, .n-pvp { grid-template-columns: 1fr; } }
     .extras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
     .extra { padding: 16px 18px; text-align: center; transition: transform 0.2s; }
     .extra:hover { transform: translateY(-4px); }
@@ -534,27 +488,16 @@
           <div class="auto revela"><img src="assets/prints/ficha.webp" alt="Ficha do pokémon com Score PvP" loading="lazy" width="1600" height="1000" /><div><h3>Ficha</h3><p><b>Score PvP</b>, efetividade, evolução e <b>preço sugerido</b>.</p></div></div>
           <div class="auto revela"><img src="assets/prints/ganhos.webp" alt="Ganhos por hora e por conta" loading="lazy" width="1600" height="1000" /><div><h3>Ganhos</h3><p>XP, Coins, compras e vendas por hora.</p></div></div>
         </div>
-        <div class="novos">
-          <article class="novo n-telas revela">
-            <div class="ilus telas" aria-hidden="true"><div class="grade4"><i class="tl tl1"><b></b></i><i class="tl tl2"><b></b></i><i class="tl tl3"><b></b></i><i class="tl tl4"><b></b></i></div><div class="alterna"><span class="on">Mapa</span><span>Completo</span></div></div>
-            <div class="txt"><span class="selo-novo">novo</span><h3>4 telas ao vivo</h3><p>As <b>4 contas</b> na tela ao mesmo tempo. Clique numa para abrir a conta.</p></div>
-          </article>
-          <article class="novo n-notif revela">
-            <div class="ilus notif" aria-hidden="true"><div class="toast t1"><i></i><span><b>Shiny capturado</b><small>Conta 2</small></span></div><div class="toast t2"><i></i><span><b>Compra feita</b><small>Conta 1</small></span></div></div>
-            <div class="txt"><span class="selo-novo">novo</span><h3>Notificações</h3><p>No <b>PC</b> e no <b>celular</b>, só do que você escolher.</p></div>
-          </article>
-          <article class="novo n-pvp revela">
-            <div class="ilus pvp" aria-hidden="true"><div class="rank"><span class="pr">PR <b>1.842</b></span><span class="pos">#37</span></div><div class="barra"><i></i></div><small>faltam 58 para o próximo corte</small></div>
-            <div class="txt"><span class="selo-novo">novo</span><h3>PvP</h3><p>Rank, fila, equipe e prêmios <b>numa tela só</b>.</p></div>
-          </article>
-        </div>
-        <div class="recs">
-          <div class="rec revela"><span class="chip" style="--c:#ffd34d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20l6-12 4 7 3-4 5 9z"/></svg></span><div><h3>Hunt automática</h3><p>Melhor hunt e Top Catch.</p></div></div>
-          <div class="rec revela"><span class="chip" style="--c:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="13" rx="2.5"/><path d="M10 9.5v4.5l4-2.25z"/><path d="M8 21h8"/></svg></span><div><h3>Multi lives</h3><p>Pontos da Twitch e Kick viram bônus.</p></div></div>
-          <div class="rec revela"><span class="chip" style="--c:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg></span><div><h3>Transferências</h3><p>Coins, gemas e pokémon entre contas.</p></div></div>
-          <div class="rec revela"><span class="chip" style="--c:#f472b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M8.5 20.5h7"/></svg></span><div><h3>Tier PvP diário</h3><p>O meta do ranqueado, todo dia.</p></div></div>
-          <div class="rec revela"><span class="chip" style="--c:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/><path d="M19 3v3M17.5 4.5h3"/></svg></span><div><h3>Shinies do servidor</h3><p>Tudo o que saiu nas últimas 24 h.</p></div></div>
-          <div class="rec revela"><span class="chip" style="--c:#4ade80"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></span><div><h3>Atualiza sozinho</h3><p>Versão nova sem reinstalar.</p></div></div>
+        <div class="extras">
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div><h3>4 telas ao vivo</h3><p>As 4 contas juntas, no mapa ou completo.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></div><h3>Notificações</h3><p>No PC e no celular, do que você escolher.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><path d="M4 20 14 10"/><path d="M14 4h6v6l-6 4-4-4z"/><path d="M20 20 10 10"/><path d="M10 4H4v6l6 4"/></svg></div><h3>PvP</h3><p>Rank, fila e prêmios numa tela só.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ffd34d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><path d="M3 20l6-12 4 7 3-4 5 9z"/><circle cx="17" cy="5" r="2"/></svg></div><h3>Hunt automática</h3><p>Troca para a melhor hunt e faz Top Catch.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px"><rect x="3" y="5" width="18" height="13" rx="2.5"/><path d="M10 9.5v4.5l4-2.25z" fill="#c4b5fd"/><path d="M8 21h8"/></svg></div><h3>Multi lives</h3><p>Twitch e Kick com pontos virando bônus.</p></div>
+          <div class="extra vao revela"><div class="ico"><span class="moeda">C</span><span class="gema"></span><img src="assets/pokebola.svg" alt="" style="width:42px" /></div><h3>Transferências</h3><p>Coins, gemas e pokémons entre contas.</p></div>
+          <div class="extra vao revela"><div class="ico"><span style="display:grid;place-items:center;width:60px;height:60px;border-radius:16px;font-family:var(--display);font-size:30px;background:linear-gradient(180deg,#f472b6,#db2777);box-shadow:0 5px 0 #831843">S+</span></div><h3>Tier PvP diário</h3><p>O meta do ranqueado, todo dia.</p></div>
+          <div class="extra vao revela"><div class="ico"><img class="pix" src="assets/itens/salamence.png" alt="" style="width:76px;height:auto" /><span style="font-family:var(--display);font-size:34px;color:var(--ouro)">24h</span></div><h3>Shinies do servidor</h3><p>Tudo o que saiu nas últimas 24 h.</p></div>
+          <div class="extra vao revela"><div class="ico"><svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></div><h3>Atualiza sozinho</h3><p>A versão nova chega sem reinstalar.</p></div>
         </div>
         <div class="online revela">
           <span class="online-rot">Também no navegador, sem instalar</span>
