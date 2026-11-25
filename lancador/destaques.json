@@ -1,7 +1,8 @@
 {
   "destaques": [
-    { "imagem": "mercado.jpg", "titulo": "Mercado mais claro", "texto": "Itens em 4 grupos e preço real, sem anúncios isca.", "novo": true },
-    { "imagem": "mochila.jpg", "titulo": "Mochila organizada", "texto": "4 botões e cards no mesmo visual do Mercado.", "novo": true },
+    { "imagem": "calculadora-vivo.jpg", "titulo": "Preço ao vivo", "texto": "A calculadora acompanha as ofertas e as vendas fechadas do Mercado.", "novo": true },
+    { "imagem": "mercado.jpg", "titulo": "Mercado mais claro", "texto": "Itens em 4 grupos e preço real, sem anúncios isca.", "novo": false },
+    { "imagem": "mochila.jpg", "titulo": "Mochila organizada", "texto": "4 botões e cards no mesmo visual do Mercado.", "novo": false },
     { "imagem": "telas.jpg", "titulo": "4 telas ao vivo", "texto": "As 4 contas na tela ao mesmo tempo, em Mapa ou Completo.", "novo": false },
     { "imagem": "notificacoes.jpg", "titulo": "Notificações", "texto": "Avisos no PC e no celular, só do que você escolher.", "novo": false },
     { "imagem": "treino.jpg", "titulo": "Treino automático", "texto": "Casas por bônus de XP, fila do Exp. Share e evolução.", "novo": false },
