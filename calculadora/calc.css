@@ -451,6 +451,17 @@ details[open] .det-seta { transform: rotate(180deg); }
 .pc small { font-size: 12px; font-weight: 700; color: var(--apagado); }
 .pc.pc-justo { background: linear-gradient(180deg, rgba(236, 72, 153, 0.16), rgba(236, 72, 153, 0.05)); border-color: rgba(244, 114, 182, 0.6); box-shadow: 0 0 18px rgba(236, 72, 153, 0.22); }
 .pc.pc-justo strong { font-size: 30px; color: #fff; }
+.coin-ico { flex: none; display: inline-block; width: 20px; height: 20px; background: url("../assets/coin.svg") center / contain no-repeat; }
+.pc strong .coin-ico { width: 18px; height: 18px; }
+.preco-moeda { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px; font-family: var(--display); font-size: 15px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--suave); }
+.preco-moeda .gema-ico, .preco-moeda .coin-ico { width: 18px; height: 18px; }
+.preco-moeda .preco-cab-hoje { margin-left: auto; text-transform: none; letter-spacing: 0; }
+.precos3-coin { margin-top: 0; }
+.pc-coin { --pc: #fcd34d; }
+.pc-coin.pc-rapido { --pc: #fde68a; }
+.pc-coin.pc-esperar { --pc: #f59e0b; }
+.pc-coin strong { color: #fde68a; }
+.pc.pc-coin.pc-justo { background: linear-gradient(180deg, rgba(234, 179, 8, 0.16), rgba(234, 179, 8, 0.05)); border-color: rgba(250, 204, 21, 0.6); box-shadow: 0 0 18px rgba(234, 179, 8, 0.22); }
 .preco-regua { position: relative; height: 26px; margin: 14px 8px 0; }
 .preco-regua::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.07); }
 .pr-faixa { position: absolute; top: 7px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #fbcfe8, #ec4899 50%, #c084fc); }
@@ -666,3 +677,4 @@ details[open] .det-seta { transform: rotate(180deg); }
 }
 .calc-incerto .visor-topo { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7), inset 0 0 0 2px rgba(251, 191, 36, 0.55), 0 16px 36px rgba(0, 0, 0, 0.55); }
 .calc-incerto .visor-topo::after { content: "Pode não ser fiel"; position: absolute; top: -10px; right: 14px; z-index: 2; padding: 2px 9px; border-radius: 99px; background: #fbbf24; color: #2a1a04; font-size: 11.5px; font-weight: 800; line-height: 16px; white-space: nowrap; pointer-events: none; }
+.preco-regua + .preco-moeda { margin-top: 16px; }

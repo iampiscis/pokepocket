@@ -872,6 +872,16 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     el('strong', {}, [gemas(v), el('span', { class: 'gema-ico', 'aria-hidden': 'true' })]),
     el('small', { text: DESCR_PRECO[k] })
   ])
+  const o = !pkS.shiny && ds.coins && ehNum(ds.coins.justo) ? ds.coins : null
+  const pontosCoins = o ? [['rapido', 'Rápido', o.rapido], ['justo', 'Justo', o.justo], ['esperar', 'Esperar', o.esperar]].filter(([, , v]) => ehNum(v)) : []
+  const hojeCoins = o && !pkH.shiny && dh && !dh.erro && ehNum(dh.coins?.justo) ? Number(dh.coins.justo) : null
+  const pCoins = hojeCoins ? variacao(hojeCoins, o.justo) : null
+  const cartaoCoin = ([k, rot, v]) => el('div', { class: `pc pc-coin pc-${k}`, role: 'listitem' }, [
+    el('span', { class: 'pc-rot' }, [el('i', { 'aria-hidden': 'true' }), rot]),
+    el('strong', {}, [grande(v), el('span', { class: 'coin-ico', 'aria-hidden': 'true' })]),
+    el('small', { text: DESCR_PRECO[k] })
+  ])
+  const subMoeda = (ico, nome, hoje, pv, fmtV) => el('div', { class: 'preco-moeda' }, [el('span', { class: ico, 'aria-hidden': 'true' }), el('span', { text: nome }), hoje != null ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${fmtV(hoje)}` }), pv != null ? el('span', { class: `delta ${classeDelta(pv)}`, text: textoVariacao(pv) }) : null]) : null])
   const regua = el('div', { class: 'preco-regua', 'aria-hidden': 'true' }, [
     el('span', { class: 'pr-faixa', style: `left:${pos(pontos[0][2])}%;right:${(100 - pos(pontos[pontos.length - 1][2])).toFixed(1)}%` }),
     ...pontos.map(([k, , v]) => el('i', { class: `pr-ponto pc-${k}`, style: `left:${pos(v)}%` })),
@@ -882,7 +892,6 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     const c = Math.max(0, Math.min(100, Math.round(ds.confianca)))
     detalhes.push(el('span', { class: 'pd-conf' }, ['Confiança', el('span', { class: 'pd-barra', 'aria-hidden': 'true' }, [el('i', { style: `width:${c}%` })]), el('b', { text: `${c}%` })]))
   }
-  if (ehNum(ds.coins?.justo)) detalhes.push(el('span', { class: 'pd-txt', text: `em Coins ${grande(ds.coins.justo)}` }))
   if (Number(ds.vendas) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendas)} vendas da espécie` }))
   if (/^\d{4}-\d{2}-\d{2}$/.test(ds.atualizadoEm || '')) detalhes.push(el('span', { class: 'pd-txt', text: `modelo de ${ds.atualizadoEm.slice(8, 10)}/${ds.atualizadoEm.slice(5, 7)}`, ...(ds.versaoModelo ? { title: `versão ${ds.versaoModelo}` } : {}) }))
   for (const a of ds.adicionais || []) {
@@ -891,12 +900,15 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     detalhes.push(el('span', { class: 'pd-chip' }, [`${nome} +${gemas(a.total)}`, el('span', { class: 'gema-ico', 'aria-hidden': 'true' })]))
   }
   const hojeTxt = hojeJusto != null ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${gemas(hojeJusto)}` }), p != null ? el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) }) : null]) : null
-  box.replaceChildren(
-    cabPreco(hojeTxt),
+  box.replaceChildren(...[
+    cabPreco(o ? null : hojeTxt),
+    o ? subMoeda('gema-ico', 'Gemas', hojeJusto, p, gemas) : null,
     el('div', { class: 'precos3', role: 'list' }, pontos.map(cartao)),
     regua,
+    o ? subMoeda('coin-ico', 'Coins', hojeCoins, pCoins, grande) : null,
+    o ? el('div', { class: 'precos3 precos3-coin', role: 'list' }, pontosCoins.map(cartaoCoin)) : null,
     detalhes.length ? el('div', { class: 'preco-det' }, detalhes) : null
-  )
+  ].filter(Boolean))
 }
 
 function statusFicha(txt, tipo = '') {
@@ -1231,10 +1243,12 @@ async function dadosCompartilhar() {
   const s = st.res?.s
   if (!s) return { linha: '', link: location.href }
   let justo = null
+  let justoCoins = null
   let vendas = null
   try {
     const p = await precoDe(pkDe(st.sim), s)
     if (ehNum(p?.gemas?.justo)) justo = Math.round(p.gemas.justo)
+    if (!st.sim.shiny && ehNum(p?.coins?.justo)) justoCoins = Math.round(p.coins.justo)
     if (Number(p?.vendas) > 0) vendas = Number(p.vendas)
   } catch {}
   const faixaTxt = (v) => (ehNum(v) ? ` · ${faixaDe(Number(v))[1]}` : '')
@@ -1242,7 +1256,7 @@ async function dadosCompartilhar() {
   if (ehNum(s.nota)) linhas.push(`⭐ Nota ${fmtNota(s.nota)} · ${faixaNota(s.nota)[1]}`)
   if (ehNum(s.score?.pvp)) linhas.push(`⚔️ PvP ${fmt.format(s.score.pvp)}${faixaTxt(s.score.pvp)}${ehNum(s.pvp) ? ` · poder ${grande(s.pvp)}` : ''}`)
   if (ehNum(s.score?.pve)) linhas.push(`🎯 PvE ${fmt.format(s.score.pve)}${faixaTxt(s.score.pve)}${ehNum(s.pve) ? ` · poder ${grande(s.pve)}` : ''}`)
-  if (justo != null) linhas.push(`💎 Preço justo ${gemas(justo)} gemas`)
+  if (justo != null) linhas.push(`💎 Preço justo ${gemas(justo)} gemas${justoCoins != null ? ` ou ${grande(justoCoins)} coins` : ''}`)
   const resumo = { nome: s.nome, pvp: ehNum(s.score?.pvp) ? s.score.pvp : null, pve: ehNum(s.score?.pve) ? s.score.pve : null, nota: ehNum(s.nota) ? s.nota : null, justo }
   let link = location.href
   try { link = await linkCurto(s, { ...resumo, vendas }) } catch {}
