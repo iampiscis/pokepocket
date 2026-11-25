@@ -479,6 +479,10 @@ details[open] .det-seta { transform: rotate(180deg); }
 .pd-barra { display: inline-block; width: 56px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
 .pd-barra i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #f9a8d4, #ec4899); }
 .pd-txt { white-space: nowrap; }
+.pd-vivo { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--suave); }
+.pd-vivo i { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); animation: pd-vivo 2.4s ease-out infinite; }
+@keyframes pd-vivo { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55); } 70%, 100% { box-shadow: 0 0 0 7px rgba(74, 222, 128, 0); } }
+@media (prefers-reduced-motion: reduce) { .pd-vivo i { animation: none; } }
 .pd-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(244, 114, 182, 0.3); color: #fbcfe8; font-weight: 800; white-space: nowrap; }
 .pd-chip .gema-ico { width: 13px; height: 13px; }
 .preco-rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 233, 163, 0.08); }

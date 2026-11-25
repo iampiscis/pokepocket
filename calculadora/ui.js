@@ -540,6 +540,7 @@ async function calcular() {
   pintarGolpe()
   pintarStats()
   $('detalhes').hidden = false
+  st.ultimoPreco = [pkH, rh, pkS, rs]
   pintarPreco(seq, pkH, rh, pkS, rs)
 }
 
@@ -893,7 +894,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     detalhes.push(el('span', { class: 'pd-conf' }, ['Confiança', el('span', { class: 'pd-barra', 'aria-hidden': 'true' }, [el('i', { style: `width:${c}%` })]), el('b', { text: `${c}%` })]))
   }
   if (Number(ds.vendas) > 0) detalhes.push(el('span', { class: 'pd-txt', text: `${fmt.format(ds.vendas)} vendas da espécie` }))
-  if (/^\d{4}-\d{2}-\d{2}$/.test(ds.atualizadoEm || '')) detalhes.push(el('span', { class: 'pd-txt', text: `modelo de ${ds.atualizadoEm.slice(8, 10)}/${ds.atualizadoEm.slice(5, 7)}`, ...(ds.versaoModelo ? { title: `versão ${ds.versaoModelo}` } : {}) }))
+  detalhes.push(el('span', { class: 'pd-vivo', title: `Ofertas do mercado e vendas fechadas${ds.versaoModelo ? ` · versão ${ds.versaoModelo}` : ''}` }, [el('i', { 'aria-hidden': 'true' }), el('span', { class: 'pd-vivo-txt', text: textoVivo() })]))
   for (const a of ds.adicionais || []) {
     if (!(Number(a?.total) > 0)) continue
     const nome = String(a.nome || '').replace(/Z-Move ([A-Z]+)/, (_, t) => `Z-\u2060Move ${nomeTipo(t)}`)
@@ -910,6 +911,29 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     detalhes.length ? el('div', { class: 'preco-det' }, detalhes) : null
   ].filter(Boolean))
 }
+
+function textoVivo() {
+  const t = motor.precoConferidoEm()
+  return t ? `ao vivo · ${new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'ao vivo'
+}
+
+async function conferirPrecoAoVivo() {
+  if (document.hidden || st.conferindoPreco) return
+  st.conferindoPreco = true
+  try {
+    const mudou = await motor.atualizarModeloPreco()
+    if (mudou && st.ultimoPreco && st.res) {
+      st.precos.clear()
+      pintarPreco(st.seq, ...st.ultimoPreco)
+    } else for (const x of document.querySelectorAll('.pd-vivo-txt')) x.textContent = textoVivo()
+  } finally {
+    st.conferindoPreco = false
+  }
+}
+setInterval(conferirPrecoAoVivo, 5 * 60000)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - motor.precoConferidoEm() > 5 * 60000) conferirPrecoAoVivo()
+})
 
 function statusFicha(txt, tipo = '') {
   const s = $('status-ficha')

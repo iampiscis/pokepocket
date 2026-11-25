@@ -395,9 +395,25 @@ async function carregarModeloPreco() {
   return pub
 }
 
+let conferidoPrecoEm = 0
+export async function atualizarModeloPreco() {
+  if (!modeloPreco) return false
+  const antigo = await modeloPreco.catch(() => null)
+  const novo = await carregarModeloPreco().catch(() => null)
+  if (!novo) return false
+  conferidoPrecoEm = Date.now()
+  if (antigo && novo.versaoModelo === antigo.versaoModelo && novo.dadosAte === antigo.dadosAte) return false
+  modeloPreco = Promise.resolve(novo)
+  return true
+}
+export const precoConferidoEm = () => conferidoPrecoEm
+
 export async function preco(pk) {
   try {
-    modeloPreco ??= carregarModeloPreco().catch((err) => {
+    modeloPreco ??= carregarModeloPreco().then((pub) => {
+      conferidoPrecoEm = Date.now()
+      return pub
+    }, (err) => {
       modeloPreco = null
       throw err
     })
