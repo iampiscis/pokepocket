@@ -111,8 +111,7 @@ function pintar() {
       bloco('⚔', 'Formação real', 'Casas tiradas de partidas ranqueadas da semana'),
       bloco('★', 'Variedade', 'Times e posições diferentes entre si'),
       bloco('↑', 'Frente', 'A fileira de cima é a mais perto do adversário'),
-      bloco('#', 'Ordem', 'Em empate de distância, o adversário mira primeiro o número menor'),
-      bloco('🏹', 'Alcance', '🗡️ corpo a corpo, 🏹 de longe; cada quadradinho é uma casa')
+      bloco('🏹', 'Alcance', '🗡️ corpo a corpo, 🏹 de longe; o número é quantas casas o golpe alcança')
     ])
   ])
   const info = el('button', { type: 'button', class: 'info', 'aria-expanded': 'false', 'aria-controls': 'pos-explica', 'aria-label': 'Como as formações são escolhidas', text: 'i' })
@@ -183,16 +182,16 @@ function cartao(j) {
       const c = CASAS.find((x) => x.fileira === fileira && x.cx === cx)
       if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
       const p = ocupa.get(c.casa)
-      const casa = el('span', { class: `pos-casa${p ? ' ocupada' : ''}`, title: p ? `${p.ordem}. ${p.nome} · ${alcance(p.alcance)}` : null }, p ? [sprite(p), el('b', { class: 'pos-casa-n', text: String(p.ordem) })] : [])
+      const casa = el('span', { class: `pos-casa${p ? ` ocupada${p.alcance > 1 ? ' longe' : ''}` : ''}`, title: p ? `${p.nome} · ${alcance(p.alcance)}` : null }, p ? [sprite(p), el('b', { class: `pos-casa-alc${p.alcance > 1 ? ' longe' : ''}`, 'aria-hidden': 'true' }, [el('i', { text: p.alcance > 1 ? '🏹' : '🗡️' }), String(Math.max(1, Math.min(4, Number(p.alcance) || 1)))])] : [])
       if (p) casas.set(p.ordem, casa)
       tab.append(casa)
     }
   }
-  const pks = [...j.pks].sort((a, b) => a.ordem - b.ordem)
+  const pos = (p) => CASAS[p.casa] || { fileira: 9, cx: 99 }
+  const pks = [...j.pks].sort((a, b) => pos(a).fileira - pos(b).fileira || pos(a).cx - pos(b).cx)
   const lista = el('ol', { class: 'pos-pks' }, [
     ...pks.map((p) => {
       const li = el('li', {}, [el('a', { class: 'pos-pk', href: linkCalc(p), title: `${p.nome} · ${alcance(p.alcance)}` }, [
-        el('span', { class: 'pos-pk-n', text: String(p.ordem) }),
         el('span', { class: 'pos-pk-img' }, [sprite(p)]),
         el('span', { class: 'pos-pk-nome', text: p.nome }),
         alcanceInfo(p.alcance)
@@ -204,7 +203,7 @@ function cartao(j) {
       li.addEventListener('focusout', () => ligar(false))
       return li
     }),
-    ...Array.from({ length: Math.max(0, 5 - pks.length) }, () => el('li', { class: 'pos-pk-vazio', 'aria-hidden': 'true' }))
+    ...Array.from({ length: Math.max(0, 5 - pks.length) }, () => el('li', { class: 'pos-pk-vazio', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { class: 'pos-pk-img' }), el('span', { text: 'vaga livre' })]))
   ])
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
