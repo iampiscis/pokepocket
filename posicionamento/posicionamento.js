@@ -178,6 +178,24 @@ const CY_DELES = (f) => 12 - f
 const distancia = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]))
 const alcanceN = (a) => Math.max(1, Math.min(4, Math.round(Number(a) || 1)))
 
+const BOLA_SVG = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fff3df" fill-opacity=".34"/><path d="M2 50a48 48 0 0 1 96 0z" fill="#e0505c" fill-opacity=".5"/><rect x="2" y="46.5" width="96" height="7" fill="#10070c"/><circle cx="50" cy="50" r="14" fill="#10070c"/><circle cx="50" cy="50" r="8.5" fill="#f3e4cf" fill-opacity=".85"/></svg>')}")`
+function pintarBola(tab) {
+  const meio = tab.querySelector('.pos-meio')
+  if (!meio || !meio.offsetWidth) return
+  const cx = meio.offsetLeft + meio.offsetWidth / 2, cy = meio.offsetTop + meio.offsetHeight / 2
+  const D = meio.offsetWidth * 0.52
+  for (const c of tab.querySelectorAll('.pos-casa:not(.ocupada)')) {
+    let b = c.querySelector('.pos-casa-bola')
+    if (!b) { b = el('i', { class: 'pos-casa-bola', 'aria-hidden': 'true' }); c.prepend(b) }
+    const x = cx - D / 2 - c.offsetLeft, y = cy - D / 2 - c.offsetTop
+    const longe = x > c.offsetWidth || y > c.offsetHeight || x + D < 0 || y + D < 0
+    b.style.backgroundImage = longe ? 'none' : BOLA_SVG
+    b.style.backgroundSize = `${D}px ${D}px`
+    b.style.backgroundPosition = `${x}px ${y}px`
+  }
+}
+const observaBola = new ResizeObserver((itens) => { for (const it of itens) pintarBola(it.target) })
+
 function cartao(j) {
   const ocupa = new Map(j.pks.map((p) => [p.casa, p]))
   const nossas = []
@@ -196,8 +214,8 @@ function cartao(j) {
     }
   }
   const meio = el('span', { class: 'pos-meio', 'aria-hidden': 'true' })
-  meio.innerHTML = '<svg class="pos-emblema" viewBox="0 0 100 100"><circle class="pos-emb-claro" cx="50" cy="50" r="48"/><path class="pos-emb-vermelho" d="M2 50a48 48 0 0 1 96 0z"/><rect class="pos-emb-faixa" x="2" y="47" width="96" height="6"/><circle class="pos-emb-faixa" cx="50" cy="50" r="13"/><circle class="pos-emb-botao" cx="50" cy="50" r="8"/></svg>'
   tab.append(meio)
+  observaBola.observe(tab)
   for (let f = 0; f < FILEIRAS.length; f++) {
     for (let cx = 11; cx <= 18; cx++) {
       const c = CASAS.find((x) => x.fileira === f && x.cx === cx)

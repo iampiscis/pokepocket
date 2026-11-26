@@ -91,3 +91,5 @@ button.pos-casa:hover, button.pos-casa:focus-visible { outline: none; box-shadow
   .pos-stats { margin-left: 0; }
   .pos-canto { font-size: 8px; }
 }
+
+.pos-casa-bola { position: absolute; inset: 0; border-radius: inherit; background-repeat: no-repeat; pointer-events: none; }
