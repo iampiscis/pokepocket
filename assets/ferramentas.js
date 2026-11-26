@@ -46,41 +46,41 @@
     if (u.origin !== location.origin || u.pathname.startsWith(isolado) || !u.pathname.startsWith(fonte)) return href
     const resto = u.pathname.slice(fonte.length)
     const ehRaiz = resto === '' || resto === 'index.html'
-    const pagina = ehRaiz ? 'calculadora' : resto.match(/^(calculadora|nivel|tier|posicionamento)\/$/)?.[1]
-    if (!pagina) return href
-    return new URL(`${isolado}${pagina === 'calculadora' ? '' : pagina + '/'}${ehRaiz ? '' : u.search + u.hash}`, location.origin).toString()
+    const pagina = ehRaiz ? '' : resto.match(/^(calculadora|nivel|tier|posicionamento)\/$/)?.[1]
+    if (pagina == null) return href
+    return new URL(`${isolado}${pagina ? pagina + '/' : ''}${ehRaiz ? '' : u.search + u.hash}`, location.origin).toString()
   }
-  const lista = document.querySelector('.ferr-lista')
-  const fontes = lista ? [...lista.querySelectorAll('a')] : []
-  const curto = { 'Calculadora Pokémon': 'Calculadora' }
-  const nomeDe = (a) => { const t = a.querySelector('.ferr-txt b')?.firstChild?.textContent?.trim() || a.textContent.trim(); return curto[t] || t }
-  const secoes = document.querySelector('.topo .secoes')
-  if (secoes && fontes.length) {
-    secoes.setAttribute('aria-label', 'Ferramentas')
-    secoes.dataset.ferr = ''
-    secoes.replaceChildren(...fontes.map((f) => {
+  const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+  const ITENS = [
+    { p: '', n: 'Início', ic: svg('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>') },
+    { p: 'calculadora/', n: 'Calculadora', ic: svg('<rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/>') },
+    { p: 'nivel/', n: 'Nível', ic: svg('<path d="M2.5 20.5 9 9.5l3.6 5.6 2.4-3.4 6.5 8.8z"/><path d="M15 11.7V3.5l4.5 1.8L15 7.1"/>') },
+    { p: 'tier/', n: 'Tier PvP', ic: svg('<path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M8.5 20.5h7M9.5 16.5h5v4h-5z"/>') },
+    { p: 'posicionamento/', n: 'Posicionamento', ic: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 12h17"/><circle cx="12" cy="12" r="3"/><path d="M8 7.5h.01M16 7.5h.01M8 16.5h.01M12 16.5h.01M16 16.5h.01"/>') },
+  ]
+  const atual = location.pathname.slice(isolado.length).replace(/index\.html$/, '')
+  const montar = (alvo, comTexto) => {
+    if (!alvo) return
+    alvo.setAttribute('aria-label', 'Ferramentas')
+    alvo.dataset.ferr = ''
+    alvo.replaceChildren(...ITENS.map((it) => {
       const a = document.createElement('a')
-      a.href = comModo(f.href)
-      a.textContent = nomeDe(f)
-      if (f.getAttribute('aria-current') === 'page') { a.className = 'ativo'; a.setAttribute('aria-current', 'page') }
+      a.href = isolado + it.p
+      a.innerHTML = `<span class="ic">${it.ic}</span>`
+      a.append(it.n)
+      if (it.p === atual) { a.className = 'ativo'; a.setAttribute('aria-current', 'page') }
       return a
     }))
   }
-  const painel = document.querySelector('.painel-menu nav')
-  if (painel && fontes.length) {
-    painel.setAttribute('aria-label', 'Ferramentas')
-    painel.dataset.ferr = ''
-    painel.replaceChildren(...fontes.map((f) => {
-      const a = document.createElement('a')
-      a.href = comModo(f.href)
-      const ic = document.createElement('span')
-      ic.className = 'ic'
-      const svg = f.querySelector('.ferr-ic svg')
-      if (svg) ic.append(svg.cloneNode(true))
-      a.append(ic, nomeDe(f))
-      if (f.getAttribute('aria-current') === 'page') a.setAttribute('aria-current', 'page')
-      return a
-    }))
+  montar(document.querySelector('.topo .secoes'))
+  montar(document.querySelector('.painel-menu nav'))
+  const marca = document.querySelector('.topo .marca')
+  if (marca && !marca.querySelector('.marca-ferr')) {
+    const tag = document.createElement('span')
+    tag.className = 'marca-ferr'
+    tag.textContent = 'Ferramentas'
+    marca.append(tag)
+    marca.setAttribute('aria-label', 'PokePocket Ferramentas, início')
   }
   const troca = (e) => {
     const a = e.target.closest?.('a[href]')

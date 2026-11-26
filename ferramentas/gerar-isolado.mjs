@@ -10,7 +10,7 @@ const PAGINAS = ['calculadora', 'nivel', 'tier', 'posicionamento']
 const SITE = 'https://iampiscis.github.io'
 const FONTE = '/pokepocket/'
 const ISOLADO = '/pokepocketferramentas/'
-const caminho = (p) => (p === 'calculadora' ? '' : `${p}/`)
+const caminho = (p) => `${p}/`
 const MODO_VELHO = (p) => `if (new URLSearchParams(location.search).has('ferramentas')) location.replace('${ISOLADO}${caminho(p)}' + location.hash)`
 const MODO_NOVO = `document.documentElement.classList.add('so-ferr'); document.documentElement.dataset.isolado = '${ISOLADO}'`
 const FORA = [/PokePocket-Setup\.exe/, /github\.com\/iampiscis\/pokepocket"/, /class="(coracao|apoio)"/, /href="\.\.\/#/, /class="final-txt"/]
@@ -34,6 +34,7 @@ for (const pagina of PAGINAS) {
   mkdirSync(pasta, { recursive: true })
   writeFileSync(resolve(pasta, 'index.html'), html)
 }
+writeFileSync(resolve(destino, 'index.html'), readFileSync(resolve(origem, 'ferramentas', 'inicio.html'), 'utf8'))
 if (falhou.length) {
   console.error(`modelo mudou, revisar o gerador: ${falhou.join(', ')}`)
   process.exit(1)

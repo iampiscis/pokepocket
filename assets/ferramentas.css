@@ -34,3 +34,24 @@
 
 .so-ferr .baixar, .so-ferr .coracao, .so-ferr .estrela, .so-ferr .painel-pe, .so-ferr [data-ferramentas], .so-ferr .final .final-txt, .so-ferr .final .acoes { display: none !important; }
 .so-ferr .topo .secoes:not([data-ferr]), .so-ferr .painel-menu nav:not([data-ferr]) { visibility: hidden; }
+
+.so-ferr .marca-ferr { align-self: center; margin-left: 2px; padding: 3px 8px 2px; border-radius: 999px; font-family: var(--display); font-size: 11.5px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc); }
+.so-ferr .topo .secoes[data-ferr] { margin: 0 0 0 auto; }
+.so-ferr .topo .secoes[data-ferr] a { display: flex; align-items: center; gap: 7px; padding: 7px 14px 7px 10px; }
+.so-ferr .topo .secoes[data-ferr] .ic { display: grid; place-items: center; width: 18px; height: 18px; color: var(--apagado); transition: color 0.2s; }
+.so-ferr .topo .secoes[data-ferr] .ic svg { width: 18px; height: 18px; }
+.so-ferr .topo .secoes[data-ferr] a:hover .ic, .so-ferr .topo .secoes[data-ferr] a.ativo .ic { color: var(--ouro); }
+.so-ferr .acoes-topo { margin-left: 0; }
+@media (min-width: 900px) {
+  .so-ferr .topo .secoes[data-ferr] { display: flex; }
+  .so-ferr .abre-menu, .so-ferr .painel-menu { display: none; }
+}
+@media (min-width: 900px) and (max-width: 1080px) {
+  .so-ferr .topo .secoes[data-ferr] a { padding: 7px 10px 7px 8px; font-size: 13.5px; gap: 5px; }
+}
+@media (max-width: 899px) {
+  .so-ferr .acoes-topo { margin-left: auto; }
+}
+@media (max-width: 400px) {
+  .so-ferr .marca-ferr { font-size: 10px; padding: 2px 6px 1px; }
+}
