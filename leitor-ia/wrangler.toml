@@ -1,0 +1,14 @@
+name = "pokepocket-leitor"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[vars]
+TETO_MES_USD = "15"
+TETO_DIA_USD = "0.75"
+LIMITE_IP_DIA = "20"
+
+[[kv_namespaces]]
+binding = "LEITOR"
+id = "b80cfd58d4ed4c8bb54eabfef3995021"

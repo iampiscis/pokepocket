@@ -1154,9 +1154,94 @@ export function refinoPelosStats(pk, stats, motor) {
   return final && REFINAVEIS.every((k) => opcoes[k].includes(final[k]) || (base[k] === final[k] && (teste[k] - base[k]) / PASSO < 1)) ? refino : null
 }
 
-export function lerPrint(imagem, opcoes = {}) {
-  if (typeof document === 'undefined') return Promise.reject(new Error('a leitura de print só funciona no navegador'))
+const URL_IA = 'https://pokepocket-leitor.piscis.workers.dev/ler'
+const PIXELS_IA = 1150000
+const PRAZO_IA = 40000
+
+async function imagemParaIa(imagem) {
+  const c = await paraCanvas(imagem)
+  const k = Math.min(1, Math.sqrt(PIXELS_IA / (c.width * c.height)))
+  const t = document.createElement('canvas')
+  t.width = Math.max(1, Math.round(c.width * k))
+  t.height = Math.max(1, Math.round(c.height * k))
+  const g = t.getContext('2d')
+  g.imageSmoothingEnabled = true
+  g.imageSmoothingQuality = 'high'
+  g.drawImage(c, 0, 0, t.width, t.height)
+  return new Promise((ok, falha) => t.toBlob((b) => (b ? ok(b) : falha(new Error('imagem'))), 'image/jpeg', 0.92))
+}
+
+const naFaixa = (v, a, b, inteiro = false) => (typeof v === 'number' && Number.isFinite(v) && v >= a && v <= b && (!inteiro || Number.isInteger(v)) ? v : null)
+
+function porStatValido(o, a, b) {
+  if (!o || typeof o !== 'object') return null
+  const out = {}
+  for (const k of STATS) { const v = naFaixa(o[k], a, b, true); if (v != null) out[k] = v }
+  return Object.keys(out).length === 6 ? out : null
+}
+
+async function lerComIa(imagem, opcoes) {
+  const corpo = await imagemParaIa(imagem)
+  const r = await fetch(URL_IA, { method: 'POST', headers: { 'content-type': 'image/jpeg' }, body: corpo, signal: AbortSignal.timeout(PRAZO_IA) })
+  if (!r.ok) return null
+  const f = (await r.json())?.ficha
+  if (!f?.ehFicha || !f.nome) return null
+  const esp = identificarEspecie([String(f.nome).replace(/^\s*shiny\s+/i, '')], null, opcoes.especiePorNome, opcoes.buscarEspecies)
+  if (!esp) return null
+  const ivSomado = naFaixa(f.ivSomado, 6, 192, true)
+  let ivs = porStatValido(f.ivs, 1, 32)
+  if (ivs && ivSomado != null && STATS.reduce((a, k) => a + ivs[k], 0) !== ivSomado) ivs = null
+  const stats = porStatValido(f.stats, 1, 1e8)
+  return {
+    speciesId: esp.speciesId, nome: esp.nome, certeza: esp.certeza ?? 1, shiny: !!f.shiny,
+    level: naFaixa(f.nivel, 1, 20000, true), potencia: naFaixa(f.potencia, 1, 5, true), quality: naFaixa(f.qualidade, 0.5, 2.5), nota: naFaixa(f.nota, 0, 10),
+    ivSomado, ivs, stats, selo: naFaixa(f.refino, 1, 999, true),
+    tmElemental: TIPOS.includes(f.tmTipo) ? f.tmTipo : null, tmFisico: !!(f.tmTipo && f.tmFisico), tmAoe: !!f.aoe, zMove: !!f.zMove
+  }
+}
+
+const PESOS_FALTA = { especie: 0.2, level: 0.1, potencia: 0.1, quality: 0.1, nota: 0.05 }
+
+function juntarLeituras(ia, local) {
+  const lf = local?.ficha || {}
+  const ficha = { speciesId: ia.speciesId, nome: ia.nome, shiny: ia.shiny || !!lf.shiny, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmFisico: false, tmAoe: false, zMove: false, stats: null, statsOpcoes: null, selo: null }
+  for (const k of ['level', 'potencia', 'quality', 'nota', 'selo']) ficha[k] = ia[k] ?? lf[k] ?? null
+  ficha.ivSomado = ia.ivSomado ?? lf.ivSomado ?? null
+  ficha.tmElemental = ia.tmElemental ?? lf.tmElemental ?? null
+  ficha.tmFisico = ia.tmElemental ? ia.tmFisico : !!lf.tmFisico
+  ficha.tmAoe = ia.tmAoe || !!lf.tmAoe
+  ficha.zMove = ia.zMove || !!lf.zMove
+  const somaLocal = STATS.every((k) => lf.ivs?.[k] != null) ? STATS.reduce((a, k) => a + lf.ivs[k], 0) : null
+  if (ia.ivs) ficha.ivs = ia.ivs
+  else if (somaLocal != null && (ficha.ivSomado == null || somaLocal === ficha.ivSomado)) ficha.ivs = { ...lf.ivs }
+  if (ia.stats) { ficha.stats = ia.stats; ficha.statsOpcoes = Object.fromEntries(STATS.map((k) => [k, [...new Set([ia.stats[k], ...(lf.statsOpcoes?.[k] || [])])]])) }
+  else if (lf.stats) { ficha.stats = lf.stats; ficha.statsOpcoes = lf.statsOpcoes }
+  const faltando = []
+  for (const k of ['level', 'potencia', 'quality', 'nota']) if (ficha[k] == null) faltando.push(k)
+  for (const k of STATS) if (ficha.ivs[k] == null) faltando.push(`ivs.${k}`)
+  let confianca = 1
+  for (const f of faltando) confianca -= PESOS_FALTA[f] ?? 0.06
+  if (ficha.ivSomado == null) confianca -= 0.1
+  if (ia.certeza < 1) confianca -= 0.1
+  const avisos = ['lido com IA']
+  if (local?.ficha && local.ficha.speciesId != null && local.ficha.speciesId !== ia.speciesId) avisos.push('a leitura local achou outra espécie; confira')
+  return { ficha, faltando, avisos, confianca: Math.round(limitar(confianca, 0, 1) * 100) / 100, ia: true }
+}
+
+const iaCompleta = (ia) => ia && ['level', 'potencia', 'quality', 'nota', 'ivSomado'].every((k) => ia[k] != null)
+
+export async function lerPrint(imagem, opcoes = {}) {
+  if (typeof document === 'undefined') throw new Error('a leitura de print só funciona no navegador')
+  const ia = opcoes.semIa ? Promise.resolve(null) : lerComIa(imagem, opcoes).catch(() => null)
   const tarefa = fila.then(() => executar(imagem, opcoes))
   fila = tarefa.catch(() => {}).finally(() => { progressoAtual = null })
-  return tarefa
+  const local = tarefa.then((r) => r, (erro) => ({ erro }))
+  const primeiro = await Promise.race([ia.then((r) => ({ ia: r })), local.then((r) => ({ local: r }))])
+  let rIa = primeiro.ia
+  if ('ia' in primeiro && iaCompleta(rIa)) return juntarLeituras(rIa, null)
+  const rLocal = await local
+  if (!('ia' in primeiro)) rIa = await ia
+  if (rIa) return juntarLeituras(rIa, rLocal.erro ? null : rLocal)
+  if (rLocal.erro) throw rLocal.erro
+  return rLocal
 }
