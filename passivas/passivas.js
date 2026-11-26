@@ -29,9 +29,9 @@ const DESC = {
 }
 const CURTO = {
   rocky_helmet: 'Devolve {pct}% do dano que recebe',
-  rain_dance: '+{pct}% de dano e recarga {recarga}% mais rápida no time',
+  rain_dance: '+{pct}% de dano e recarga {recarga}% mais rápida (BST até {bst})',
   swarm: '+{pct}% de dano, +{porInseto}% por Inseto (até {teto}%)',
-  intimidate: 'Inimigos causam {pct}% menos dano',
+  intimidate: 'Inimigos causam {pct}% menos dano de golpe',
   iron_defense: '+{pct}% de DEF e SP.DEF',
   burn: '{pct}% do HP por segundo, {seg} s',
   poison: '{pct}% do HP por segundo, {seg} s',
@@ -39,7 +39,7 @@ const CURTO = {
   paralyze: 'Recargas +{atraso} s, {recarga}% mais lentas, {falha}% de falha',
   leech_seed: 'Drena {pct}% por segundo e cura quem plantou',
   dig: 'Desvia do próximo golpe',
-  confusion: 'O próximo golpe dele acerta um aliado',
+  confusion: 'O próximo golpe dele acerta o aliado mais perto',
   fear: 'Recua {seg} s sem atacar',
   rock_smash: '−{pct}% de DEF e SP.DEF por {seg} s',
   whirlwind: 'Empurra para o fundo e causa {pct}% do HP',
@@ -56,9 +56,14 @@ const ALVO = {
   rocky_helmet: 'Quem bate nele', rain_dance: 'Ele e os aliados de BST até {bst}', swarm: 'Ele mesmo', intimidate: 'Todos os inimigos',
   iron_defense: 'Ele mesmo', dig: 'Ele mesmo', charm: 'O inimigo mais longe', recover: 'O mais ferido do time (BST até {bst})'
 }
-const ALVO_CICLO = 'No começo, o inimigo mais perto; depois, quem ele está atacando'
-const NO_INIMIGO = new Set(['rocky_helmet', 'intimidate', 'burn', 'poison', 'freeze', 'paralyze', 'leech_seed', 'dig', 'confusion', 'fear', 'rock_smash', 'whirlwind', 'assurance', 'charm'])
+const ALVO_CICLO = 'No começo, o inimigo mais perto em casas; no fim de cada ciclo, quem ele está atacando'
+const DOIS_LADOS = new Set(['rocky_helmet', 'dig'])
+const NO_INIMIGO = new Set(['rocky_helmet', 'intimidate', 'burn', 'poison', 'freeze', 'paralyze', 'leech_seed', 'confusion', 'fear', 'rock_smash', 'whirlwind', 'assurance', 'charm'])
 
+const SOM_PASSIVA = { rocky_helmet: 'pedra', rain_dance: 'chuva', swarm: 'inseto', intimidate: 'rugido', iron_defense: 'metal', burn: 'fogo', poison: 'veneno', freeze: 'gelo', paralyze: 'raio', leech_seed: 'planta', dig: 'terra', confusion: 'psi', fear: 'fantasma', rock_smash: 'soco', whirlwind: 'vento', assurance: 'sombra', charm: 'fada', recover: 'cura' }
+let somMod = null
+const somPronto = import('./som.js').then((m) => { somMod = m; return m }).catch(() => null)
+function som(nome, opt) { if (!cena || cena.vel) somMod?.tocar(nome, opt) }
 const preencher = (txt, n) => txt.replace(/\{(\w+)\}/g, (_, k) => n[k] ?? '')
 const $ = (id) => document.getElementById(id)
 const reduzido = matchMedia('(prefers-reduced-motion: reduce)')
@@ -97,6 +102,7 @@ const LISTA = P.ORDEM_PASSIVAS.map((id) => {
     id, p, n, especies,
     nome: p.nome, tipo: p.tipo, icone: p.icone,
     inimigo: NO_INIMIGO.has(id),
+    doisLados: NO_INIMIGO.has(id) || DOIS_LADOS.has(id),
     gatCurto: preencher(GATILHO[p.gatilho]?.curto ?? '', n),
     gatLongo: preencher(GATILHO[p.gatilho]?.longo ?? '', n),
     alvo: ALVO[id] ? preencher(ALVO[id], n) : ALVO_CICLO,
@@ -133,17 +139,10 @@ function gravarHash() {
 
 function montarLista() {
   const corpo = $('pas-linhas')
-  corpo.replaceChildren(...LISTA.filter((x) => estado.filtro === 'todas' || (estado.filtro === 'inimigo') === x.inimigo).map((x) => {
-    const b = el('button', { type: 'button', class: `pas-linha${x.id === estado.sel ? ' sel' : ''}`, style: `--t:${COR_TIPO[x.tipo]}`, 'data-id': x.id, 'aria-pressed': String(x.id === estado.sel) }, [
-      el('span', { class: 'pas-ic', 'aria-hidden': 'true', text: x.icone }),
-      el('span', { class: 'pas-linha-txt' }, [
-        el('span', { class: 'pas-linha-topo' }, [el('b', { text: x.nome }), el('span', { class: 'pas-tipo', text: NOME_TIPO[x.tipo] })]),
-        el('span', { class: 'pas-linha-ef', text: x.curto })
-      ]),
-      el('span', { class: `pas-gat g-${x.p.gatilho}`, text: x.gatCurto })
-    ])
-    return b
-  }))
+  corpo.replaceChildren(...LISTA.filter((x) => estado.filtro === 'todas' || (estado.filtro === 'inimigo') === x.inimigo).map((x) => el('button', { type: 'button', class: `pas-linha${x.id === estado.sel ? ' sel' : ''}`, style: `--t:${COR_TIPO[x.tipo]}`, 'data-id': x.id, 'aria-pressed': String(x.id === estado.sel), title: `${x.nome}: ${x.curto}` }, [
+    el('span', { class: 'pas-ic', 'aria-hidden': 'true', text: x.icone }),
+    el('span', { class: 'pas-linha-txt' }, [el('b', { text: x.nome }), el('span', { class: `pas-gat g-${x.p.gatilho}`, text: x.gatCurto })])
+  ])))
   document.querySelectorAll('[data-filtro]').forEach((b) => {
     const on = b.dataset.filtro === estado.filtro
     b.classList.toggle('ativo', on)
@@ -151,14 +150,28 @@ function montarLista() {
   })
 }
 
-function escolher(id, rolar = false) {
+let trocaToken = 0
+async function escolher(id, rolar = false, caster = null) {
   if (!PORID.has(id)) return
+  const mudou = id !== estado.sel
   estado.sel = id
-  estado.caster = null
+  estado.caster = caster
   gravarHash()
   montarLista()
+  som('clique', { forca: 0.6 })
+  if (rolar && matchMedia('(max-width: 900px)').matches) $('pas-palco').scrollIntoView({ behavior: reduzido.matches ? 'auto' : 'smooth', block: 'start' })
+  const alvos = ['pas-cab', 'pas-passo', 'pas-fatos', 'pas-quem'].map($).concat(tabuleiro ? [tabuleiro.camada] : [])
+  const meu = ++trocaToken
+  if (mudou && !reduzido.matches) {
+    cena?.parar()
+    await Promise.all(alvos.map((e) => e.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(4px)' }], { duration: 170, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {})))
+    if (meu !== trocaToken) return
+  }
   montarDetalhe()
-  if (rolar && matchMedia('(max-width: 980px)').matches) $('pas-palco').scrollIntoView({ behavior: reduzido.matches ? 'auto' : 'smooth', block: 'start' })
+  for (const e of alvos) {
+    e.getAnimations().forEach((an) => an.cancel())
+    if (mudou && !reduzido.matches) e.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.7,.3,1)' })
+  }
 }
 
 function casterPadrao(x) {
@@ -178,8 +191,10 @@ function montarDetalhe() {
       el('h2', { text: x.nome }),
       el('span', { class: 'pas-cab-chips' }, [
         el('span', { class: 'pas-tipo', text: NOME_TIPO[x.tipo] }),
-        el('span', { class: `pas-lado ${x.inimigo ? 'ini' : 'time'}`, text: x.inimigo ? 'Afeta o inimigo' : 'Ajuda o time' })
-      ])
+        el('span', { class: `pas-lado ${x.inimigo ? 'ini' : 'time'}`, text: x.inimigo ? 'Afeta o inimigo' : 'Ajuda o time' }),
+        el('span', { class: `pas-gat g-${x.p.gatilho}`, text: x.gatCurto })
+      ]),
+      el('span', { class: 'pas-resumo', text: x.curto })
     ])
   )
   $('pas-fatos').replaceChildren(
@@ -196,13 +211,16 @@ function fato(rot, txt) {
 
 function montarQuemTem(x) {
   const caixa = $('pas-quem')
-  const titulo = el('h3', {}, [`Quem tem`, el('span', { class: 'pas-n', text: String(x.especies.length) })])
+  const titulo = el('h3', {}, [`Quem tem`, el('span', { class: 'pas-n', text: String(new Set(x.especies.map((s) => especie(s)?.nome).filter(Boolean)).size || x.especies.length) })])
   if (!motorPronto) {
     caixa.replaceChildren(titulo, el('p', { class: 'pas-carregando', text: 'Carregando pokémon…' }))
     return
   }
   const itens = x.especies.map((s) => ({ s, e: especie(s) })).filter((i) => i.e)
-  itens.sort((a, b) => a.e.nome.localeCompare(b.e.nome, 'pt-BR'))
+  const atualSp = casterPadrao(x)
+  const porNome = new Map()
+  for (const i of itens.sort((a, b) => a.s - b.s)) if (!porNome.has(i.e.nome) || i.s === atualSp) porNome.set(i.e.nome, i)
+  itens.splice(0, itens.length, ...[...porNome.values()].sort((a, b) => a.e.nome.localeCompare(b.e.nome, 'pt-BR')))
   const atual = casterPadrao(x)
   caixa.replaceChildren(titulo, el('div', { class: 'pas-quem-lista' }, itens.map(({ s, e }) => {
     const b = el('button', { type: 'button', class: `pas-pk${s === atual ? ' sel' : ''}`, 'data-sp': String(s), title: `Ver ${e.nome} no tabuleiro` }, [
@@ -245,14 +263,41 @@ function montarTabuleiro(doisLados) {
   return { tab, casas, camada }
 }
 
+let tabuleiro = null
+const LEVE = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4 || matchMedia('(max-width: 560px)').matches
+let palcoVisivel = true
+let pronto = false
+const precisaPausar = () => document.hidden || !palcoVisivel
+async function aguardarVisivel(c) { while (c.vivo && precisaPausar()) await new Promise((ok) => setTimeout(ok, 300)) }
+const RITMO = 1
+const BOLA_SVG = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fff3df" fill-opacity=".34"/><path d="M2 50a48 48 0 0 1 96 0z" fill="#e0505c" fill-opacity=".55"/><rect x="2" y="46.5" width="96" height="7" fill="#10070c"/><circle cx="50" cy="50" r="14" fill="#10070c"/><circle cx="50" cy="50" r="8.5" fill="#f3e4cf" fill-opacity=".9"/></svg>')}")`
+function pintarBola(tab) {
+  const meio = tab.querySelector('.pas-meio')
+  if (!meio) return
+  const cx = meio.offsetLeft + meio.offsetWidth / 2, cy = meio.offsetTop + meio.offsetHeight / 2
+  const D = meio.offsetWidth * 0.52
+  for (const c of tab.querySelectorAll('.pas-casa')) {
+    let b = c.firstElementChild
+    if (!b) { b = document.createElement('i'); b.className = 'pas-casa-bola'; c.append(b) }
+    const x = cx - D / 2 - c.offsetLeft, y = cy - D / 2 - c.offsetTop
+    const longe = x > c.offsetWidth || y > c.offsetHeight || x + D < 0 || y + D < 0
+    b.style.backgroundImage = longe ? 'none' : BOLA_SVG
+    b.style.backgroundSize = `${D}px ${D}px`
+    b.style.backgroundPosition = `${x}px ${y}px`
+  }
+}
 class Cena {
   constructor(x, doisLados) {
     this.x = x
     this.vivo = true
     this.pecas = []
     this.vel = reduzido.matches ? 0 : 1
-    const { tab, casas, camada } = montarTabuleiro(doisLados)
+    tabuleiro ??= montarTabuleiro(true)
+    const { tab, casas, camada } = tabuleiro
     this.tab = tab; this.casas = casas; this.camada = camada
+    camada.getAnimations().forEach((an) => an.cancel())
+    camada.replaceChildren()
+    if (this.vel) camada.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-out' })
     this.ro = new ResizeObserver(() => this.reposicionar())
     this.ro.observe(tab)
   }
@@ -266,7 +311,7 @@ class Cena {
     const n = el('div', { class: `pas-peca ${lado} ${papel}` }, [
       el('span', { class: 'pas-peca-img' }, [imgSprite(lt, sp)]),
       el('span', { class: 'pas-st' }),
-      el('span', { class: 'pas-hp' }, [el('i')]),
+      el('span', { class: 'pas-hp' }, [el('b'), el('i')]),
       rotulo ? el('span', { class: 'pas-rot', text: rotulo }) : null
     ])
     this.camada.append(n)
@@ -280,12 +325,13 @@ class Cena {
     const g = this.geo(p.lado, p.col, p.f)
     p.n.style.left = `${g.x}px`; p.n.style.top = `${g.y}px`; p.n.style.width = `${g.w}px`; p.n.style.height = `${g.w}px`
   }
-  reposicionar() { for (const p of this.pecas) this.por(p) }
+  reposicionar() { pintarBola(this.tab); for (const p of this.pecas) this.por(p) }
   centro(p) { const g = this.geo(p.lado, p.col, p.f); return { x: g.x + g.w / 2, y: g.y + g.w / 2, w: g.w } }
-  ms(v) { return v * this.vel }
+  ms(v) { return v * this.vel * RITMO }
   async espera(ms) {
     if (!this.vivo) throw new Error('fim')
-    await new Promise((ok) => setTimeout(ok, this.vel ? ms : Math.min(ms, 400)))
+    await new Promise((ok) => setTimeout(ok, this.vel ? ms * RITMO : Math.min(ms, 400)))
+    if (precisaPausar()) await aguardarVisivel(this)
     if (!this.vivo) throw new Error('fim')
   }
   async mover(p, col, f, ms = 500, arco = 0) {
@@ -295,44 +341,108 @@ class Cena {
     this.por(p)
     if (!this.ms(ms)) return this.espera(0)
     const dx = a.x - b.x, dy = a.y - b.y
+    som(arco ? 'puxao' : 'passo', { forca: arco ? 0.9 : 0.5 })
     const meio = arco ? [{ transform: `translate(${dx / 2}px, ${dy / 2 - arco * b.w}px) scale(1.15)`, offset: 0.5 }] : []
     await p.n.animate([{ transform: `translate(${dx}px, ${dy}px)` }, ...meio, { transform: 'translate(0, 0)' }], { duration: this.ms(ms), easing: 'cubic-bezier(.45,.05,.35,1)' }).finished.catch(() => {})
     if (!this.vivo) throw new Error('fim')
   }
   async investida(p, alvo, ms = 380) {
+    setTimeout(() => som('soco', { forca: 0.7 }), this.ms(ms) * 0.4)
     const a = this.centro(p), b = this.centro(alvo)
     const dx = (b.x - a.x) * 0.45, dy = (b.y - a.y) * 0.45
     if (!this.ms(ms)) return this.espera(0)
     await p.n.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px, ${dy}px)`, offset: 0.45 }, { transform: 'translate(0,0)' }], { duration: this.ms(ms), easing: 'ease-in-out' }).finished.catch(() => {})
     if (!this.vivo) throw new Error('fim')
   }
-  async golpe(de, para, emoji, ms = 520, classe = '') {
+  cor() { return COR_TIPO[this.x.tipo] }
+  async golpe(de, para, emoji, ms = 520, opt = {}) {
+    if (typeof opt === 'string') opt = { classe: opt }
+    const cor = opt.cor ?? (opt.classe === 'cura' ? '#4ade80' : this.cor())
     const a = this.centro(de), b = this.centro(para)
-    const o = el('span', { class: `pas-proj ${classe}`, text: emoji, style: `left:${a.x}px;top:${a.y}px;font-size:${Math.max(14, a.w * 0.5)}px` })
-    this.camada.append(o)
-    if (this.ms(ms)) await o.animate([{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 0.2 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.2 }, { transform: `translate(calc(-50% + ${b.x - a.x}px), calc(-50% + ${b.y - a.y}px)) scale(1.1)`, opacity: 1 }], { duration: this.ms(ms), easing: 'cubic-bezier(.3,.1,.4,1)' }).finished.catch(() => {})
-    o.remove()
+    const k = opt.passa ? 1.45 : 1
+    const dx = (b.x - a.x) * k, dy = (b.y - a.y) * k
+    const tam = Math.max(18, a.w * 0.56)
+    const base = `left:${a.x}px;top:${a.y}px;--c:${cor}`
+    const rastro = [1, 2, 3, 4].map((i) => el('span', { class: 'pas-rastro', style: `${base};width:${tam * (1 - i * 0.16)}px;height:${tam * (1 - i * 0.16)}px` }))
+    const panDe = (pp) => Math.max(-1, Math.min(1, (this.centro(pp).x / Math.max(1, this.tab.clientWidth)) * 2 - 1)) * 0.6
+    const doDono = de === this.dono
+    som(opt.classe === 'cura' ? 'cura' : doDono ? 'disparo' : 'disparo', { forca: doDono ? 0.8 : 0.45, pan: panDe(de) })
+    if (doDono && !opt.semSomPassiva) som(SOM_PASSIVA[this.x.id], { forca: 0.7, pan: panDe(de) })
+    const orbe = el('span', { class: `pas-proj ${opt.classe || ''}`, style: `${base};width:${tam}px;height:${tam}px;font-size:${tam * 0.6}px` }, [el('span', { text: emoji })])
+    this.camada.append(...rastro, orbe)
+    const fimOp = opt.passa ? 0 : 1
+    const kf = (op) => [{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: op, offset: 0.14 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${opt.passa ? 0.7 : 1})`, opacity: op * fimOp }]
+    const opts = (d) => ({ duration: this.ms(ms), delay: this.ms(d), easing: 'cubic-bezier(.35,.05,.35,1)', fill: 'both' })
+    if (this.ms(ms)) await Promise.all([orbe.animate(kf(1), opts(0)).finished, ...rastro.map((r, i) => r.animate(kf(0.55 - i * 0.11), opts((i + 1) * 28)).finished)]).catch(() => {})
+    orbe.remove(); rastro.forEach((r) => r.remove())
     if (!this.vivo) throw new Error('fim')
-    this.impacto(para)
+    if (!opt.passa && !opt.semImpacto) { this.impacto(para, cor); som(doDono ? 'impacto' : 'impacto', { forca: doDono ? 0.9 : 0.5, pan: panDe(para) }) }
   }
-  impacto(p) {
+  impacto(p, cor = this.cor(), forte = 1) {
     if (!this.vel) return
-    p.n.animate([{ filter: 'brightness(2.2)' }, { filter: 'brightness(1)' }], { duration: 260 })
-    p.n.animate([{ transform: 'translateX(-3px)' }, { transform: 'translateX(3px)' }, { transform: 'translateX(0)' }], { duration: 200 })
+    const c = this.centro(p)
+    p.n.animate([{ filter: 'brightness(2.4) saturate(1.4)' }, { filter: 'none' }], { duration: 320 })
+    p.n.querySelector('.pas-peca-img').animate([{ transform: 'translate(0,0)' }, { transform: `translate(${-3 * forte}px,1px)` }, { transform: `translate(${3 * forte}px,-1px)` }, { transform: 'translate(0,0)' }], { duration: 220 })
+    const anel = el('span', { class: 'pas-anel', style: `left:${c.x}px;top:${c.y}px;--c:${cor};width:${c.w}px;height:${c.w}px` })
+    this.camada.append(anel)
+    const tira = () => anel.remove()
+    anel.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.6)', opacity: 0 }], { duration: 420, easing: 'ease-out' }).finished.then(tira, tira)
+    this.particulas(p, cor, 9, 'explode')
+  }
+  particulas(p, cor, n = 8, modo = 'explode', simbolo = null) {
+    if (!this.vel || precisaPausar()) return
+    if (LEVE) n = Math.ceil(n / 2)
+    const c = this.centro(p)
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + Math.random() * 0.6
+      const r = c.w * (0.55 + Math.random() * 0.5)
+      const t = simbolo ? Math.max(9, c.w * 0.26) : Math.max(4, c.w * (0.07 + Math.random() * 0.06))
+      const o = el('span', { class: `pas-part${simbolo ? ' sim' : ''}`, text: simbolo, style: `left:${c.x}px;top:${c.y}px;--c:${cor};${simbolo ? `font-size:${t}px` : `width:${t}px;height:${t}px`}` })
+      this.camada.append(o)
+      let kf
+      if (modo === 'sobe') {
+        const x0 = (Math.random() - 0.5) * c.w * 0.8, y0 = c.w * (0.1 + Math.random() * 0.25)
+        kf = [{ transform: `translate(calc(-50% + ${x0}px), calc(-50% + ${y0}px)) scale(.4)`, opacity: 0 }, { opacity: 1, offset: 0.25 }, { transform: `translate(calc(-50% + ${x0 + (Math.random() - 0.5) * c.w * 0.4}px), calc(-50% - ${c.w * (0.7 + Math.random() * 0.5)}px)) scale(1)`, opacity: 0 }]
+      } else if (modo === 'suga') {
+        kf = [{ transform: `translate(calc(-50% + ${Math.cos(ang) * r}px), calc(-50% + ${Math.sin(ang) * r}px)) scale(1)`, opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 }]
+      } else {
+        kf = [{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(ang) * r}px), calc(-50% + ${Math.sin(ang) * r}px)) scale(.2)`, opacity: 0 }]
+      }
+      const tira = () => o.remove()
+      o.animate(kf, { duration: modo === 'sobe' ? 900 + Math.random() * 500 : 520 + Math.random() * 200, delay: modo === 'sobe' ? Math.random() * 300 : 0, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' }).finished.then(tira, tira)
+    }
+  }
+  aura(p, cor, on = true) {
+    p.n.style.setProperty('--a', cor)
+    p.n.classList.toggle('aura', on)
+  }
+  fio(de, para, cor, { arco = 0, classe = '' } = {}) {
+    const a = this.centro(de), b = this.centro(para)
+    const W = this.tab.clientWidth, H = this.tab.clientHeight
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - arco * a.w
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('class', `pas-fio ${classe}`)
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+    svg.style.cssText = `--c:${cor}`
+    svg.innerHTML = `<path d="M${a.x} ${a.y} Q${mx} ${my} ${b.x} ${b.y}"/>`
+    this.camada.prepend(svg)
+    return svg
   }
   texto(p, txt, tipo = 'dano') {
     const c = this.centro(p)
-    const o = el('span', { class: `pas-txt ${tipo}`, text: txt, style: `left:${c.x}px;top:${c.y - c.w * 0.35}px` })
+    const o = el('span', { class: `pas-txt ${tipo}`, text: txt, style: `left:${c.x}px;top:${c.y - c.w * 0.42}px;--c:${this.cor()}` })
     this.camada.append(o)
     const fim = () => o.remove()
-    if (!this.vel) { setTimeout(fim, 900); return }
-    o.animate([{ transform: 'translate(-50%, 0) scale(.7)', opacity: 0 }, { transform: 'translate(-50%, -60%) scale(1.05)', opacity: 1, offset: 0.2 }, { transform: 'translate(-50%, -140%) scale(1)', opacity: 0 }], { duration: 1300, easing: 'ease-out' }).finished.then(fim, fim)
+    if (!this.vel) { setTimeout(fim, 1100); return }
+    o.animate([{ transform: 'translate(-50%, 10%) scale(.5)', opacity: 0 }, { transform: 'translate(-50%, -55%) scale(1.12)', opacity: 1, offset: 0.16 }, { transform: 'translate(-50%, -70%) scale(1)', opacity: 1, offset: 0.62 }, { transform: 'translate(-50%, -125%) scale(.96)', opacity: 0 }], { duration: 2300, easing: 'ease-out' }).finished.then(fim, fim)
   }
   vida(p, v, ms = 350) {
     p.hp = Math.max(0, Math.min(100, v))
-    const i = p.n.querySelector('.pas-hp i')
+    const i = p.n.querySelector('.pas-hp i'), g = p.n.querySelector('.pas-hp b')
     i.style.transition = `width ${this.ms(ms)}ms ease`
     i.style.width = `${p.hp}%`
+    g.style.transition = `width ${this.ms(ms + 500)}ms ease ${this.ms(380)}ms`
+    g.style.width = `${p.hp}%`
     i.classList.toggle('baixo', p.hp <= 50)
   }
   status(p, txt) {
@@ -349,18 +459,41 @@ class Cena {
     const x1 = Math.max(...cs.map((c) => c.offsetLeft + c.offsetWidth)), y1 = Math.max(...cs.map((c) => c.offsetTop + c.offsetHeight))
     if (!o) { o = el('span', { class: `pas-fx ${classe}` }); this.camada.prepend(o) }
     Object.assign(o.style, { left: `${x0 - 4}px`, top: `${y0 - 4}px`, width: `${x1 - x0 + 8}px`, height: `${y1 - y0 + 8}px` })
+    if (classe === 'chuva' && !o.childElementCount) {
+      const alt = y1 - y0 + 60, larg = x1 - x0 + 8
+      o.style.setProperty('--alt', `${alt}px`)
+      for (let i = 0; i < (LEVE ? 28 : 64); i++) {
+        const d = 0.55 + Math.random() * 0.35
+        o.append(el('i', { class: 'pas-gota', style: `left:${Math.random() * (larg + 30)}px;--h:${12 + Math.random() * 16}px;--o:${0.5 + Math.random() * 0.5};--d:${d}s;--a:${-Math.random() * d}s` }))
+      }
+      for (let i = 0; i < 9; i++) o.append(el('i', { class: 'pas-respingo', style: `left:${8 + Math.random() * (larg - 16)}px;top:${10 + Math.random() * (alt - 70)}px;--a:${Math.random() * 1.4}s` }))
+    }
   }
   onda(p, cor) {
+    if (p === this.dono) som(SOM_PASSIVA[this.x.id], { forca: 0.8 })
     const c = this.centro(p)
     const o = el('span', { class: 'pas-onda', style: `left:${c.x}px;top:${c.y}px;--c:${cor}` })
     this.camada.append(o)
     const fim = () => o.remove()
     if (!this.vel) { fim(); return }
-    o.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 0.9 }, { transform: 'translate(-50%,-50%) scale(9)', opacity: 0 }], { duration: 1100, easing: 'ease-out' }).finished.then(fim, fim)
+    o.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 0.95 }, { transform: 'translate(-50%,-50%) scale(10)', opacity: 0 }], { duration: 1200, easing: 'cubic-bezier(.2,.7,.3,1)' }).finished.then(fim, fim)
+    const o2 = el('span', { class: 'pas-onda fina', style: `left:${c.x}px;top:${c.y}px;--c:${cor}` })
+    this.camada.append(o2)
+    const fim2 = () => o2.remove()
+    o2.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 0.8 }, { transform: 'translate(-50%,-50%) scale(7)', opacity: 0 }], { duration: 1000, delay: 160, easing: 'ease-out', fill: 'both' }).finished.then(fim2, fim2)
   }
-  legenda(txt) {
+  async legenda(txt) {
+    if (this.vel && this.leituraAte) { const falta = this.leituraAte - performance.now(); if (falta > 0) await this.espera(falta) }
+    if (!this.vivo) throw new Error('fim')
+    this.leituraAte = performance.now() + Math.max(1500, txt.length * 55)
     const l = $('pas-passo')
-    l.textContent = txt
+    this.nPasso = (this.nPasso || 0) + 1
+    const corpo = el('span', { class: 'pas-passo-txt' })
+    const partes = txt.split(/([−+]?\d+(?:,\d+)?\s?(?:%\/s|%|s\b)|\b\d{2,}\b)/)
+    partes.forEach((t, i) => { if (t) corpo.append(i % 2 ? el('b', { class: 'pas-num', text: t }) : t) })
+    const barra = el('i', { class: 'pas-passo-barra' })
+    l.replaceChildren(el('span', { class: 'pas-passo-ic', 'aria-hidden': 'true', text: this.x.icone }), corpo, barra)
+    if (this.vel) barra.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: Math.max(1500, txt.length * 55), easing: 'linear', fill: 'forwards' })
     if (this.vel) l.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 260 })
   }
 }
@@ -371,228 +504,366 @@ function elenco(c, x, { aliadosInseto = false, aliadoForte = false } = {}) {
   const sp = casterPadrao(x)
   const e = motorPronto ? especie(sp) : null
   const C = c.peca('nos', 3, 0, { sp, lt: e?.looktype, papel: 'dono' })
+  c.dono = C
   const outrosInseto = aliadosInseto ? x.especies.filter((s) => s !== sp && especie(s)).slice(0, 2) : []
   const a1 = outrosInseto[0] ?? DITTO
   const a2 = outrosInseto[1] ?? (aliadoForte ? DRAGONITE : DITTO)
   const A1 = c.peca('nos', 5, 1, { sp: a1, lt: especie(a1)?.looktype, papel: 'aliado' })
   const A2 = c.peca('nos', 1, 2, { sp: a2, lt: especie(a2)?.looktype, papel: 'aliado', rotulo: aliadoForte ? 'BST > 500' : null })
-  return { C, A1, A2 }
+  return { C, A1, A2, nInseto: outrosInseto.length }
 }
-function inimigos(c) {
-  return {
-    E1: c.peca('ini', 3, 0), E2: c.peca('ini', 6, 1), E3: c.peca('ini', 1, 1), E4: c.peca('ini', 4, 2), E5: c.peca('ini', 3, 4)
+function inimigos(c, { apagados = false } = {}) {
+  const E = {
+    E1: c.peca('ini', 3, 0), E2: c.peca('ini', 6, 1), E3: c.peca('ini', 0, 1), E4: c.peca('ini', 4, 2), E5: c.peca('ini', 3, 4)
   }
+  if (apagados) for (const p of Object.values(E)) c.marca(p, 'quieto')
+  return E
 }
+
+const num = (v) => Number(String(v).replace(',', '.'))
+const COR = { fogo: '#ff8a3d', veneno: '#c46be0', gelo: '#7fe3ff', raio: '#ffd84d', planta: '#6fd44a', terra: '#c9a24c', psi: '#ff6fae', fantasma: '#a98bff', luta: '#ff5a4f', vento: '#cfd6ff', sombra: '#8a6bb8', fada: '#ff8fc8', cura: '#4ade80', pedra: '#d1b46a', agua: '#6fa8ff', inseto: '#b8d42a', dragao: '#8b5cff', aco: '#c9d0ff' }
 
 const CENAS = {
   async rocky_helmet(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
-    c.status(C, x.icone); c.legenda('A passiva fica ativa a luta toda.')
-    await c.espera(900)
+    c.status(C, x.icone); c.aura(C, COR.pedra)
+    await c.legenda('Ativa a luta toda.')
+    await c.espera(1000)
     for (let i = 0; i < 2; i++) {
-      c.legenda('O inimigo bate nele…')
-      await c.investida(E1, C); c.impacto(C); c.texto(C, '−10%'); c.vida(C, C.hp - 10)
-      await c.espera(250)
-      c.legenda(`…e leva de volta ${pct(x.n.pct)} do dano do golpe.`)
-      await c.golpe(C, E1, '⛰️', 380); c.texto(E1, `−${pct(x.n.pct)} do dano`, 'refl'); c.vida(E1, E1.hp - 2)
-      await c.espera(900)
+      await c.legenda('Bateu nele…')
+      await c.investida(E1, C); c.impacto(C, '#ffb3ba'); c.texto(C, '−10%'); c.vida(C, C.hp - 10)
+      await c.espera(200)
+      await c.legenda(`…leva ${pct(x.n.pct)} do dano de volta.`)
+      await c.golpe(C, E1, '⛰️', 420, { cor: COR.pedra }); c.texto(E1, `−${pct(x.n.pct)} do dano`, 'refl'); c.vida(E1, E1.hp - 2)
+      await c.espera(1000)
     }
+    await c.legenda('Vale até para a Investida.')
+    await c.espera(1200)
   },
   async rain_dance(c, x) {
-    const { C, A1, A2 } = elenco(c, x, { aliadoForte: true })
-    c.legenda('No começo da luta, começa a chover no seu lado.')
-    await c.espera(500); c.efeito('chuva', 'nos'); await c.espera(700)
-    for (const p of [C, A1]) { c.status(p, '🌧️'); c.texto(p, `+${pct(x.n.pct)} dano`, 'buff') }
-    c.legenda(`Ele e os aliados de BST até ${x.n.bst}: +${pct(x.n.pct)} de dano e recarga ${pct(x.n.recarga)} mais rápida.`)
-    await c.espera(1600)
+    const { C, A1, A2 } = elenco(c, x, { aliadoForte: true }); inimigos(c, { apagados: true })
+    await c.legenda('Começa a luta: bônus no time.')
+    await c.espera(500); c.onda(C, COR.agua); c.efeito('chuva', 'nos'); await c.espera(800)
+    for (const p of [C, A1]) { c.aura(p, COR.agua); c.status(p, '🌧️'); c.texto(p, `+${pct(x.n.pct)} dano`, 'buff'); c.particulas(p, COR.agua, 6, 'sobe') }
+    await c.legenda(`+${pct(x.n.pct)} de dano e recarga ${pct(x.n.recarga)} mais rápida.`)
+    await c.espera(2200)
     c.texto(A2, 'não recebe', 'nada'); c.marca(A2, 'apagado')
-    c.legenda(`Aliado de BST acima de ${x.n.bst} não recebe. Duas Rain Dance não somam.`)
-    await c.espera(2000)
+    await c.legenda(`BST acima de ${x.n.bst} fica de fora.`)
+    await c.espera(2400)
   },
   async swarm(c, x) {
-    const { C, A1, A2 } = elenco(c, x, { aliadosInseto: true })
-    c.legenda('No começo da luta, ele conta os outros Insetos do time.')
-    await c.espera(900)
-    c.status(C, '🐝'); c.texto(C, `+${pct(x.n.pct)}`, 'buff'); await c.espera(700)
-    for (const p of [A1, A2]) { c.onda(p, '#94a61a'); c.texto(p, `+${pct(x.n.porInseto)}`, 'buff'); await c.espera(600) }
-    const total = Math.min(Number(String(x.n.teto).replace(',', '.')), Number(String(x.n.pct).replace(',', '.')) + 2 * Number(String(x.n.porInseto).replace(',', '.')))
-    c.texto(C, `= +${pct(total)} de dano`, 'buff')
-    c.legenda(`+${pct(x.n.pct)} e mais ${pct(x.n.porInseto)} por Inseto, até +${pct(x.n.teto)}, a luta toda.`)
-    await c.espera(2200)
+    const { C, A1, A2, nInseto } = elenco(c, x, { aliadosInseto: true }); inimigos(c, { apagados: true })
+    c.aura(C, COR.inseto)
+    await c.legenda(`Começa com +${pct(x.n.pct)} de dano.`)
+    await c.espera(500); c.status(C, '🐝'); c.texto(C, `+${pct(x.n.pct)}`, 'buff'); c.particulas(C, COR.inseto, 8, 'explode'); som('inseto')
+    await c.espera(1100)
+    if (nInseto) {
+      await c.legenda(`+${pct(x.n.porInseto)} por outro Inseto no time.`)
+      for (const p of [A1, A2].slice(0, nInseto)) {
+        const f = c.fio(p, C, COR.inseto)
+        c.onda(p, COR.inseto); await c.golpe(p, C, '🐝', 480, { cor: COR.inseto, semImpacto: true })
+        c.texto(C, `+${pct(x.n.porInseto)} (Inseto)`, 'buff'); som('inseto', { forca: 0.6 })
+        await c.espera(500); f.remove()
+      }
+    }
+    const total = Math.min(num(x.n.teto), num(x.n.pct) + nInseto * num(x.n.porInseto))
+    c.texto(C, `+${pct(total)} de dano`, 'buff'); c.particulas(C, COR.inseto, 10, 'sobe')
+    await c.legenda(`Total: +${pct(total)} (máximo +${pct(x.n.teto)}).`)
+    await c.espera(2600)
   },
   async intimidate(c, x) {
     const { C } = elenco(c, x); const E = inimigos(c)
-    c.legenda('No começo da luta, ele intimida o lado inimigo.')
-    await c.espera(700); c.onda(C, '#6a35ea'); await c.espera(500)
-    for (const p of Object.values(E)) { c.status(p, '🐉'); c.texto(p, `−${pct(x.n.pct)} dano`, 'deb') }
-    c.legenda(`Todos os inimigos causam ${pct(x.n.pct)} menos dano de golpe. Só vale se ele for o único Dragão do time.`)
+    await c.legenda('Começa a luta intimidando.')
+    await c.espera(700); c.onda(C, COR.dragao); await c.espera(450)
+    for (const p of Object.values(E)) { c.aura(p, COR.dragao); c.status(p, '🐉'); c.texto(p, `−${pct(x.n.pct)} dano`, 'deb') }
+    await c.legenda(`Inimigos: −${pct(x.n.pct)} de dano.`)
+    await c.espera(1600)
+    await c.golpe(E.E1, C, '✦', 480, { cor: '#ffb3ba' }); c.texto(C, `dano de golpe −${pct(x.n.pct)}`, 'nada')
     await c.espera(1200)
-    await c.investida(E.E1, C); c.impacto(C); c.texto(C, 'dano menor', 'nada')
-    await c.espera(1800)
+    await c.legenda('Só se for o único Dragão do time.')
+    await c.espera(2200)
   },
   async iron_defense(c, x) {
-    const { C } = elenco(c, x)
-    c.legenda('No começo da luta, ele levanta a guarda.')
-    await c.espera(700); c.onda(C, '#8c8cae'); c.status(C, '🔩'); c.marca(C, 'escudo')
+    const { C, A1 } = elenco(c, x); const { E1, E2 } = inimigos(c)
+    await c.legenda('Começa a luta na defesa.')
+    await c.espera(700); c.onda(C, COR.aco); c.status(C, '🔩'); c.marca(C, 'escudo'); c.particulas(C, COR.aco, 10, 'explode'); som('metal')
     c.texto(C, `+${pct(x.n.pct)} DEF e SP.DEF`, 'buff')
-    c.legenda(`+${pct(x.n.pct)} de DEF e SP.DEF, a luta toda.`)
-    await c.espera(2600)
+    await c.legenda(`+${pct(x.n.pct)} de DEF e SP.DEF.`)
+    await c.espera(1500)
+    await c.golpe(E1, C, '✦', 460, { cor: '#ffb3ba' }); c.texto(C, 'menos dano', 'nada'); c.vida(C, C.hp - 6); som('metal', { forca: 0.5 })
+    await c.espera(400)
+    await c.golpe(E2, A1, '✦', 460, { cor: '#ffb3ba' }); c.texto(A1, '−12%'); c.vida(A1, A1.hp - 12)
+    await c.legenda('Só ele. Aliados não ganham.')
+    await c.espera(2200)
   },
-  async burn(c, x) { await dot(c, x, '🔥', 'queima') },
-  async poison(c, x) { await dot(c, x, '☠️', 'veneno') },
+  async burn(c, x) { await dot(c, x, '🔥', 'queima', COR.fogo) },
+  async poison(c, x) { await dot(c, x, '☠️', 'veneno', COR.veneno) },
   async freeze(c, x) {
     const { C, A1 } = elenco(c, x); const { E1 } = inimigos(c)
-    c.legenda('No começo da luta, mira no inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '❄️')
+    await c.legenda('Mira no inimigo mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '❄️', 520, { cor: COR.gelo })
+    c.particulas(E1, COR.gelo, 7, 'explode', '❄')
     c.status(E1, '❄️'); c.marca(E1, 'gelo')
-    c.legenda(`Por ${x.n.seg} s ele não ataca nem anda e as recargas param.`)
-    await c.espera(1000)
-    c.legenda(`Enquanto isso, toma ${pct(x.n.danoRecebido)} a mais de dano de golpe.`)
-    await c.golpe(A1, E1, '✦', 420); c.texto(E1, `+${pct(x.n.danoRecebido)}`, 'deb'); c.vida(E1, E1.hp - 14)
-    await c.espera(900); c.marca(E1, 'gelo', false); c.status(E1, ''); c.legenda('Depois, repete a cada ciclo, em quem ele estiver atacando.')
+    await c.legenda(`Congelado: ${x.n.seg} s parado.`)
     await c.espera(1400)
+    await c.legenda(`Toma +${pct(x.n.danoRecebido)} de dano.`)
+    await c.golpe(A1, E1, '✦', 460, { cor: '#ffe9a3' }); c.texto(E1, `+${pct(x.n.danoRecebido)} dano`, 'deb'); c.vida(E1, E1.hp - 14)
+    await c.espera(1100); c.marca(E1, 'gelo', false); c.status(E1, ''); c.particulas(E1, COR.gelo, 8, 'explode')
+    await c.legenda('Repete a cada ciclo.')
+    await c.espera(1800)
   },
   async paralyze(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
-    c.legenda('No começo da luta, mira no inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '⚡', 380)
-    c.status(E1, '🌩️'); c.marca(E1, 'choque')
+    await c.legenda('Mira no inimigo mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '⚡', 380, { cor: COR.raio })
+    c.status(E1, '🌩️'); c.marca(E1, 'choque'); c.aura(E1, COR.raio)
     c.texto(E1, `recargas +${String(x.n.atraso).replace('.', ',')} s`, 'deb')
-    c.legenda(`Na hora, as recargas dele atrasam ${x.n.atraso} s.`)
-    await c.espera(1500)
-    c.legenda(`Por ${x.n.seg} s, recargas ${pct(x.n.recarga)} mais lentas e ${pct(x.n.falha)} de chance de cada ataque falhar.`)
-    await c.investida(E1, C); c.texto(E1, 'Falhou!', 'nada')
-    await c.espera(1800); c.marca(E1, 'choque', false)
+    await c.legenda(`Recargas atrasam ${x.n.atraso} s.`)
+    for (let i = 0; i < 4; i++) { c.particulas(E1, COR.raio, 5, 'explode'); await c.espera(380) }
+    await c.legenda(`Por ${x.n.seg} s: ${pct(x.n.falha)} de chance de falhar.`)
+    await c.espera(900)
+    await c.legenda('Falhou: o ataque não sai.'); await c.espera(500)
+    c.texto(E1, 'Falhou!', 'nada'); c.particulas(E1, COR.raio, 8, 'explode'); som('falha')
+    await c.espera(2000); c.marca(E1, 'choque', false); c.aura(E1, COR.raio, false)
   },
   async leech_seed(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
     c.vida(C, 70, 0)
-    c.legenda('No começo da luta, planta uma semente no inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '🌱'); c.status(E1, '🌱')
-    c.legenda(`Drena ${pct(x.n.pct)} do HP máximo dele por segundo durante ${x.n.seg} s e cura quem plantou no mesmo tanto.`)
-    for (let i = 0; i < 4; i++) {
-      c.texto(E1, `−${pct(x.n.pct)}`); c.vida(E1, E1.hp - 4)
-      await c.golpe(E1, C, '✚', 420, 'cura'); c.texto(C, `+${pct(x.n.pct)}`, 'cura'); c.vida(C, C.hp + 4)
-      await c.espera(250)
+    await c.legenda('Planta no inimigo mais perto.')
+    await c.espera(900); await c.golpe(C, E1, '🌱', 520, { cor: COR.planta }); c.status(E1, '🌱'); c.aura(E1, COR.planta)
+    const f = c.fio(E1, C, COR.planta)
+    await c.legenda(`Drena ${pct(x.n.pct)}/s e cura quem plantou.`)
+    const ticks = Math.round(num(x.n.seg)), por = num(x.n.pct)
+    let curado = 0
+    for (let i = 0; i < ticks; i++) {
+      c.vida(E1, E1.hp - por, 250); c.particulas(E1, COR.planta, 3, 'explode')
+      if (i % 2 === 0) c.texto(E1, `−${pct(por)}`)
+      const cura = Math.min(por, num(x.n.curaMax) - curado)
+      if (cura > 0) { curado += cura; c.vida(C, C.hp + cura, 250); if (i % 2 === 0) { c.golpe(E1, C, '✚', 380, { classe: 'cura', semImpacto: true }).catch(() => {}); som('planta', { forca: 0.5 }) } }
+      await c.espera(320)
     }
-    c.legenda(`A cura vai até ${pct(x.n.curaMax)} do HP máximo de quem plantou.`)
-    await c.espera(1800)
+    await c.espera(400)
+    f.remove(); c.aura(E1, COR.planta, false); c.status(E1, '')
+    c.texto(E1, `${pct(Math.round(ticks * por * 10) / 10)} no total`, 'deb')
+    await c.legenda(`Cura até ${pct(x.n.curaMax)}. Repete a cada ciclo.`)
+    await c.espera(2600)
   },
   async dig(c, x) {
     const { C } = elenco(c, x); const { E2 } = inimigos(c)
-    c.status(C, '🕳️'); c.legenda('Ele fica pronto para desviar do próximo golpe.')
-    await c.espera(900)
-    c.legenda('Quando o golpe vem, ele some no chão…')
-    const ida = c.golpe(E2, C, '✦', 650)
-    await c.espera(330); c.marca(C, 'cavando')
-    await ida; c.texto(C, 'Esquivou!', 'nada')
-    await c.espera(500); c.marca(C, 'cavando', false); c.status(C, '')
-    c.legenda(`…e não toma dano. O Z-Move não é desviado.`)
-    await c.espera(1400); c.status(C, '🕳️'); c.legenda('No próximo ciclo, ele fica pronto de novo.')
+    c.status(C, '🕳️'); c.aura(C, COR.terra)
+    await c.legenda('Pronto para desviar.')
+    await c.espera(1000)
+    await c.legenda('O golpe vem…')
+    const ida = c.golpe(E2, C, '✦', 700, { cor: '#ffb3ba', passa: true })
+    await c.espera(280); c.marca(C, 'cavando'); c.particulas(C, COR.terra, 10, 'explode'); som('terra')
+    await ida; c.texto(C, 'Esquivou!', 'nada'); som('esquiva')
+    await c.espera(450); c.marca(C, 'cavando', false); c.status(C, ''); c.aura(C, COR.terra, false); c.particulas(C, COR.terra, 6, 'sobe')
+    await c.legenda('…e passa direto. Z-Move não.')
+    await c.espera(1800); c.status(C, '🕳️'); c.aura(C, COR.terra)
+    await c.legenda('Pronto de novo a cada ciclo.')
     await c.espera(1600)
   },
   async confusion(c, x) {
     const { C } = elenco(c, x); const { E1, E4 } = inimigos(c)
-    c.legenda('No começo da luta, confunde o inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '💫'); c.status(E1, '💫'); c.texto(E1, 'Confuso!', 'nada')
-    await c.espera(900)
-    c.legenda('O próximo golpe dele acerta o aliado mais perto dele…')
-    await c.golpe(E1, E4, '✦', 520); c.texto(E4, '−12%'); c.vida(E4, E4.hp - 12); c.status(E1, '')
-    c.legenda('…e o dano conta para quem confundiu. O Z-Move e a Investida não gastam a confusão.')
-    await c.espera(2400)
+    await c.legenda('Confunde o inimigo mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '💫', 520, { cor: COR.psi }); c.status(E1, '💫'); c.aura(E1, COR.psi)
+    c.particulas(E1, COR.psi, 6, 'sobe', '★')
+    await c.espera(1300)
+    await c.legenda('O próximo golpe dele…')
+    await c.espera(700)
+    c.texto(E1, 'Confuso!', 'nada'); som('psi')
+    await c.golpe(E1, E4, '✦', 560, { cor: '#ffb3ba' }); c.texto(E4, '−12%'); c.vida(E4, E4.hp - 12); c.status(E1, ''); c.aura(E1, COR.psi, false)
+    await c.legenda('…acerta o aliado mais perto.')
+    await c.espera(3000)
   },
   async fear(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
-    c.legenda('No começo da luta, assusta o inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '👻'); c.status(E1, '👻'); c.marca(E1, 'medo')
-    c.legenda(`Por ${x.n.seg} s ele recua, uma casa por vez, sem atacar, e as recargas param.`)
-    for (const f of [1, 2, 3]) { await c.mover(E1, 3, f, 520); await c.espera(380) }
-    c.marca(E1, 'medo', false); c.status(E1, '')
-    c.legenda('Depois volta a lutar, longe de onde estava.')
-    await c.espera(1800)
+    await c.legenda('Assusta o inimigo mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '👻', 560, { cor: COR.fantasma }); c.status(E1, '👻'); c.marca(E1, 'medo'); c.aura(E1, COR.fantasma)
+    await c.legenda(`Recua ${x.n.seg} s sem atacar.`)
+    for (const f of [1, 2, 3]) { c.particulas(E1, COR.fantasma, 4, 'sobe'); await c.mover(E1, 3, f, 520); await c.espera(420) }
+    c.marca(E1, 'medo', false); c.status(E1, ''); c.aura(E1, COR.fantasma, false)
+    await c.legenda('Volta a lutar de onde parou.')
+    await c.espera(2200)
   },
   async rock_smash(c, x) {
     const { C, A1, A2 } = elenco(c, x); const { E1 } = inimigos(c)
-    c.legenda('No começo da luta, quebra a defesa do inimigo mais perto.')
-    await c.espera(600); await c.investida(C, E1); c.impacto(E1); c.status(E1, '👊'); c.marca(E1, 'quebrado')
+    await c.legenda('Quebra a defesa do mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '👊', 420, { cor: COR.luta }); c.status(E1, '👊'); c.marca(E1, 'quebrado'); c.aura(E1, COR.luta)
     c.texto(E1, `−${pct(x.n.pct)} DEF e SP.DEF`, 'deb')
-    c.legenda(`Por ${x.n.seg} s ele perde ${pct(x.n.pct)} da DEF e da SP.DEF, e o time inteiro aproveita.`)
-    await c.espera(900)
-    await Promise.all([c.golpe(A1, E1, '✦', 500), c.golpe(A2, E1, '✦', 600)])
+    await c.legenda(`−${pct(x.n.pct)} DEF e SP.DEF por ${x.n.seg} s.`)
+    await c.espera(1200)
+    await Promise.all([c.golpe(A1, E1, '✦', 500, { cor: '#ffe9a3' }), c.golpe(A2, E1, '✦', 620, { cor: '#ffe9a3' })])
     c.texto(E1, 'mais dano', 'deb'); c.vida(E1, E1.hp - 22)
-    await c.espera(2000); c.marca(E1, 'quebrado', false)
+    await c.espera(1600); c.marca(E1, 'quebrado', false); c.aura(E1, COR.luta, false)
+    await c.legenda('Repete a cada ciclo.')
+    await c.espera(1600)
   },
   async whirlwind(c, x) {
-    const { C } = elenco(c, x); const { E1 } = inimigos(c)
-    c.legenda('No começo da luta, sopra o inimigo mais perto.')
-    await c.espera(600); await c.golpe(C, E1, '🌪️', 450)
+    const { C } = elenco(c, x); const { E1, E5 } = inimigos(c)
+    await c.legenda('Sopra o inimigo mais perto.')
+    await c.espera(600); await c.golpe(C, E1, '🌪️', 480, { cor: COR.vento })
     c.texto(E1, `−${pct(x.n.pct)}`); c.vida(E1, E1.hp - 15)
-    c.legenda('Ele é empurrado para o fundo, na mesma coluna, e para antes de quem estiver no caminho.')
-    c.marca(E1, 'girando')
+    await c.legenda('Empurra para o fundo…')
+    c.marca(E1, 'girando'); c.particulas(E1, COR.vento, 8, 'explode')
     await c.mover(E1, 3, 3, 900)
-    c.marca(E1, 'girando', false)
-    await c.espera(2200)
+    c.marca(E1, 'girando', false); c.impacto(E1, COR.vento, 0.4)
+    c.marca(E5, 'mira')
+    await c.legenda('…até antes de quem está atrás.')
+    await c.espera(1600); c.marca(E5, 'mira', false)
+    await c.espera(900)
   },
   async assurance(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
     c.vida(E1, 60, 0)
-    c.legenda('No começo da luta, golpeia o inimigo mais perto (aqui, com 60% do HP).')
-    await c.espera(900); await c.golpe(C, E1, '🌑', 450)
-    const p1 = Number(String(x.n.pct).replace(',', '.')), p2 = Number(String(x.n.faltando).replace(',', '.'))
-    const extra = Math.round((40 * p2) / 100 * 10) / 10
+    await c.legenda('Golpeia quem ele ataca (60% do HP).')
+    await c.espera(1100); await c.golpe(C, E1, '🌑', 480, { cor: COR.sombra })
+    const p1 = num(x.n.pct), p2 = num(x.n.faltando)
+    const extra = Math.round(40 * p2) / 100
+    c.particulas(E1, COR.sombra, 10, 'explode')
     c.texto(E1, `−${pct(p1)} −${pct(extra)}`); c.vida(E1, E1.hp - p1 - extra)
-    c.legenda(`${pct(p1)} do HP máximo mais ${pct(p2)} do HP que falta a ele: quanto mais ferido, mais dói.`)
-    await c.espera(2600)
+    await c.legenda(`${pct(p1)} + ${pct(p2)} do que falta. Ferido dói mais.`)
+    await c.espera(3200)
   },
   async charm(c, x) {
     const { C } = elenco(c, x); const { E5 } = inimigos(c)
-    c.legenda('No começo da luta, mira no inimigo mais longe.')
-    await c.espera(500); c.marca(E5, 'mira'); await c.espera(700)
-    await c.golpe(C, E5, '💗', 650)
-    c.marca(E5, 'mira', false); c.status(E5, '💗')
-    c.legenda('Ele é puxado para a casa livre mais à frente do lado dele…')
+    await c.legenda('Mira no inimigo mais longe.')
+    await c.espera(500); c.marca(E5, 'mira')
+    const mira = c.fio(C, E5, COR.fada)
+    await c.espera(900)
+    await c.golpe(C, E5, '💗', 620, { cor: COR.fada })
+    mira.remove(); c.marca(E5, 'mira', false); c.status(E5, '💗'); c.aura(E5, COR.fada)
+    await c.legenda('Puxa para a frente…')
+    c.particulas(E5, COR.fada, 6, 'sobe', '♥')
     await c.mover(E5, 4, 0, 950, 1.2)
+    c.impacto(E5, COR.fada); c.particulas(E5, COR.fada, 6, 'sobe', '♥')
     c.texto(E5, `−${pct(x.n.pct)}`); c.vida(E5, E5.hp - 10)
-    c.legenda(`…e toma ${pct(x.n.pct)} do HP máximo dele. Agora ele está na linha de frente.`)
-    await c.espera(2400)
+    await c.legenda(`…e tira ${pct(x.n.pct)} do HP.`)
+    await c.espera(2000); c.aura(E5, COR.fada, false)
+    await c.legenda('Repete a cada ciclo.')
+    await c.espera(1600)
   },
   async recover(c, x) {
-    const { C, A1 } = elenco(c, x)
-    c.legenda(`Quando ele ou um aliado de BST até ${x.n.bst} cai a ${x.n.gatilhoHp}% do HP…`)
-    await c.espera(700)
-    for (const d of [25, 30]) { c.impacto(A1); c.texto(A1, `−${d}%`); c.vida(A1, A1.hp - d); await c.espera(650) }
-    c.onda(C, '#4ade80'); await c.golpe(C, A1, '💚', 480, 'cura')
-    c.texto(A1, `+${pct(x.n.pct)}`, 'cura'); c.vida(A1, A1.hp + Number(String(x.n.pct).replace(',', '.')))
-    c.legenda(`…cura ${pct(x.n.pct)} do HP máximo do mais ferido do time. Depois, só volta após um ciclo completo.`)
-    await c.espera(2600)
+    const { C, A1 } = elenco(c, x); const { E2, E4 } = inimigos(c)
+    await c.legenda(`Aliado caiu a ${x.n.gatilhoHp}% do HP…`)
+    await c.espera(800)
+    for (const [E, d] of [[E2, 25], [E4, 30]]) { await c.golpe(E, A1, '✦', 460, { cor: '#ffb3ba' }); c.texto(A1, `−${d}%`); c.vida(A1, A1.hp - d); await c.espera(450) }
+    c.onda(C, COR.cura); await c.golpe(C, A1, '💚', 520, { classe: 'cura' })
+    c.particulas(A1, COR.cura, 8, 'sobe', '✚')
+    c.texto(A1, `+${pct(x.n.pct)}`, 'cura'); c.vida(A1, A1.hp + num(x.n.pct))
+    await c.legenda(`…cura ${pct(x.n.pct)} do mais ferido.`)
+    await c.espera(3000)
   }
+
 }
-async function dot(c, x, emoji, classe) {
+async function dot(c, x, emoji, classe, cor) {
   const { C } = elenco(c, x); const { E1 } = inimigos(c)
-  c.legenda('No começo da luta, mira no inimigo mais perto.')
-  await c.espera(600); await c.golpe(C, E1, emoji); c.status(E1, emoji); c.marca(E1, classe)
-  c.legenda(`Ele perde ${pct(x.n.pct)} do HP máximo por segundo durante ${x.n.seg} s (${pct(x.n.total)} no total).`)
-  const passo = Number(String(x.n.total).replace(',', '.')) / 5
-  for (let i = 0; i < 5; i++) { await c.espera(520); c.texto(E1, `−${pct(x.n.pct)}`); c.vida(E1, E1.hp - passo, 400) }
-  c.marca(E1, classe, false); c.status(E1, '')
-  c.legenda('Depois, repete a cada ciclo, em quem ele estiver atacando.')
-  await c.espera(1800)
+  await c.legenda('Mira no inimigo mais perto.')
+  await c.espera(600); await c.golpe(C, E1, emoji, 520, { cor }); c.status(E1, emoji); c.marca(E1, classe); c.aura(E1, cor)
+  await c.legenda(`−${pct(x.n.pct)} do HP por segundo, ${x.n.seg} s.`)
+  const ticks = Math.round(num(x.n.seg)), por = num(x.n.pct), passo = Math.min(560, 3600 / ticks)
+  for (let i = 0; i < ticks; i++) {
+    await c.espera(passo)
+    c.particulas(E1, cor, 4, 'sobe'); c.vida(E1, E1.hp - por, Math.min(300, passo))
+    if (ticks <= 6 || i % 2 === 0) c.texto(E1, `−${pct(por)}`)
+    if (i % 2 === 0) som(classe === 'queima' ? 'fogo' : 'veneno', { forca: 0.5 })
+  }
+  await c.espera(300)
+  c.texto(E1, `${pct(x.n.total)} no total`, 'deb')
+  c.marca(E1, classe, false); c.status(E1, ''); c.aura(E1, cor, false)
+  await c.legenda('Repete a cada ciclo.')
+  await c.espera(2000)
 }
 
 function iniciarCena(x) {
+  if (!pronto) return
   cena?.parar()
-  const c = new Cena(x, x.inimigo)
+  const c = new Cena(x, x.doisLados)
   cena = c
-  $('pas-legenda-tab').textContent = x.inimigo ? 'Os Ditto são pokémon de teste.' : 'Os Ditto são aliados de teste.'
+  $('pas-legenda-tab').textContent = 'Os Ditto são pokémon de teste.'
   const rodar = async () => {
     if (!c.vivo) return
     try {
       await CENAS[x.id](c, x)
       if (!c.vivo) return
-      c.tLoop = setTimeout(() => { if (c.vivo) { c.camada.replaceChildren(); c.pecas = []; rodar() } }, 900)
+      if (c.vel && c.leituraAte) { const falta = c.leituraAte - performance.now(); if (falta > 0) await c.espera(falta) }
+      if (c.vel) await c.camada.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {})
+      if (!c.vivo) return
+      c.camada.getAnimations().forEach((an) => an.cancel())
+      c.camada.replaceChildren(); c.pecas = []; c.nPasso = 0; c.leituraAte = 0
+      if (c.vel) c.camada.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: 'ease-out' })
+      c.tLoop = setTimeout(rodar, 60)
     } catch {}
   }
   requestAnimationFrame(() => requestAnimationFrame(rodar))
+}
+
+const normal = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+function ligarBusca() {
+  const campo = $('pas-busca'), caixa = $('pas-achados')
+  let ativo = -1
+  const fechar = () => { caixa.hidden = true; caixa.replaceChildren(); ativo = -1; campo.setAttribute('aria-expanded', 'false') }
+  const abrirPassiva = (sp, pid) => {
+    escolher(pid, true, sp)
+    fechar()
+    campo.value = ''
+    campo.blur()
+  }
+  const pintar = () => {
+    const q = campo.value
+    if (!normal(q)) return fechar()
+    if (!motorPronto) {
+      caixa.replaceChildren(el('p', { class: 'pas-achados-vazio', text: 'Carregando os pokémon do jogo…' }))
+      caixa.hidden = false
+      return
+    }
+    let achados = []
+    try { achados = motorPronto.buscarEspecies(q, 8) } catch {}
+    if (!achados.length) {
+      caixa.replaceChildren(el('p', { class: 'pas-achados-vazio', text: 'Nenhum pokémon com esse nome.' }))
+      caixa.hidden = false
+      return
+    }
+    caixa.replaceChildren(...achados.map((a, i) => {
+      const pas = P.passivaDaEspecie(a.speciesId)
+      const e = especie(a.speciesId)
+      const bst = e ? Object.values(e.base || {}).reduce((t, v) => t + (Number(v) || 0), 0) : null
+      const x = pas ? PORID.get(pas.id) : null
+      const b = el('button', { type: 'button', class: `pas-achado${x ? '' : ' sem'}`, role: 'option', 'data-sp': String(a.speciesId), 'data-pas': x?.id || '', style: x ? `--t:${COR_TIPO[x.tipo]}` : null }, [
+        el('span', { class: 'pas-pk-img' }, [imgSprite(a.looktype, a.speciesId)]),
+        el('span', { class: 'pas-achado-txt' }, [
+          el('b', { text: a.nome }),
+          el('small', { text: bst ? `BST ${bst} · ${bst <= P.BST_MAX_PASSIVA ? 'recebe' : 'não recebe'} Rain Dance e Recover de aliados` : '' })
+        ]),
+        x ? el('span', { class: 'pas-achado-pas' }, [el('span', { 'aria-hidden': 'true', text: x.icone }), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
+      ])
+      if (i === ativo) b.classList.add('foco')
+      return b
+    }))
+    caixa.hidden = false
+    campo.setAttribute('aria-expanded', 'true')
+  }
+  campo.addEventListener('input', () => { ativo = -1; pintar() })
+  campo.addEventListener('focus', () => { carregarMotor().then((m) => { motorPronto = m; if (normal(campo.value)) pintar() }) ; if (normal(campo.value)) pintar() })
+  campo.addEventListener('keydown', (e) => {
+    const itens = [...caixa.querySelectorAll('.pas-achado')]
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!itens.length) return
+      e.preventDefault()
+      ativo = (ativo + (e.key === 'ArrowDown' ? 1 : -1) + itens.length) % itens.length
+      itens.forEach((b, i) => b.classList.toggle('foco', i === ativo))
+      itens[ativo].scrollIntoView({ block: 'nearest' })
+    } else if (e.key === 'Enter') {
+      const b = itens[ativo >= 0 ? ativo : 0]
+      if (b?.dataset.pas) { e.preventDefault(); abrirPassiva(Number(b.dataset.sp), b.dataset.pas) }
+    } else if (e.key === 'Escape') fechar()
+  })
+  caixa.addEventListener('mousedown', (e) => e.preventDefault())
+  caixa.addEventListener('click', (e) => {
+    const b = e.target.closest('.pas-achado')
+    if (b?.dataset.pas) abrirPassiva(Number(b.dataset.sp), b.dataset.pas)
+  })
+  campo.addEventListener('blur', () => setTimeout(fechar, 120))
 }
 
 function montarCiclo() {
@@ -619,8 +890,49 @@ function ligar() {
     montarQuemTem(PORID.get(estado.sel))
     iniciarCena(PORID.get(estado.sel))
   })
-  $('pas-repetir').addEventListener('click', () => iniciarCena(PORID.get(estado.sel)))
+  const btSom = $('pas-som')
+  const pintarSom = (on) => { btSom.setAttribute('aria-pressed', String(on)); btSom.title = on ? 'Desligar som' : 'Ligar som'; btSom.classList.toggle('ligado', on) }
+  somPronto.then((m) => { if (!m) { btSom.hidden = true; return } pintarSom(m.somLigado()) })
+  btSom.addEventListener('click', async () => { const m = await somPronto; if (!m) return; const on = m.alternarSom(); pintarSom(on); if (on) iniciarCena(PORID.get(estado.sel)) })
+  ligarBusca()
+  const pop = $('pas-como')
+  $('pas-como-abrir').addEventListener('click', () => { pop.showModal(); som('clique', { forca: 0.6 }) })
+  $('pas-como-fechar').addEventListener('click', () => pop.close())
+  pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
   addEventListener('hashchange', () => { lerHash(); escolher(estado.sel) })
+}
+
+async function precarregar() {
+  const carga = $('pas-carga'), barra = carga.querySelector('em'), txt = carga.querySelector('b')
+  const avanca = (f, t) => { barra.style.transform = `scaleX(${Math.max(0.04, Math.min(1, f))})`; if (t) txt.textContent = t }
+  avanca(0.05, 'Carregando os pokémon…')
+  try {
+    motorPronto = await import('../calculadora/motor.js').then(async (m) => { await m.carregar((f) => avanca(0.05 + f * 0.6)); return m })
+    motor = Promise.resolve(motorPronto)
+  } catch {}
+  avanca(0.68, 'Carregando sprites…')
+  const sps = new Set([DITTO, DRAGONITE])
+  for (const x of LISTA) { const c = casterPadrao(x); if (c != null) sps.add(c) }
+  for (const s of PORID.get('swarm').especies.filter((s) => especie(s)).slice(0, 3)) sps.add(s)
+  const lista = [...sps]
+  let feitos = 0
+  await Promise.all(lista.map((sp) => new Promise((ok) => {
+    const img = imgSprite(especie(sp)?.looktype, sp)
+    const fim = () => { feitos++; avanca(0.68 + (feitos / lista.length) * 0.27); ok() }
+    if (img.complete && img.naturalWidth) return fim()
+    img.addEventListener('load', fim, { once: true })
+    img.addEventListener('error', () => setTimeout(() => (img.complete ? fim() : null), 50), { once: true })
+    setTimeout(fim, 6000)
+  })))
+  await Promise.race([document.fonts?.ready, new Promise((ok) => setTimeout(ok, 1500))])
+  await somPronto
+  avanca(1, 'Pronto')
+  pronto = true
+  montarQuemTem(PORID.get(estado.sel))
+  iniciarCena(PORID.get(estado.sel))
+  const some = () => carga.remove()
+  if (reduzido.matches) some()
+  else carga.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, delay: 150, easing: 'ease-out', fill: 'forwards' }).finished.then(some, some)
 }
 
 lerHash()
@@ -628,6 +940,8 @@ ligar()
 montarCiclo()
 montarLista()
 montarDetalhe()
-carregarMotor().then((m) => { motorPronto = m; montarQuemTem(PORID.get(estado.sel)); iniciarCena(PORID.get(estado.sel)) }).catch(() => {
-  $('pas-quem').querySelector('.pas-carregando')?.replaceChildren('Não deu para carregar a lista agora.')
-})
+tabuleiro ??= montarTabuleiro(true)
+requestAnimationFrame(() => pintarBola(tabuleiro.tab))
+document.addEventListener('visibilitychange', () => { document.documentElement.classList.toggle('pas-oculta', document.hidden) })
+new IntersectionObserver((it) => { palcoVisivel = it[0].isIntersecting; $('pas-palco').classList.toggle('fora-da-tela', !palcoVisivel) }).observe($('pas-palco'))
+precarregar()
