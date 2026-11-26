@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="../calculadora/calc.css" />
   <link rel="stylesheet" href="tier.css" />
   <script type="module" src="tier.js"></script>
+  <script type="module" src="posicionamento.js"></script>
 </head>
 <body>
   <div class="ceu" aria-hidden="true"></div>
@@ -78,7 +79,12 @@
   <main>
     <section class="abre envolve">
       <h1>Tier PvP <span class="shiny">shiny</span></h1>
-      <p>Atualizado todo dia com o meta do ranqueado<span id="atualizado" hidden></span></p>
+      <p class="sub-tier">Atualizado todo dia com o meta do ranqueado<span id="atualizado" hidden></span></p>
+      <p class="sub-pos">Formações reais de jogadores do top mensal, renovadas toda segunda</p>
+      <div class="vistas" role="tablist" aria-label="Tier PvP">
+        <button type="button" role="tab" data-vista="tier" aria-selected="true" aria-controls="tier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h11M4 18h6"/></svg>Tier list</button>
+        <button type="button" role="tab" data-vista="pos" aria-selected="false" aria-controls="pos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>Posicionamento dos top</button>
+      </div>
     </section>
 
     <div class="envolve largo">
@@ -124,6 +130,10 @@
         </section>
         <p id="vazio" class="vazio" hidden>Nenhum pokémon com esses filtros.</p>
       </div>
+
+      <section id="pos" class="pos" role="tabpanel" aria-label="Posicionamento dos top">
+        <div id="pos-corpo" class="pos-corpo"></div>
+      </section>
     </div>
 
     <section class="final">
