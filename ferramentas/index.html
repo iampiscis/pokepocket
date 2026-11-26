@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferramentas · PokePocket</title>
+  <meta name="description" content="Ferramentas grátis do Pokéidle no navegador: Calculadora Pokémon, Calculadora de Nível e Tier PvP do ranqueado." />
+  <meta name="theme-color" content="#0b0608" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PokePocket" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Ferramentas · PokePocket" />
+  <meta property="og:description" content="Calculadora Pokémon, Nível e Tier PvP do Pokéidle. Grátis, no navegador." />
+  <meta property="og:url" content="https://iampiscis.github.io/pokepocket/ferramentas/" />
+  <link rel="icon" href="../assets/icone.png" />
+  <link rel="stylesheet" href="../calculadora/calc.css" />
+  <link rel="stylesheet" href="../assets/ferramentas.css" />
+  <style>
+    .fr { padding: 48px 0 72px; }
+    .fr .abre { text-align: center; margin-bottom: 32px; }
+    .fr .abre h1 { margin: 6px 0 10px; }
+    .fr .abre p { margin: 0 auto; max-width: 520px; color: var(--suave); }
+    .ferr-grade { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .ferr-card { position: relative; display: grid; align-content: start; gap: 14px; padding: 22px; border-radius: 20px; text-decoration: none; color: var(--tinta); background: linear-gradient(180deg, #28161f, #150b10); border: 1px solid rgba(255, 233, 163, 0.16); box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 246, 239, 0.05); transition: transform 0.2s, border-color 0.2s; }
+    .ferr-card:hover, .ferr-card:focus-visible { transform: translateY(-3px); border-color: rgba(255, 211, 77, 0.45); }
+    .ferr-ic.grande { width: 52px; height: 52px; border-radius: 15px; }
+    .ferr-ic.grande svg { width: 26px; height: 26px; }
+    .ferr-card-txt { display: grid; gap: 6px; }
+    .ferr-card-txt b { font-size: 19px; font-weight: 900; color: #fff3df; }
+    .ferr-card-txt span { font-size: 15px; line-height: 1.45; color: var(--suave); }
+    .seta-card { position: absolute; top: 24px; right: 22px; width: 20px; height: 20px; color: var(--ouro); opacity: 0.7; transition: transform 0.2s, opacity 0.2s; }
+    .ferr-card:hover .seta-card { transform: translateX(3px); opacity: 1; }
+    .destino svg { width: 18px; height: 18px; }
+    @media (max-width: 860px) {
+      .ferr-grade { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .ferr-card { grid-template-columns: 52px minmax(0, 1fr) 20px; align-items: center; padding: 16px; }
+      .seta-card { position: static; }
+    }
+    @media (max-width: 420px) {
+      .fr { padding-top: 28px; }
+      .destino .rot { display: none; }
+      .destino { padding: 0 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .ferr-card, .seta-card { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="ceu" aria-hidden="true"></div>
+
+  <header class="topo">
+    <div class="envolve">
+      <a class="marca" href="../"><img src="../assets/icone.png" alt="" /><span><span class="p">Poke</span>Pocket</span></a>
+      <nav class="secoes" aria-label="Ferramentas">
+        <a href="../calculadora/" data-goatcounter-click="ferr-calculadora-topo" data-goatcounter-title="ferr-calculadora-topo">Calculadora</a>
+        <a href="../nivel/" data-goatcounter-click="ferr-nivel-topo" data-goatcounter-title="ferr-nivel-topo">Nível</a>
+        <a href="../tier/" data-goatcounter-click="ferr-tier-topo" data-goatcounter-title="ferr-tier-topo">Tier PvP</a>
+      </nav>
+      <div class="acoes-topo">
+        <a class="destino" href="../" data-goatcounter-click="ferr-inicio-topo" data-goatcounter-title="ferr-inicio-topo" aria-label="Página inicial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg><span class="rot">Página inicial</span></a>
+        <button class="abre-menu" type="button" aria-expanded="false" aria-controls="painel-secoes" aria-label="Abrir seções"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg></button>
+      </div>
+      <div class="painel-menu" id="painel-secoes">
+        <nav aria-label="Ferramentas">
+          <a href="../calculadora/" data-goatcounter-click="ferr-calculadora-painel" data-goatcounter-title="ferr-calculadora-painel"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/></svg></span>Calculadora</a>
+          <a href="../nivel/" data-goatcounter-click="ferr-nivel-painel" data-goatcounter-title="ferr-nivel-painel"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 20.5 9 9.5l3.6 5.6 2.4-3.4 6.5 8.8z"/><path d="M15 11.7V3.5l4.5 1.8L15 7.1"/></svg></span>Nível</a>
+          <a href="../tier/" data-goatcounter-click="ferr-tier-painel" data-goatcounter-title="ferr-tier-painel"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M8.5 20.5h7M9.5 16.5h5v4h-5z"/></svg></span>Tier PvP</a>
+          <a href="../" data-goatcounter-click="ferr-inicio-painel" data-goatcounter-title="ferr-inicio-painel"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg></span>Página inicial</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="fr">
+    <section class="abre envolve">
+      <span class="rotulo">Pokéidle</span>
+      <h1>Ferramentas</h1>
+      <p>Grátis, no navegador, sem instalar nada.</p>
+    </section>
+    <div class="envolve ferr-grade">
+      <a class="ferr-card" href="../calculadora/" data-goatcounter-click="ferr-calculadora-cartao" data-goatcounter-title="ferr-calculadora-cartao">
+        <span class="ferr-ic grande"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M8.5 18h.01M12 18h.01M15.5 14.5V18"/></svg></span>
+        <span class="ferr-card-txt"><b>Calculadora Pokémon</b><span>Nota, Score PvP e preço de mercado de qualquer pokémon, com a ficha do jogo.</span></span>
+        <svg class="seta-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="ferr-card" href="../nivel/" data-goatcounter-click="ferr-nivel-cartao" data-goatcounter-title="ferr-nivel-cartao">
+        <span class="ferr-ic grande"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 20.5 9 9.5l3.6 5.6 2.4-3.4 6.5 8.8z"/><path d="M15 11.7V3.5l4.5 1.8L15 7.1"/></svg></span>
+        <span class="ferr-card-txt"><b>Nível</b><span>Quando você chega ao nível que quer: tempo, data e XP que falta.</span></span>
+        <svg class="seta-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="ferr-card" href="../tier/" data-goatcounter-click="ferr-tier-cartao" data-goatcounter-title="ferr-tier-cartao">
+        <span class="ferr-ic grande"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5h8V9a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3.2 4M16 5.5h3a3 3 0 0 1-3.2 4M12 13v3.5M8.5 20.5h7M9.5 16.5h5v4h-5z"/></svg></span>
+        <span class="ferr-card-txt"><b>Tier PvP</b><span>Os shinies que o top 100 do ranqueado usa, por força e uso, todo dia.</span></span>
+        <svg class="seta-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const botao = document.querySelector('.abre-menu');
+      const painel = document.getElementById('painel-secoes');
+      const aberto = () => botao.getAttribute('aria-expanded') === 'true';
+      const abre = (v) => { botao.setAttribute('aria-expanded', String(v)); botao.setAttribute('aria-label', v ? 'Fechar seções' : 'Abrir seções'); painel.classList.toggle('aberto', v); };
+      botao.addEventListener('click', () => abre(!aberto()));
+      painel.addEventListener('click', (e) => { if (e.target.closest('a')) abre(false) });
+      document.addEventListener('click', (e) => { if (aberto() && !painel.contains(e.target) && !botao.contains(e.target)) abre(false) });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && aberto()) { abre(false); botao.focus() } });
+      matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches) abre(false) });
+    })();
+  </script>
+  <script>if (!document.documentElement.classList.contains('embed')) { const g = document.createElement('script'); g.async = true; g.src = 'https://gc.zgo.at/count.js'; g.dataset.goatcounter = 'https://pokepocket.goatcounter.com/count'; document.body.append(g) }</script>
+</body>
+</html>
