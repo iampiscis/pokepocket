@@ -1108,6 +1108,7 @@ async function lerImagem(arquivo) {
     if (deduzido) refino = deduzido
     else refinoAviso = ' Não deu para conferir o refino; ajuste à mão.'
   }
+  if (f.zMove && !f.tmElemental) f.tmElemental = especie(sid)?.tipos?.[0] ?? null
   let ivsEstimados = null
   try { ivsEstimados = estimarIvs({ ...f, speciesId: sid, refino }) } catch {}
   trocarPokemon({ ...f, speciesId: sid, refino, ...(ivsEstimados ? { ivs: ivsEstimados } : {}) })

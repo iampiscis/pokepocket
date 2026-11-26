@@ -277,6 +277,55 @@ async function passadaGeral(worker, origem, y0, y1) {
   return { palavras: palavrasDe(d.words, escala, 0, y0), linhas: linhasDe(d.lines, escala, 0, y0), texto: d.text || '' }
 }
 
+function escurecerLocal(origem, escala, raio) {
+  const p = lerPixels(origem, 0, 0, origem.width, origem.height, escala)
+  const { w, h } = p
+  const d = p.img.data
+  const L = new Float32Array(w * h)
+  for (let i = 0; i < L.length; i++) L[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]
+  const m = mediaCaixa(L, w, h, Math.max(2, Math.round(raio * escala)))
+  for (let i = 0; i < L.length; i++) {
+    const v = m[i] > 90 && m[i] - L[i] > 25 ? 0 : 255
+    d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v
+    d[i * 4 + 3] = 255
+  }
+  p.g.putImageData(p.img, 0, 0)
+  return p.c
+}
+
+async function passadaEscura(worker, origem) {
+  const W = origem.width, H = origem.height
+  let escala = limitar(LARGURA_ALVO / W, 1, 4)
+  if (W * H * escala * escala > MAX_PIXELS) escala = Math.max(0.8, Math.sqrt(MAX_PIXELS / (W * H)))
+  const raio = limitar(Math.round(Math.min(W, H) / 60), 4, 10)
+  const d = await reconhecer(worker, escurecerLocal(origem, escala, raio), '11')
+  return { palavras: palavrasDe(d.words, escala), linhas: linhasDe(d.lines, escala), texto: d.text || '' }
+}
+
+const decimal = (inteiro, frac) => Number(`${inteiro}.${frac}`)
+
+function camposDoTexto(texto) {
+  const t = chave(texto).replace(/[|]/g, ' ')
+  const D = '[0-9OIL]'
+  const num = (x) => Number(digitos(x).replace(/L/g, '1'))
+  const out = {}
+  const pot = /(?:^|[^A-Z0-9])P\s?([1-5])(?![0-9.,])/.exec(t)
+  if (pot) out.potencia = Number(pot[1])
+  const soma = new RegExp(`(${D}{1,3})\\s*[/:.]\\s*192\\b`).exec(t) || new RegExp(`(?:^|[^A-Z])[I1L][VY]\\s*(?:S[O0]MAD[O0])?\\s*(${D}{1,3})\\b(?![.,]\\d)`).exec(t)
+  if (soma && num(soma[1]) >= 6 && num(soma[1]) <= 192) out.ivSomado = num(soma[1])
+  const q = new RegExp(`(?:^|[^A-Z])(?:Q|QUALIDADE|QUALITY|CALIDAD)\\s*[:.]?\\s*([0-3OIL])\\s*[,.]\\s*(${D}{1,3})\\b`).exec(t)
+  if (q) out.quality = Number(`${num(q[1])}.${digitos(q[2]).replace(/L/g, '1')}`)
+  const n = new RegExp(`(?:^|[^A-Z])(?:N|NOTA|SCORE)\\s*[:.]?\\s*(${D}{1,2})\\s*[,.]\\s*(${D}{1,3})\\b`).exec(t)
+  if (n && num(n[1]) <= 10) out.nota = Number(`${num(n[1])}.${digitos(n[2]).replace(/L/g, '1')}`)
+  const nv = new RegExp('(?:^|[^A-Z])N[VY]\\s*\\.?\\s*' + NUM_NIVEL + '(?![0-9])').exec(digitos(t))
+  if (nv) out.level = numeroNivel(nv[1])
+  const selo = /(?:^|\s)\+\s?(\d{1,2})(?=\s|$)/m.exec(t)
+  if (selo) out.selo = Number(selo[1])
+  out.zMove = /Z\s?-?\s?M[O0]VE/.test(t)
+  out.aoe = /(?:^|[^A-Z0-9])A[O0]E(?:$|[^A-Z])/.test(t)
+  return out
+}
+
 function ancora(palavras, re, filtro = () => true) {
   return palavras.filter((p) => re.test(p.k) && filtro(p)).sort((a, b) => a.y0 - b.y0 || a.x0 - b.x0)[0] || null
 }
@@ -683,6 +732,7 @@ function candidatosNome(linhas, limiteY) {
       .map((p) => p.replace(/^[^A-Za-zÀ-ÿ]+|[^A-Za-zÀ-ÿ.'-]+$/g, ''))
       .filter((p) => /^[A-Za-zÀ-ÿ.'-]{2,}$/.test(p) || /^[A-Z]$/.test(p))
       .filter((p) => !/^shiny$/i.test(p))
+      .map((p) => (/^[A-Za-z]{3,5}$/.test(p) && /[gc]a$/i.test(p) && distancia(p.toLowerCase(), 'mega') <= 2 ? 'Mega' : p))
     for (let n = Math.min(4, palavras.length); n >= 1; n--) {
       for (let i = 0; i + n <= palavras.length; i++) {
         const t = palavras.slice(i, i + n).join(' ')
@@ -760,18 +810,19 @@ function lerChips(texto) {
   const shiny = tokens.some((t) => t.length >= 4 && distancia(t.replace(/[^A-Z]/g, ''), 'SHINY') <= 1)
   const aoe = tokens.some((t) => { const x = t.replace(/[^A-Z0]/g, '').replace(/0/g, 'O'); return x.length >= 2 && x.length <= 4 && distancia(x, 'AOE') <= 1 && x.startsWith('A') })
   let elemental = null
-  const re = /(?:^|[^A-Z])E\s*[:;.,]?\s*([A-Z]{3,9})/g
+  let fisico = false
+  const re = /(?:^|[^A-Z])([EF])\s*[:;.,\-]{0,2}\s*([A-Z]{3,9})/g
   for (let m; (m = re.exec(k)) && !elemental;) {
-    const w = m[1]
+    const w = m[2]
     let melhor = null
     for (const tipo of TIPOS) {
       const d = distancia(w, tipo)
       const lim = tipo.length <= 3 ? 0 : 1
       if (d <= lim && (!melhor || d < melhor.d)) melhor = { tipo, d }
     }
-    if (melhor) elemental = melhor.tipo
+    if (melhor && !(TIPOS.includes(m[1] + w) && !/[:;.,]/.test(m[0]))) { elemental = melhor.tipo; fisico = m[1] === 'F' }
   }
-  return { shiny, aoe, elemental }
+  return { shiny, aoe, elemental, fisico }
 }
 
 async function executar(imagem, opcoes) {
@@ -802,11 +853,11 @@ async function executar(imagem, opcoes) {
   let feitos = 0
   const ctx = { worker, origem, passo: () => avisar(0.75 + Math.min(0.23, ++feitos * 0.02), 'Conferindo os números') }
 
-  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmAoe: false, stats: null, statsOpcoes: null, selo: null }
+  const ficha = { speciesId: null, nome: null, shiny: false, level: null, potencia: null, quality: null, nota: null, ivs: {}, refino: {}, tmElemental: null, tmFisico: false, tmAoe: false, zMove: false, stats: null, statsOpcoes: null, selo: null }
   const avisos = []
 
   const cartoes = localizarCartoes(linhas, W)
-  const limiteTopo = cartoes ? cartoes.topo : H * 0.3
+  const limiteTopo = cartoes ? cartoes.topo : H
   const topoCartoes = cartoes ? cartoes.topo : null
   const nvPalavra = palavras
     .filter((p) => p.y1 <= limiteTopo && /(^|[^A-Z])N[VYRW¥][\d.,]*$/.test(p.k.replace(/[^A-Z0-9¥.,]/g, '')))
@@ -892,6 +943,7 @@ async function executar(imagem, opcoes) {
     const chips = lerChips(textoChips)
     if (chips.shiny) ficha.shiny = true
     ficha.tmElemental = chips.elemental
+    ficha.tmFisico = chips.fisico
     ficha.tmAoe = chips.aoe
   }
   const cand = candidatosNome([...linhas.filter((l) => l.y1 <= limiteTopo), ...cabecalho], null)
@@ -917,6 +969,30 @@ async function executar(imagem, opcoes) {
     ficha.speciesId = esp.speciesId
     ficha.nome = esp.nome
   } else ficha.nome = cand[0] || null
+
+  let escura = null
+  if (!cartoes || ficha.speciesId == null || ficha.level == null || ficha.potencia == null || ficha.quality == null || ficha.nota == null || !opcoesIvSomado.length) {
+    escura = await passadaEscura(worker, origem)
+    ctx.passo()
+    const tudo = g.texto + '\n' + escura.texto
+    const c = camposDoTexto(tudo)
+    for (const k of ['potencia', 'quality', 'nota', 'level']) if (ficha[k] == null && c[k] != null) ficha[k] = c[k]
+    if (c.ivSomado != null && !opcoesIvSomado.includes(c.ivSomado)) opcoesIvSomado.push(c.ivSomado)
+    if (ficha.selo == null && c.selo != null) ficha.selo = c.selo
+    if (c.zMove) ficha.zMove = true
+    const chips = lerChips(tudo)
+    if (chips.shiny) ficha.shiny = true
+    if (!ficha.tmElemental && chips.elemental) { ficha.tmElemental = chips.elemental; ficha.tmFisico = chips.fisico }
+    if (c.aoe) ficha.tmAoe = true
+    if (ficha.speciesId == null || (esp && esp.certeza < 1)) {
+      const outro = identificarEspecie(candidatosNome([...linhas, ...escura.linhas], null), numero, especiePorNome, buscarEspecies)
+      if (outro && (!esp || outro.certeza > esp.certeza)) {
+        ficha.speciesId = outro.speciesId
+        ficha.nome = outro.nome
+      }
+    }
+  }
+  if (opcoes.depurar) ficha.depurar = { texto: g.texto, escura: escura?.texto ?? null, cand: cand.slice(0, 12) }
 
   const yTopo = aStats ? aStats.y1 : topoCartoes != null ? topoCartoes : 0
   const legenda = linhas.filter((l) => l.y0 > yTopo && /\(DE|DE 1 ?A|1 ?A ?32|STATS.?BASE/.test(digitos(l.k).replace(/1A/g, '1 A'))).sort((a, b) => a.y0 - b.y0)[0]
@@ -1014,10 +1090,15 @@ async function executar(imagem, opcoes) {
     escolha = achou.escolha
     ivSomado = achou.soma
   }
-  STATS.forEach((k, i) => { if (escolha.ivs[i] != null) ficha.ivs[k] = escolha.ivs[i] })
+  const descartarIvs = escolha.bate === false && ivSomado != null
+  if (!descartarIvs) STATS.forEach((k, i) => { if (escolha.ivs[i] != null) ficha.ivs[k] = escolha.ivs[i] })
   if (ivSomado != null) ficha.ivSomado = ivSomado
   if (escolha.deduzido != null) avisos.push(`IV de ${ROTULOS[STATS[escolha.deduzido]]} deduzido pelo IV somado`)
-  if (escolha.bate === false) {
+  if (descartarIvs) {
+    ficha.stats = null
+    ficha.statsOpcoes = null
+    avisos.push('não consegui ler os IVs de cada stat; estimei pelo IV somado e pela nota')
+  } else if (escolha.bate === false) {
     const s = STATS.reduce((a, k) => a + (ficha.ivs[k] ?? 0), 0)
     avisos.push(`soma dos IVs (${s}) não bate com IV somado (${ivSomado})`)
   }
