@@ -214,7 +214,7 @@ function cartao(j) {
       if (!p) { tab.append(el('span', { class: `pos-casa nossa${alt}`, 'aria-hidden': 'true' })); continue }
       const n = alcanceN(p.alcance)
       const t = tierDe(p)
-      const b = el('button', { type: 'button', class: `pos-casa nossa ocupada${alt}${n > 1 ? ' longe' : ''}`, title: `${p.nome}${t ? ` · tier ${t}` : ''} · ${alcance(n)}`, 'aria-label': `${p.nome}${t ? `, tier ${t}` : ''}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
+      const b = el('button', { type: 'button', style: t ? `--t:${COR_TIER[t]}` : null, class: `pos-casa nossa ocupada${alt}${n > 1 ? ' longe' : ''}`, title: `${p.nome}${t ? ` · tier ${t}` : ''} · ${alcance(n)}`, 'aria-label': `${p.nome}${t ? `, tier ${t}` : ''}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
         sprite(p),
         el('span', { class: 'pos-casa-info', 'aria-hidden': 'true' }, [seloTier(p, 'pos-tier mini'), el('b', { class: `pos-casa-alc${n > 1 ? ' longe' : ''}` }, [ico(n > 1 ? 'arco' : 'espada'), String(n)])])
       ])
