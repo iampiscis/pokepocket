@@ -16,6 +16,10 @@ const AGENTE = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KH
 const LIGAS = ['challenger', 'graomestre', 'mestre']
 const NOME_LIGA = { challenger: 'Challenger', graomestre: 'Grão-Mestre', mestre: 'Mestre' }
 const RECORTE = 'Mestre+'
+const TOPO = 100
+const MIN_USO_TOPO = 3
+const MIN_USO_SEM_TOPO = 1
+const PESO_USO = 0.5
 const TETO_JOGADORES = Math.min(3000, Math.max(50, Number(process.env.META_PVP_TETO) || 1500))
 const PAUSA_MS = 500
 const LIMITES = { partidasMin: 1000, p99: 15, max: 30 }
@@ -23,7 +27,7 @@ const IV_MEDIO = { hp: 21, atk: 21, def: 21, spAtk: 21, spDef: 21, speed: 21 }
 const QUALIDADE_MEDIA = 1.28
 const PADRAO = { potencia: 1, quality: 1.1, shiny: true, ivs: { hp: 20, atk: 20, def: 20, spAtk: 20, spDef: 20, speed: 20 } }
 const TIERS = [['S+', 0.04], ['S', 0.08], ['S-', 0.18], ['A+', 0.23], ['A', 0.32], ['A-', 0.41], ['B+', 0.51], ['B', 0.6], ['B-', 0.69], ['C', 0.85], ['D', 1]]
-const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos, e sem a versão comum de quem tem mega. Faixas pelas formas shiny usadas nos times dos jogadores Mestre, Grão-Mestre e Challenger do ranqueado (todas as partidas do dia que o tracker registra para eles), com o meta dessas partidas; formas finais sem uso ficam em foraDoMeta.`
+const REGRA = `Só shinies, cada forma como aparece nas partidas (mega, forma regional e ramificação separadas), avaliada sozinha com qualidade 1,1, IV 20 em tudo, P1, sem refino. Sem lendários e míticos, e sem a versão comum de quem tem mega. Entram no tier as formas shiny usadas por pelo menos ${MIN_USO_TOPO}% dos jogadores do top ${TOPO} do ranqueado no período; a posição mistura, em partes iguais, a força (Score PvP contra o meta das partidas Mestre+) e o uso no top ${TOPO}. As demais ficam em foraDoMeta, na faixa que a força sozinha daria.`
 const HORA = 3600000
 const DIA = 24 * HORA
 const JANELAS = { dia: { idade: 20 * HORA, dias: 1 }, semana: { idade: 7 * DIA - 4 * HORA, dias: 7 }, mes: { idade: 30 * DIA - 4 * HORA, dias: 30 } }
@@ -281,6 +285,7 @@ const enxuta = (p) => ({ em: p.em, venci: !!p.venci, oponente: p.oponente?.nick 
 
 async function elegiveis() {
   const nicks = []
+  const posicoes = new Map()
   const porLiga = {}
   let temporada = null
   let fim = false
@@ -292,19 +297,20 @@ async function elegiveis() {
       if (!LIGAS.includes(x.tierId)) { fim = true; break }
       if (nicks.length >= TETO_JOGADORES) break
       nicks.push(x.nick)
+      posicoes.set(x.nick, Number(x.posicao) || nicks.length)
       porLiga[x.tierId] = (porLiga[x.tierId] || 0) + 1
     }
     await espera(PAUSA_MS)
   }
   log(`ladder: ${nicks.length} jogadores ${RECORTE} da temporada ${temporada} (${LIGAS.map((l) => `${NOME_LIGA[l]} ${porLiga[l] || 0}`).join(', ')})${nicks.length >= TETO_JOGADORES ? `, no teto de ${TETO_JOGADORES}` : ''}`)
-  return { nicks, temporada, porLiga }
+  return { nicks, posicoes, temporada, porLiga }
 }
 
-async function coletarListas(nicks) {
+async function coletarListas(nicks, posicoes = new Map()) {
   const listas = []
   for (const nick of nicks) {
     const j = await api('partidas', { nick })
-    if (j) listas.push({ nick, partidas: (j.partidas || []).map(enxuta) })
+    if (j) listas.push({ nick, posicao: posicoes.get(nick) ?? null, partidas: (j.partidas || []).map(enxuta) })
     await espera(PAUSA_MS)
     if (listas.length && listas.length % 100 === 0) log(`partidas: ${listas.length} jogadores`)
   }
@@ -312,19 +318,21 @@ async function coletarListas(nicks) {
 }
 
 async function coletarPassada() {
-  const { nicks, temporada, porLiga } = await elegiveis()
-  const listas = await coletarListas(nicks)
+  const { nicks, posicoes, temporada, porLiga } = await elegiveis()
+  const listas = await coletarListas(nicks, posicoes)
   return { em: new Date().toISOString(), temporada, porLiga, listas }
 }
 
 function juntarListas(passadas, desde) {
   const porNick = new Map()
+  const posicao = new Map()
   for (const ps of passadas) for (const l of ps.listas || []) {
     let m = porNick.get(l.nick)
     if (!m) porNick.set(l.nick, (m = new Map()))
+    if (Number(l.posicao) > 0) posicao.set(l.nick, Number(l.posicao))
     for (const p of l.partidas || []) if (Date.parse(p.em) > desde && !m.has(p.em)) m.set(p.em, p)
   }
-  return [...porNick].map(([nick, m]) => ({ nick, partidas: [...m.values()].sort((a, b) => Date.parse(b.em) - Date.parse(a.em)) }))
+  return [...porNick].map(([nick, m]) => ({ nick, posicao: posicao.get(nick) ?? null, partidas: [...m.values()].sort((a, b) => Date.parse(b.em) - Date.parse(a.em)) }))
 }
 
 function lerPassadas(pasta) {
@@ -477,6 +485,14 @@ function montarBalde(c, ativo, bruta, de, ate) {
   const vit = {}
   const nicks = []
   let times = 0
+  const topo = { jogadores: 0, uso: {} }
+  for (const j of bruta.listas) {
+    if (!(Number(j.posicao) > 0 && Number(j.posicao) <= TOPO)) continue
+    const ps = j.partidas.filter((x) => dentro(x.em))
+    if (!ps.length) continue
+    topo.jogadores++
+    for (const id of new Set(ps.flatMap((x) => (x.eu?.pks || []).filter((k) => k.shiny).map((k) => Number(k.id))))) topo.uso[id] = (topo.uso[id] || 0) + 1
+  }
   for (const j of bruta.listas) {
     const p = j.partidas.find((x) => dentro(x.em))
     if (!p) continue
@@ -504,7 +520,7 @@ function montarBalde(c, ativo, bruta, de, ate) {
       versaoJogo: c.versao?.versaoJogo ?? null, partidas: unicas.length, completas: partidas.length, N: pks.length,
       soma: { inc: Object.fromEntries(TIPOS.map((t) => [t, soma.inc[t].map((x) => sig(x, 9))])), def: Object.fromEntries(TIPOS.map((t) => [t, soma.def[t].map((x) => sig(x, 9))])), invInc: sig(soma.invInc, 9), defInv: sig(soma.defInv, 9) },
       amostra: embaralhados.slice(0, AMOSTRA).map((o) => o.bruto),
-      times, uso, vit, nicks
+      times, uso, vit, nicks, ...(topo.jogadores ? { topo } : {})
     },
     partidas,
     pks,
@@ -697,14 +713,14 @@ function prepararLinhas(c) {
   return { formas, baseDe, folhas }
 }
 
-function cortarEmTiers(itens) {
-  const ordem = itens.slice().sort((a, b) => b.score - a.score || b.forca - a.forca || a.nome.localeCompare(b.nome))
+function cortarEmTiers(itens, chave = 'score') {
+  const ordem = itens.slice().sort((a, b) => b[chave] - a[chave] || b.score - a.score || b.forca - a.forca || a.nome.localeCompare(b.nome))
   const n = ordem.length
   const tiers = []
   let i = 0
   for (const [tier, ate] of TIERS) {
     let fim = Math.max(i, Math.round(n * ate))
-    while (fim > i && fim < n && ordem[fim].score === ordem[fim - 1].score) fim++
+    while (fim > i && fim < n && ordem[fim][chave] === ordem[fim - 1][chave]) fim++
     tiers.push({ tier, itens: ordem.slice(i, fim) })
     i = fim
   }
@@ -717,7 +733,13 @@ function tierDaJanela(c, linhas, meta, baldes) {
   const times = baldes.reduce((t, b) => t + b.times, 0)
   const uso = new Map()
   const vit = new Map()
+  const usoTopo = new Map()
+  let jogadoresTopo = 0
   for (const b of baldes) {
+    if (b.topo?.jogadores) {
+      jogadoresTopo += b.topo.jogadores
+      for (const [id, k] of Object.entries(b.topo.uso)) usoTopo.set(Number(id), (usoTopo.get(Number(id)) || 0) + k)
+    }
     for (const [id, k] of Object.entries(b.uso)) uso.set(Number(id), (uso.get(Number(id)) || 0) + k)
     for (const [id, [n, w]] of Object.entries(b.vit)) { const v = vit.get(Number(id)) || [0, 0]; v[0] += n; v[1] += w; vit.set(Number(id), v) }
   }
@@ -742,17 +764,29 @@ function tierDaJanela(c, linhas, meta, baldes) {
       uso: times ? Math.min(100, Math.round((1000 * usam) / times) / 10) : null,
       vitorias: n >= MIN_VITORIAS ? Math.round((1000 * w) / n) / 10 : null,
       n,
-      usado: usam > 0
+      ...(jogadoresTopo ? { usoTopo: Math.round((1000 * (usoTopo.get(id) || 0)) / jogadoresTopo) / 10 } : {})
     })
   }
-  const tiers = cortarEmTiers(itens.filter((x) => x.usado))
-  const cortes = tiers.filter((t) => t.itens.length).map((t) => ({ tier: t.tier, min: t.itens.at(-1).score }))
-  const faixaDe = (score) => (cortes.find((k) => score >= k.min) || cortes.at(-1))?.tier ?? null
+  const pesoUso = (x) => (jogadoresTopo ? x.usoTopo : x.uso) || 0
+  for (const x of itens) x.usado = jogadoresTopo ? x.usoTopo >= MIN_USO_TOPO : (x.uso || 0) >= MIN_USO_SEM_TOPO
+  const noMeta = itens.filter((x) => x.usado)
+  const pct = (v, lista) => (lista.length > 1 ? (lista.filter((y) => y < v).length + (lista.filter((y) => y === v).length - 1) / 2) / (lista.length - 1) : 1)
+  const scores = noMeta.map((x) => x.forca)
+  const usos = noMeta.map(pesoUso)
+  for (const x of noMeta) x.nota = Math.round(1000 * ((1 - PESO_USO) * pct(x.forca, scores) + PESO_USO * pct(pesoUso(x), usos)))
+  const tiers = cortarEmTiers(noMeta, 'nota')
+  const cortes = tiers.filter((t) => t.itens.length).map((t) => ({ tier: t.tier, min: t.itens.at(-1).nota }))
+  const porForca = scores.slice().sort((a, b) => b - a)
+  const faixaPelaForca = (forca) => {
+    const acima = porForca.filter((y) => y > forca).length
+    const p = porForca.length ? acima / porForca.length : 1
+    return (TIERS.find(([, ate]) => p < ate) || TIERS.at(-1))[0]
+  }
   const foraDoMeta = itens.filter((x) => !x.usado)
     .sort((a, b) => b.score - a.score || b.forca - a.forca || a.nome.localeCompare(b.nome))
-    .map((x) => ({ ...x, tier: faixaDe(x.score) }))
+    .map((x) => ({ ...x, tier: faixaPelaForca(x.forca) }))
   for (const x of [...tiers.flatMap((t) => t.itens), ...foraDoMeta]) { delete x.forca; delete x.usado }
-  return { cortes, tiers, foraDoMeta }
+  return { cortes, tiers, foraDoMeta, criterio: 'nota', topo: jogadoresTopo ? TOPO : null, jogadoresTopo, minUsoTopo: MIN_USO_TOPO }
 }
 
 async function principal() {
@@ -827,10 +861,11 @@ async function principal() {
     if (!metaValido(meta)) meta = metaDia
     const nicks = new Set(bs.flatMap((b) => b.nicks))
     const dias = Math.max(1, Math.round(bs.reduce((t, b) => t + Date.parse(b.ate) - Date.parse(b.de), 0) / DIA))
-    const { cortes, tiers, foraDoMeta } = tierDaJanela(c, linhas, meta, bs)
+    const { cortes, tiers, foraDoMeta, criterio, topo, jogadoresTopo, minUsoTopo } = tierDaJanela(c, linhas, meta, bs)
     janelas[j] = {
       de: bs[0].de, ate: bs.at(-1).ate, jogadores: nicks.size, partidas: bs.reduce((t, b) => t + b.partidas, 0),
       ...(dias < JANELAS[j].dias ? { parcial: true, dias } : {}),
+      criterio, ...(topo ? { topo, jogadoresTopo, minUsoTopo } : {}),
       cortes, tiers, foraDoMeta
     }
     log(`${j}: ${dias} dia(s), ${janelas[j].partidas} partidas, ${tiers.reduce((t, g) => t + g.itens.length, 0)} formas no meta, ${foraDoMeta.length} fora; S+: ${tiers[0].itens.slice(0, 5).map((x) => `${x.nome} ${x.score}`).join(', ')}`)

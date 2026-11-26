@@ -84,7 +84,7 @@ function cartao(p) {
   const tipos = (p.tipos || []).filter(Boolean).map((t) => String(t).toUpperCase())
   const nomesTipos = tipos.map((t) => NOME_TIPO[t] || t).join(' e ')
   const score = ehNum(p.score) ? Math.round(p.score) : null
-  return el('a', { class: 'poke', href: linkCalc(p), 'data-id': String(p.speciesId), title: `${p.nome} shiny${nomesTipos ? ` (${nomesTipos})` : ''}${score != null ? ` · score ${fmt.format(score)}` : ''}${Number(p.uso) > 0 ? ` · uso ${fmtPct.format(p.uso)}%` : ''}` }, [
+  return el('a', { class: 'poke', href: linkCalc(p), 'data-id': String(p.speciesId), title: `${p.nome} shiny${nomesTipos ? ` (${nomesTipos})` : ''}${score != null ? ` · score ${fmt.format(score)}` : ''}${ehNum(p.usoTopo) ? ` · ${fmtPct.format(p.usoTopo)}% do top ${fmt.format(janelaAtual()?.topo ?? 100)}` : Number(p.uso) > 0 ? ` · uso ${fmtPct.format(p.uso)}%` : ''}` }, [
     el('span', { class: 'poke-img' }, [sprite(p), el('i', { class: 'poke-shiny', 'aria-hidden': 'true', text: '✦' })]),
     el('span', { class: 'poke-nome', text: p.nome }),
     nomesTipos ? el('span', { class: 'so-leitor', text: nomesTipos }) : null,
@@ -154,7 +154,7 @@ function filtrar(itens) {
 
 function ordenar(itens) {
   const sc = (p) => (ehNum(p.score) ? Number(p.score) : -1)
-  const us = (p) => (ehNum(p.uso) ? Number(p.uso) : -1)
+  const us = (p) => (ehNum(p.usoTopo) ? Number(p.usoTopo) : ehNum(p.uso) ? Number(p.uso) : -1)
   return [...itens].sort(estado.ordem === 'uso' ? (a, b) => us(b) - us(a) || sc(b) - sc(a) : (a, b) => sc(b) - sc(a) || us(b) - us(a))
 }
 
@@ -248,7 +248,7 @@ function pintar() {
     const pos = (t) => { const k = ordem.indexOf(t); return k < 0 ? ordem.length : k }
     foraFaixas = [...grupos.keys()].sort((a, b) => pos(a) - pos(b)).map((t) => faixa(t, grupos.get(t), cortes, true)).filter(Boolean)
     $('t-fora').textContent = `Fora do meta ${{ dia: 'hoje', semana: 'na semana', mes: 'no mês' }[estado.janela] || 'no período'}`
-    $('fora-aviso').textContent = `sem uso shiny ${recorteDe(j)?.frase ?? 'no ranqueado'} no período`
+    $('fora-aviso').textContent = j.criterio === 'nota' && j.topo ? `em menos de ${fmtPct.format(j.minUsoTopo ?? 3)}% dos times do top ${fmt.format(j.topo)} no período; faixa pela força` : `sem uso shiny ${recorteDe(j)?.frase ?? 'no ranqueado'} no período`
   }
   $('fora-faixas').replaceChildren(...foraFaixas)
   $('fora').hidden = !foraFaixas.length
@@ -262,7 +262,7 @@ function faixa(tier, lista, cortes, apagada = false, destaque = false) {
   const itens = ordenar(filtrar(lista || []))
   if (!itens.length) return null
   const min = cortes.get(tier)
-  return el('section', { class: `faixa${destaque ? ' destaque' : ''}${apagada ? ' apagada' : ''}`, style: `--cor:${COR_TIER[tier] || '#8b919c'}`, 'aria-label': `${apagada ? 'Fora do meta, tier' : 'Tier'} ${tier}`, title: ehNum(min) && Number(min) > 0 ? `Tier ${tier}: score ${fmt.format(min)} ou mais` : null }, [
+  return el('section', { class: `faixa${destaque ? ' destaque' : ''}${apagada ? ' apagada' : ''}`, style: `--cor:${COR_TIER[tier] || '#8b919c'}`, 'aria-label': `${apagada ? 'Fora do meta, tier' : 'Tier'} ${tier}`, title: janelaAtual()?.criterio !== 'nota' && ehNum(min) && Number(min) > 0 ? `Tier ${tier}: score ${fmt.format(min)} ou mais` : null }, [
     el('div', { class: 'faixa-rot' }, [el('b', { text: tier })]),
     el('div', { class: 'faixa-cartoes' }, itens.map(cartao))
   ])
@@ -404,7 +404,9 @@ function pintarFicha({ p, tier, fora }) {
   const defs = el('div', { class: 'f-defs' }, [carga()])
   const stats = el('div', { class: 'f-stats' }, [carga()])
   const noTopo = recorteDe(janelaAtual())?.frase ?? 'no topo do ranqueado'
+  const jt = janelaAtual()
   const uso = [
+    ehNum(p.usoTopo) ? (Number(p.usoTopo) > 0 ? `Em ${fmtPct.format(p.usoTopo)}% dos times do top ${fmt.format(jt?.topo ?? 100)}` : `Sem uso no top ${fmt.format(jt?.topo ?? 100)}`) : null,
     Number(p.uso) > 0 ? `Uso ${fmtPct.format(p.uso)}% ${noTopo}` : `Sem uso ${noTopo}`,
     ehNum(p.vitorias) ? `${fmtPct.format(p.vitorias)}% de vitórias` : null,
     Number(p.n) > 0 ? plural(p.n, 'partida', 'partidas') : null
@@ -416,7 +418,7 @@ function pintarFicha({ p, tier, fora }) {
       el('div', { class: 'f-id' }, [
         el('h2', { id: 'ficha-nome', text: p.nome }),
         el('div', { class: 'f-linha' }, [
-          el('span', { class: 'f-tier', text: tier || '?', title: fora ? 'Tier pelo score; fora do meta no período' : `Tier ${tier}` }),
+          el('span', { class: 'f-tier', text: tier || '?', title: fora ? 'Tier pela força; pouco usado no período' : `Tier ${tier}` }),
           el('span', { class: 'f-score' }, [el('b', { text: score != null ? fmt.format(score) : '—' }), el('small', { text: 'Score PvP' })])
         ]),
         tipos.length ? el('span', { class: 'tipos' }, tipos.map(chipTipo)) : null
@@ -512,8 +514,10 @@ function pintarCabecalho() {
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como o tier é feito' })]),
     el('div', { class: 'ex-grade' }, [
       bloco('✦', 'Shiny padrão', 'Nv 100 · qualidade 1,1 · IV 20 · P1 · sem refino'),
-      bloco('⚔', 'Meta real', `${fonte}. Sem lendários e míticos.`),
-      bloco('★', 'Score 0–1000', 'O mesmo da calculadora')
+      ...(janelasDe(dados).dia?.criterio === 'nota'
+        ? [bloco('⚔', 'Uso no top 100', `Só formas em ${fmtPct.format(janelasDe(dados).dia?.minUsoTopo ?? 3)}% ou mais dos times do top 100. Sem lendários e míticos.`),
+          bloco('★', 'Força + uso', 'Metade Score PvP (o da calculadora), metade uso no top 100')]
+        : [bloco('⚔', 'Meta real', `${fonte}. Sem lendários e míticos.`), bloco('★', 'Score 0–1000', 'O mesmo da calculadora')])
     ]),
     ...(versao ? [el('small', { class: 'ex-pe', text: versao })] : [])
   )
