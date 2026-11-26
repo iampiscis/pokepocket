@@ -246,10 +246,7 @@ html.embed, html.embed body { height: auto; overflow: visible; overscroll-behavi
 .pos-casa.alt { background: var(--madeira-alt); }
 .pos-casa img { position: absolute; inset: 7%; width: 86%; height: 86%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.7)) saturate(1.1); }
 .pos-casa img.bola { inset: 25%; width: 50%; height: 50%; opacity: 0.5; image-rendering: auto; }
-.pos-casa-info { position: absolute; z-index: 5; left: 50%; bottom: -8px; translate: -50% 0; display: inline-flex; align-items: center; gap: 0; height: 13px; border-radius: 999px; background: #10070c; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.35), 0 2px 4px rgba(0, 0, 0, 0.7); white-space: nowrap; overflow: hidden; }
-.pos-casa-alc { display: inline-flex; align-items: center; gap: 1px; height: 13px; padding: 0 4px 0 3px; font: 700 8.5px/1 Tahoma, Verdana, 'Segoe UI', sans-serif; color: #fff; background: #a8492a; white-space: nowrap; }
-.pos-casa-alc svg { width: 8px; height: 8px; stroke-width: 2.8; }
-.pos-casa-alc.longe { background: #2b7a6c; }
+.pos-casa-info { position: absolute; z-index: 5; left: 50%; bottom: -7px; translate: -50% 0; display: inline-flex; align-items: center; gap: 0; height: 13px; border-radius: 999px; background: #10070c; box-shadow: 0 0 0 1px rgba(255, 233, 163, 0.35), 0 2px 4px rgba(0, 0, 0, 0.7); white-space: nowrap; overflow: hidden; }
 
 @media (max-width: 1100px) {
   .pos-grade { grid-template-columns: minmax(0, 1fr); }
@@ -267,9 +264,7 @@ html.embed, html.embed body { height: auto; overflow: visible; overscroll-behavi
   .pos-uso .poke-img img { max-width: 32px; max-height: 32px; }
   .pos-uso-barra { left: 47px; }
   .pos-grade { grid-template-columns: minmax(0, 1fr); }
-  .pos-casa-alc { height: 10px; padding: 0 2px 0 1px; font-size: 7.5px; }
-  .pos-casa-alc svg { width: 7px; height: 7px; }
-  .pos-tier.mini { min-width: 0; height: 13px; padding: 0 3px; border-radius: 0; font: 700 8.5px/1 Tahoma, Verdana, 'Segoe UI', sans-serif; box-shadow: none; }
+  .pos-tier.mini { min-width: 0; height: 13px; padding: 0 5px; border-radius: 0; font: 700 8.5px/1 Tahoma, Verdana, 'Segoe UI', sans-serif; box-shadow: none; }
 }
 
 .pos-lado { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0 0 -3px; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }

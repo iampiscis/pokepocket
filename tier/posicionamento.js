@@ -216,7 +216,7 @@ function cartao(j) {
       const t = tierDe(p)
       const b = el('button', { type: 'button', style: t ? `--t:${COR_TIER[t]}` : null, class: `pos-casa nossa ocupada${alt}${n > 1 ? ' longe' : ''}`, title: `${p.nome}${t ? ` · tier ${t}` : ''} · ${alcance(n)}`, 'aria-label': `${p.nome}${t ? `, tier ${t}` : ''}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
         sprite(p),
-        el('span', { class: 'pos-casa-info', 'aria-hidden': 'true' }, [seloTier(p, 'pos-tier mini'), el('b', { class: `pos-casa-alc${n > 1 ? ' longe' : ''}` }, [ico(n > 1 ? 'arco' : 'espada'), String(n)])])
+        t ? el('span', { class: 'pos-casa-info', 'aria-hidden': 'true' }, [seloTier(p, 'pos-tier mini')]) : null
       ])
       nossas.push({ el: b, p, n, xy: [cx, CY_NOSSO(f)] })
       tab.append(b)
