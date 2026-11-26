@@ -1,4 +1,5 @@
 import * as P from '../calculadora/jogo/pvp-passivas.mjs'
+import { iconePassiva } from './icones.js'
 
 const SPRITES = '../calculadora/jogo/sprites-png/'
 const BOLA = '../assets/pokebola.svg'
@@ -64,6 +65,13 @@ const SOM_PASSIVA = { rocky_helmet: 'pedra', rain_dance: 'chuva', swarm: 'inseto
 let somMod = null
 const somPronto = import('./som.js').then((m) => { somMod = m; return m }).catch(() => null)
 function som(nome, opt) { if (!cena || cena.vel) somMod?.tocar(nome, opt) }
+const EMOJI_PASSIVA = { '⛰️': 'rocky_helmet', '🌧️': 'rain_dance', '🐝': 'swarm', '🐉': 'intimidate', '🔩': 'iron_defense', '🔥': 'burn', '☠️': 'poison', '❄️': 'freeze', '🌩️': 'paralyze', '⚡': 'paralyze', '🌱': 'leech_seed', '🕳️': 'dig', '💫': 'confusion', '👻': 'fear', '👊': 'rock_smash', '🌪️': 'whirlwind', '🌑': 'assurance', '💗': 'charm', '💚': 'recover' }
+const IDS_ICONE = new Set(Object.values(EMOJI_PASSIVA))
+function comIcone(n, txt) {
+  const id = EMOJI_PASSIVA[txt] || (IDS_ICONE.has(txt) ? txt : null)
+  if (id) { n.innerHTML = iconePassiva(id); n.classList.add('svg') } else { n.textContent = txt || ''; n.classList.remove('svg') }
+  return n
+}
 const preencher = (txt, n) => txt.replace(/\{(\w+)\}/g, (_, k) => n[k] ?? '')
 const $ = (id) => document.getElementById(id)
 const reduzido = matchMedia('(prefers-reduced-motion: reduce)')
@@ -140,7 +148,7 @@ function gravarHash() {
 function montarLista() {
   const corpo = $('pas-linhas')
   corpo.replaceChildren(...LISTA.filter((x) => estado.filtro === 'todas' || (estado.filtro === 'inimigo') === x.inimigo).map((x) => el('button', { type: 'button', class: `pas-linha${x.id === estado.sel ? ' sel' : ''}`, style: `--t:${COR_TIPO[x.tipo]}`, 'data-id': x.id, 'aria-pressed': String(x.id === estado.sel), title: `${x.nome}: ${x.curto}` }, [
-    el('span', { class: 'pas-ic', 'aria-hidden': 'true', text: x.icone }),
+    comIcone(el('span', { class: 'pas-ic', 'aria-hidden': 'true' }), x.id),
     el('span', { class: 'pas-linha-txt' }, [el('b', { text: x.nome }), el('span', { class: `pas-gat g-${x.p.gatilho}`, text: x.gatCurto })])
   ])))
   document.querySelectorAll('[data-filtro]').forEach((b) => {
@@ -186,7 +194,7 @@ function montarDetalhe() {
   const palco = $('pas-palco')
   palco.style.setProperty('--t', COR_TIPO[x.tipo])
   $('pas-cab').replaceChildren(
-    el('span', { class: 'pas-ic grande', 'aria-hidden': 'true', text: x.icone }),
+    comIcone(el('span', { class: 'pas-ic grande', 'aria-hidden': 'true' }), x.id),
     el('span', { class: 'pas-cab-txt' }, [
       el('h2', { text: x.nome }),
       el('span', { class: 'pas-cab-chips' }, [
@@ -368,7 +376,7 @@ class Cena {
     const doDono = de === this.dono
     som(opt.classe === 'cura' ? 'cura' : doDono ? 'disparo' : 'disparo', { forca: doDono ? 0.8 : 0.45, pan: panDe(de) })
     if (doDono && !opt.semSomPassiva) som(SOM_PASSIVA[this.x.id], { forca: 0.7, pan: panDe(de) })
-    const orbe = el('span', { class: `pas-proj ${opt.classe || ''}`, style: `${base};width:${tam}px;height:${tam}px;font-size:${tam * 0.6}px` }, [el('span', { text: emoji })])
+    const orbe = el('span', { class: `pas-proj ${opt.classe || ''}`, style: `${base};width:${tam}px;height:${tam}px;font-size:${tam * 0.6}px` }, [comIcone(el('span'), emoji)])
     this.camada.append(...rastro, orbe)
     const fimOp = opt.passa ? 0 : 1
     const kf = (op) => [{ transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: op, offset: 0.14 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${opt.passa ? 0.7 : 1})`, opacity: op * fimOp }]
@@ -447,7 +455,7 @@ class Cena {
   }
   status(p, txt) {
     const s = p.n.querySelector('.pas-st')
-    s.textContent = txt || ''
+    comIcone(s, txt)
     s.classList.toggle('on', !!txt)
   }
   marca(p, classe, on = true) { p.n.classList.toggle(classe, on) }
@@ -492,7 +500,7 @@ class Cena {
     const partes = txt.split(/([−+]?\d+(?:,\d+)?\s?(?:%\/s|%|s\b)|\b\d{2,}\b)/)
     partes.forEach((t, i) => { if (t) corpo.append(i % 2 ? el('b', { class: 'pas-num', text: t }) : t) })
     const barra = el('i', { class: 'pas-passo-barra' })
-    l.replaceChildren(el('span', { class: 'pas-passo-ic', 'aria-hidden': 'true', text: this.x.icone }), corpo, barra)
+    l.replaceChildren(comIcone(el('span', { class: 'pas-passo-ic', 'aria-hidden': 'true' }), this.x.id), corpo, barra)
     if (this.vel) barra.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: Math.max(1500, txt.length * 55), easing: 'linear', fill: 'forwards' })
     if (this.vel) l.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 260 })
   }
@@ -526,7 +534,7 @@ const COR = { fogo: '#ff8a3d', veneno: '#c46be0', gelo: '#7fe3ff', raio: '#ffd84
 const CENAS = {
   async rocky_helmet(c, x) {
     const { C } = elenco(c, x); const { E1 } = inimigos(c)
-    c.status(C, x.icone); c.aura(C, COR.pedra)
+    c.status(C, x.id); c.aura(C, COR.pedra)
     await c.legenda('Ativa a luta toda.')
     await c.espera(1000)
     for (let i = 0; i < 2; i++) {
@@ -835,7 +843,7 @@ function ligarBusca() {
           el('b', { text: a.nome }),
           el('small', { text: bst ? `BST ${bst} · ${bst <= P.BST_MAX_PASSIVA ? 'recebe' : 'não recebe'} Rain Dance e Recover de aliados` : '' })
         ]),
-        x ? el('span', { class: 'pas-achado-pas' }, [el('span', { 'aria-hidden': 'true', text: x.icone }), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
+        x ? el('span', { class: 'pas-achado-pas' }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), x.id), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
       ])
       if (i === ativo) b.classList.add('foco')
       return b
@@ -896,6 +904,7 @@ function ligar() {
   btSom.addEventListener('click', async () => { const m = await somPronto; if (!m) return; const on = m.alternarSom(); pintarSom(on); if (on) iniciarCena(PORID.get(estado.sel)) })
   ligarBusca()
   const pop = $('pas-como')
+  pop.querySelectorAll('[data-ico]').forEach((e) => comIcone(e, e.dataset.ico))
   $('pas-como-abrir').addEventListener('click', () => { pop.showModal(); som('clique', { forca: 0.6 }) })
   $('pas-como-fechar').addEventListener('click', () => pop.close())
   pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
