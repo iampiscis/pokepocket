@@ -246,7 +246,6 @@ export const GOLPES_PRE_EVOLUCOES_KANTO = {};
 
 
 
-
 export const GOLPES_REWORK_2026_09_28 = {};
 
 
@@ -399,7 +398,6 @@ export const GOLPES_MEGAS_2026_10_03 = {};
 
 
 export const GOLPES_LENDARIOS_2026_10_11 = {};
-
 
 
 

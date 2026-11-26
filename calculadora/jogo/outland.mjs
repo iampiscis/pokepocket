@@ -39,9 +39,25 @@ export function remapOutlandPokeId(pokeId) {
 }
 
 
+export const ESPELHO_FANTASMA_14_MIN = 14000;
+export const ESPELHO_FANTASMA_14_MAX = 15000;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function isEspelhoFantasmaPokeId(pokeId) {
   const id = Number(pokeId);
-  return id >= 10000 && id < OUTLAND_POKE_LEGADO_MIN;
+  return (id >= 10000 && id < OUTLAND_POKE_LEGADO_MIN) || (id >= ESPELHO_FANTASMA_14_MIN && id < ESPELHO_FANTASMA_14_MAX);
 }
 
 

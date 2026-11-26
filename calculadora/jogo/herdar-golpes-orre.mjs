@@ -34,10 +34,6 @@
 
 
 
-
-
-
-
 const ORRE_MIN = 13000;
 const ORRE_MAX = 14000;
 
