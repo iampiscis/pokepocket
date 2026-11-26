@@ -9,7 +9,7 @@ const RAIZES = [
   'ginasios.mjs', 'evolucoes-ramificadas.mjs', 'evolucoes-cruzadas.mjs', 'megas.mjs', 'outland.mjs',
   'golpes-planilhas.mjs', 'golpes-especiais.mjs', 'herdar-base-outland.mjs', 'herdar-golpes-orre.mjs',
   'ajustes-especie-espelho.mjs', 'tm-elemental.mjs', 'teto-captura.mjs', 'linhagem-nota.mjs',
-  'nota-pokemon.mjs', 'formas.mjs', 'cooldown-golpes.mjs'
+  'nota-pokemon.mjs', 'formas.mjs', 'cooldown-golpes.mjs', 'pvp-passivas.mjs'
 ]
 const CATALOGOS = ['creatures', 'creatures-novos', 'creatures-outland-novos', 'creatures-formas', 'creatures-audit-overrides']
 const OBRIGATORIOS = new Set(['creatures'])
