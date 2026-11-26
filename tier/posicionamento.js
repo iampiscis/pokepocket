@@ -161,6 +161,13 @@ function alcanceInfo(a) {
   ])
 }
 
+function guildTag(g) {
+  const tag = String(g?.tag || '').trim().slice(0, 8)
+  if (!tag) return null
+  const cor = /^#[0-9a-f]{3,8}$/i.test(String(g.cor || '')) ? g.cor : '#c9b8a8'
+  return el('span', { class: 'pos-guild', style: `--g:${cor}`, title: g.nome ? `Guild ${g.nome}` : 'Guild' }, [`[${tag}]`])
+}
+
 function usadoEm(dia) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dia || ''))) return null
   const d = new Date(`${dia}T12:00:00`)
@@ -205,7 +212,8 @@ function cartao(j) {
   return el('article', { class: `pos-card${podio}` }, [
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
-      el('strong', { class: 'pos-nick', title: j.nick }, [el('span', { text: j.nick })])
+      el('strong', { class: 'pos-nick', title: j.guild?.nome ? `${j.nick} · ${j.guild.nome}` : j.nick }, [el('span', { text: j.nick })]),
+      guildTag(j.guild)
     ]),
     el('ul', { class: 'pos-stats' }, [
       el('li', { title: 'Pontos no mês' }, [ico('pontos'), el('span', { text: `${fmt.format(j.pontos || 0)} pts` })]),
