@@ -110,7 +110,7 @@ function pintar() {
     el('div', { class: 'ex-grade' }, [
       bloco('⚔', 'Formação real', 'Casas tiradas de partidas ranqueadas da semana'),
       bloco('★', 'Variedade', 'Times e posições diferentes entre si'),
-      bloco('↑', 'Frente', 'A fileira de cima é a mais perto do adversário'),
+      bloco('↑', 'Tabuleiro', 'Adversário em cima; toque num pokémon para ver as casas que ele alcança'),
       bloco('🏹', 'Alcance', '🗡️ corpo a corpo, 🏹 de longe; o número é quantas casas o golpe alcança')
     ])
   ])
@@ -149,17 +149,6 @@ function resumo(lista, n) {
   ])
 }
 
-const ALC_MAX = 4
-function alcanceInfo(a) {
-  const n = Math.max(1, Math.min(ALC_MAX, Math.round(Number(a) || 1)))
-  const longe = n > 1
-  return el('span', { class: `pos-alc${longe ? ' longe' : ''}`, title: longe ? `Ataca de longe: alcance de ${n} casas` : 'Corpo a corpo: alcance de 1 casa', 'aria-label': longe ? `alcance de ${n} casas` : 'corpo a corpo' }, [
-    el('span', { class: 'pos-alc-emoji', 'aria-hidden': 'true', text: longe ? '🏹' : '🗡️' }),
-    el('span', { class: 'pos-alc-casas', 'aria-hidden': 'true' }, Array.from({ length: ALC_MAX }, (_, i) => el('i', { class: i < n ? 'on' : null }))),
-    el('b', { class: 'pos-alc-n', 'aria-hidden': 'true', text: String(n) })
-  ])
-}
-
 function guildTag(g) {
   const tag = String(g?.tag || '').trim().slice(0, 8)
   if (!tag) return null
@@ -173,38 +162,71 @@ function usadoEm(dia) {
   return el('li', { class: 'pos-usado', title: 'Última partida em que essa formação foi usada' }, [ico('semana'), el('span', { text: `usada em ${fmtDia.format(d)}` })])
 }
 
+const CY_NOSSO = (f) => 13 + f
+const CY_DELES = (f) => 12 - f
+const distancia = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]))
+const alcanceN = (a) => Math.max(1, Math.min(4, Math.round(Number(a) || 1)))
+
 function cartao(j) {
   const ocupa = new Map(j.pks.map((p) => [p.casa, p]))
-  const casas = new Map()
-  const tab = el('div', { class: 'pos-tab', role: 'img', 'aria-label': `Formação de ${j.nick}: ${j.pks.map((p) => `${p.nome} na ${zona(p.casa)}`).join(', ')}` })
-  for (let fileira = 0; fileira < FILEIRAS.length; fileira++) {
+  const nossas = []
+  const deles = []
+  const tab = el('div', { class: 'pos-tab', role: 'group', 'aria-label': `Formação de ${j.nick}` })
+  for (let f = FILEIRAS.length - 1; f >= 0; f--) {
     for (let cx = 11; cx <= 18; cx++) {
-      const c = CASAS.find((x) => x.fileira === fileira && x.cx === cx)
+      const c = CASAS.find((x) => x.fileira === f && x.cx === 29 - cx)
       if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
-      const p = ocupa.get(c.casa)
-      const casa = el('span', { class: `pos-casa${p ? ` ocupada${p.alcance > 1 ? ' longe' : ''}` : ''}`, title: p ? `${p.nome} · ${alcance(p.alcance)}` : null }, p ? [sprite(p), el('b', { class: `pos-casa-alc${p.alcance > 1 ? ' longe' : ''}`, 'aria-hidden': 'true' }, [el('i', { text: p.alcance > 1 ? '🏹' : '🗡️' }), String(Math.max(1, Math.min(4, Number(p.alcance) || 1)))])] : [])
-      if (p) casas.set(p.ordem, casa)
-      tab.append(casa)
+      const s = el('span', { class: 'pos-casa inimiga', 'aria-hidden': 'true' })
+      deles.push({ el: s, xy: [cx, CY_DELES(f)] })
+      tab.append(s)
     }
   }
-  const pos = (p) => CASAS[p.casa] || { fileira: 9, cx: 99 }
-  const pks = [...j.pks].sort((a, b) => pos(a).fileira - pos(b).fileira || pos(a).cx - pos(b).cx)
-  const lista = el('ol', { class: 'pos-pks' }, [
-    ...pks.map((p) => {
-      const li = el('li', {}, [el('a', { class: 'pos-pk', href: linkCalc(p), title: `${p.nome} · ${alcance(p.alcance)}` }, [
-        el('span', { class: 'pos-pk-img' }, [sprite(p)]),
-        el('span', { class: 'pos-pk-nome', text: p.nome }),
-        alcanceInfo(p.alcance)
-      ])])
-      const ligar = (on) => casas.get(p.ordem)?.classList.toggle('foco', on)
-      li.addEventListener('pointerenter', () => ligar(true))
-      li.addEventListener('pointerleave', () => ligar(false))
-      li.addEventListener('focusin', () => ligar(true))
-      li.addEventListener('focusout', () => ligar(false))
-      return li
-    }),
-    ...Array.from({ length: Math.max(0, 5 - pks.length) }, () => el('li', { class: 'pos-pk-vazio', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { class: 'pos-pk-img' }), el('span', { text: 'vaga livre' })]))
-  ])
+  tab.append(el('span', { class: 'pos-meio', 'aria-hidden': 'true' }))
+  for (let f = 0; f < FILEIRAS.length; f++) {
+    for (let cx = 11; cx <= 18; cx++) {
+      const c = CASAS.find((x) => x.fileira === f && x.cx === cx)
+      if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
+      const p = ocupa.get(c.casa)
+      if (!p) { tab.append(el('span', { class: 'pos-casa', 'aria-hidden': 'true' })); continue }
+      const n = alcanceN(p.alcance)
+      const b = el('button', { type: 'button', class: `pos-casa ocupada${n > 1 ? ' longe' : ''}`, title: `${p.nome} · ${alcance(n)}`, 'aria-label': `${p.nome}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
+        sprite(p),
+        el('b', { class: `pos-casa-alc${n > 1 ? ' longe' : ''}`, 'aria-hidden': 'true' }, [el('i', { text: n > 1 ? '🏹' : '🗡️' }), String(n)])
+      ])
+      nossas.push({ el: b, p, n, xy: [cx, CY_NOSSO(f)] })
+      tab.append(b)
+    }
+  }
+  const legenda = el('p', { class: 'pos-legenda', role: 'status' })
+  let fixo = null
+  const mostrar = (o) => {
+    for (const x of nossas) { x.el.classList.toggle('sel', x === o); x.el.setAttribute('aria-pressed', String(x === o)) }
+    let total = 0
+    for (const d of deles) {
+      const ok = !!o && distancia(o.xy, d.xy) <= o.n
+      d.el.classList.toggle('alcanca', ok)
+      if (ok) total++
+    }
+    tab.classList.toggle('mirando', !!o)
+    if (!o) {
+      legenda.replaceChildren(el('span', { class: 'pos-legenda-dica', text: 'Toque num pokémon para ver onde ele alcança' }))
+      return
+    }
+    legenda.replaceChildren(
+      el('b', { text: o.p.nome }),
+      el('span', { class: `pos-legenda-alc${o.n > 1 ? ' longe' : ''}` }, [o.n > 1 ? '🏹' : '🗡️', ` ${o.n > 1 ? `${o.n} casas` : 'corpo a corpo'}`]),
+      el('span', { class: 'pos-legenda-n', text: total ? `alcança ${total} ${total === 1 ? 'casa' : 'casas'} do adversário` : 'precisa andar para alcançar' })
+    )
+  }
+  for (const o of nossas) {
+    o.el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !fixo) mostrar(o) })
+    o.el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !fixo) mostrar(null) })
+    o.el.addEventListener('focus', () => { if (!fixo) mostrar(o) })
+    o.el.addEventListener('blur', () => { if (!fixo) mostrar(null) })
+    o.el.addEventListener('click', () => { fixo = fixo === o ? null : o; mostrar(fixo || o) })
+  }
+  mostrar(null)
+  const faltam = 5 - j.pks.length
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const podio = j.pos <= 3 ? ` p${j.pos}` : ''
@@ -217,11 +239,13 @@ function cartao(j) {
     el('ul', { class: 'pos-stats' }, [
       el('li', { title: 'Pontos no mês' }, [ico('pontos'), el('span', { text: `${fmt.format(j.pontos || 0)} pts` })]),
       wr != null ? el('li', { title: `${fmt.format(j.vitorias)} vitórias e ${fmt.format(j.derrotas)} derrotas no mês` }, [ico('vitorias'), el('span', { text: `${wr}%` })]) : null,
-      usadoEm(j.usadoEm)
+      usadoEm(j.usadoEm),
+      faltam > 0 ? el('li', { class: 'pos-menos', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { text: `${j.pks.length} pokémon` })]) : null
     ]),
-    el('p', { class: 'pos-frente', 'aria-hidden': 'true' }, [ico('frente'), 'Frente']),
+    el('p', { class: 'pos-lado deles', 'aria-hidden': 'true', text: 'Adversário' }),
     tab,
-    lista
+    el('p', { class: 'pos-lado', 'aria-hidden': 'true' }, [ico('frente'), 'Formação']),
+    legenda
   ])
 }
 
