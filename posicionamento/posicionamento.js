@@ -67,7 +67,7 @@ const COR_TIER = { 'S+': '#ff6fae', S: '#ff7676', 'S-': '#b495ff', 'A+': '#f5b13
 
 async function lerTiers() {
   try {
-    const r = await fetch('tier.json', { cache: 'no-cache' })
+    const r = await fetch('../tier/tier.json', { cache: 'no-cache' })
     if (!r.ok) return
     const j = (await r.json())?.janelas?.dia
     const m = new Map()
@@ -82,15 +82,6 @@ function seloTier(p, cls = 'pos-tier') {
   return t ? el('span', { class: cls, style: `--t:${COR_TIER[t]}`, title: `Tier ${t} no tier de hoje` }, [t]) : null
 }
 let carregando = null
-
-function aba() { return location.hash === '#posicionamento' ? 'pos' : 'tier' }
-
-function aplicarAba() {
-  const v = aba()
-  document.documentElement.classList.toggle('ver-pos', v === 'pos')
-  document.querySelectorAll('[data-vista]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.vista === v)))
-  if (v === 'pos') carregar()
-}
 
 async function carregar() {
   if (dados || carregando) return carregando
@@ -276,20 +267,4 @@ function cartao(j) {
   ])
 }
 
-function montar() {
-  const abas = document.querySelectorAll('[data-vista]')
-  abas.forEach((b) => {
-    b.addEventListener('click', () => {
-      const alvo = b.dataset.vista
-      if (alvo === aba()) return
-      if (alvo === 'pos') location.hash = 'posicionamento'
-      else history.pushState(null, '', location.pathname + location.search)
-      aplicarAba()
-    })
-  })
-  addEventListener('hashchange', aplicarAba)
-  addEventListener('popstate', aplicarAba)
-  aplicarAba()
-}
-
-montar()
+carregar()
