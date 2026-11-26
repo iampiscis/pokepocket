@@ -192,8 +192,11 @@ function cartao(j) {
   const ocupa = new Map(j.pks.map((p) => [p.casa, p]))
   const nossas = []
   const deles = []
-  const tab = el('div', { class: 'pos-tab', role: 'group', 'aria-label': `Formação de ${j.nick}` })
-  for (let f = FILEIRAS.length - 1; f >= 0; f--) {
+  const tab = el('div', { class: 'pos-tab', role: 'group', 'aria-label': `Formação de ${j.nick}` }, [
+    el('span', { class: 'pos-canto deles', 'aria-hidden': 'true', text: 'Adversário' }),
+    el('span', { class: 'pos-canto nosso', 'aria-hidden': 'true', text: 'Formação' })
+  ])
+  for (let f = FILEIRAS.length - 2; f >= 0; f--) {
     for (let cx = 11; cx <= 18; cx++) {
       const c = CASAS.find((x) => x.fileira === f && x.cx === 29 - cx)
       if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
@@ -234,7 +237,7 @@ function cartao(j) {
     }
     tab.classList.toggle('mirando', !!o)
     if (!o) {
-      legenda.replaceChildren(el('span', { class: 'pos-legenda-dica', text: 'Toque num pokémon para ver onde ele alcança' }))
+      legenda.replaceChildren(el('span', { class: 'pos-legenda-dica', text: 'Toque num pokémon para ver o alcance' }))
       return
     }
     legenda.replaceChildren(
@@ -260,17 +263,15 @@ function cartao(j) {
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
       el('strong', { class: 'pos-nick', title: j.guild?.nome ? `${j.nick} · ${j.guild.nome}` : j.nick }, [el('span', { text: j.nick })]),
-      guildTag(j.guild)
-    ]),
-    el('ul', { class: 'pos-stats' }, [
+      guildTag(j.guild),
+      el('ul', { class: 'pos-stats' }, [
       el('li', { title: 'Pontos no mês' }, [ico('pontos'), el('span', { text: `${fmt.format(j.pontos || 0)} pts` })]),
       wr != null ? el('li', { title: `${fmt.format(j.vitorias)} vitórias e ${fmt.format(j.derrotas)} derrotas no mês` }, [ico('vitorias'), el('span', { text: `${wr}%` })]) : null,
       usadoEm(j.usadoEm),
       faltam > 0 ? el('li', { class: 'pos-menos', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { text: `${j.pks.length} pokémon` })]) : null
+      ])
     ]),
-    el('p', { class: 'pos-lado deles', 'aria-hidden': 'true', text: 'Adversário' }),
     tab,
-    el('p', { class: 'pos-lado', 'aria-hidden': 'true' }, [ico('frente'), 'Formação']),
     legenda
   ])
 }
