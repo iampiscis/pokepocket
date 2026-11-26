@@ -84,6 +84,7 @@ function el(tag, attrs = {}, filhos = []) {
     if (k === 'text') n.textContent = v
     else if (k === 'class') n.className = v
     else if (k === 'style') n.style.cssText = v
+    else if (k === 'html') n.innerHTML = v
     else n.setAttribute(k, v === true ? '' : v)
   }
   for (const f of [].concat(filhos)) if (f != null && f !== false) n.append(f)
@@ -135,14 +136,24 @@ function especie(id) {
 }
 let motorPronto = null
 
-const estado = { sel: 'charm', filtro: 'todas', caster: null }
+const estado = { sel: 'charm', filtro: 'todas', caster: null, modo: 'passivas', time: [], timeSel: null }
+const TIME_MAX = 5
+const TIME_EXEMPLO = [[210, 3, 0], [184, 4, 0], [12, 2, 1], [621, 5, 1], [3149, 3, 1]]
 
 function lerHash() {
   const h = decodeURIComponent(location.hash.slice(1))
+  if (h === 'time' || h.startsWith('time=')) {
+    estado.modo = 'time'
+    const lista = h.startsWith('time=') ? h.slice(5).split(',').map((t) => t.split('.').map(Number)).filter((v) => v.length === 3 && v.every(Number.isFinite) && valida(v[1], v[2])) : null
+    estado.time = (lista ?? TIME_EXEMPLO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
+    return
+  }
+  estado.modo = 'passivas'
   if (PORID.has(h)) estado.sel = h
 }
 function gravarHash() {
-  history.replaceState(null, '', `#${estado.sel}`)
+  if (estado.modo === 'time') history.replaceState(null, '', `#time=${estado.time.map((m) => `${m.sp}.${m.col}.${m.f}`).join(',')}`)
+  else history.replaceState(null, '', `#${estado.sel}`)
 }
 
 function montarLista() {
@@ -161,7 +172,8 @@ function montarLista() {
 let trocaToken = 0
 async function escolher(id, rolar = false, caster = null) {
   if (!PORID.has(id)) return
-  const mudou = id !== estado.sel
+  const mudou = id !== estado.sel || estado.modo !== 'passivas'
+  if (estado.modo !== 'passivas') { estado.modo = 'passivas'; aplicarModo() }
   estado.sel = id
   estado.caster = caster
   gravarHash()
@@ -254,7 +266,7 @@ function montarTabuleiro(doisLados) {
   const linha = (lado, f) => {
     for (let col = 0; col < 8; col++) {
       if (!valida(col, f)) { filhos.push(el('span', { class: 'pas-fora' })); continue }
-      const c = el('span', { class: `pas-casa ${lado}${(col + f) % 2 ? ' alt' : ''}` })
+      const c = el('span', { class: `pas-casa ${lado}${(col + f) % 2 ? ' alt' : ''}`, 'data-k': `${lado}:${col}:${f}` })
       casas.set(`${lado}:${col}:${f}`, c)
       filhos.push(c)
     }
@@ -500,7 +512,7 @@ class Cena {
     const partes = txt.split(/([−+]?\d+(?:,\d+)?\s?(?:%\/s|%|s\b)|\b\d{2,}\b)/)
     partes.forEach((t, i) => { if (t) corpo.append(i % 2 ? el('b', { class: 'pas-num', text: t }) : t) })
     const barra = el('i', { class: 'pas-passo-barra' })
-    l.replaceChildren(comIcone(el('span', { class: 'pas-passo-ic', 'aria-hidden': 'true' }), this.x.id), corpo, barra)
+    l.replaceChildren(estado.modo === 'time' ? el('span', { class: 'pas-passo-ic svg time', 'aria-hidden': 'true', html: ICO_TIME }) : comIcone(el('span', { class: 'pas-passo-ic', 'aria-hidden': 'true' }), this.x.id), corpo, barra)
     if (this.vel) barra.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: Math.max(1500, txt.length * 55), easing: 'linear', fill: 'forwards' })
     if (this.vel) l.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 260 })
   }
@@ -788,11 +800,12 @@ function iniciarCena(x) {
   cena?.parar()
   const c = new Cena(x, x.doisLados)
   cena = c
+  const emTime = estado.modo === 'time'
   $('pas-legenda-tab').textContent = 'Os Ditto são pokémon de teste.'
   const rodar = async () => {
     if (!c.vivo) return
     try {
-      await CENAS[x.id](c, x)
+      await (emTime ? cenaTime(c) : CENAS[x.id](c, x))
       if (!c.vivo) return
       if (c.vel && c.leituraAte) { const falta = c.leituraAte - performance.now(); if (falta > 0) await c.espera(falta) }
       if (c.vel) await c.camada.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {})
@@ -908,7 +921,252 @@ function ligar() {
   $('pas-como-abrir').addEventListener('click', () => { pop.showModal(); som('clique', { forca: 0.6 }) })
   $('pas-como-fechar').addEventListener('click', () => pop.close())
   pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
-  addEventListener('hashchange', () => { lerHash(); escolher(estado.sel) })
+  addEventListener('hashchange', () => { lerHash(); if (estado.modo === 'time') { aplicarModo(); atualizarTime(true) } else escolher(estado.sel) })
+}
+
+const ORDEM_CASAS = [[0, [3, 4, 2, 5, 1, 6]], [1, [3, 4, 2, 5, 1, 6, 0, 7]], [2, [3, 4, 2, 5, 1, 6, 0, 7]], [3, [3, 4, 2, 5]], [4, [3, 4, 2, 5]]].flatMap(([f, cols]) => cols.map((col) => ({ col, f })))
+const bstDe = (e) => (e ? Object.values(e.base || {}).reduce((t, v) => t + (Number(v) || 0), 0) : null)
+const ICO_TIME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.8 19.5c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5M10.8 19.5c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5"/></svg>'
+const ICO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>'
+
+function membros() {
+  return estado.time.map((m, i) => {
+    const e = especie(m.sp)
+    const p = P.passivaDaEspecie(m.sp)
+    return { ...m, i, e, p, x: p ? PORID.get(p.id) : null, bst: bstDe(e), tipos: e?.tipos || [] }
+  })
+}
+function analisar(T) {
+  const tem = (id) => T.filter((m) => m.p?.id === id)
+  const insetos = T.filter((m) => m.tipos.includes('BUG'))
+  const dragoes = T.filter((m) => m.tipos.includes('DRAGON'))
+  const alertas = []
+  const rain = tem('rain_dance')
+  if (rain.length > 1) alertas.push(['rain_dance', 'Duas Rain Dance não somam: vale uma só.'])
+  if (rain.length) for (const m of T.filter((m) => m.bst > P.BST_MAX_PASSIVA && m.p?.id !== 'rain_dance')) alertas.push(['rain_dance', `${m.e?.nome} não recebe a Rain Dance (BST ${m.bst}).`])
+  const intim = tem('intimidate')
+  if (intim.length && dragoes.length > 1) alertas.push(['intimidate', `Intimidate desligado: há ${dragoes.length} Dragões no time (megas contam).`])
+  for (const m of tem('swarm')) {
+    const n = insetos.filter((o) => o !== m).length
+    alertas.push(['swarm', `Swarm de ${m.e?.nome}: +${Math.min(num(m.x.n.teto), num(m.x.n.pct) + n * num(m.x.n.porInseto))}% de dano (${n} outro${n === 1 ? '' : 's'} Inseto${n === 1 ? '' : 's'}).`])
+  }
+  if (tem('recover').length) for (const m of T.filter((m) => m.bst > P.BST_MAX_PASSIVA)) alertas.push(['recover', `${m.e?.nome} não é curado pelo Recover (BST ${m.bst}).`])
+  return { insetos, dragoes, alertas, intimOk: dragoes.length <= 1 }
+}
+
+function aplicarModo() {
+  const time = estado.modo === 'time'
+  document.documentElement.classList.toggle('modo-time', time)
+  document.querySelectorAll('[data-modo]').forEach((b) => { const on = b.dataset.modo === estado.modo; b.classList.toggle('ativo', on); b.setAttribute('aria-pressed', String(on)) })
+}
+function irParaTime() {
+  if (estado.modo === 'time') return
+  estado.modo = 'time'
+  if (!estado.time.length) estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f }))
+  aplicarModo()
+  atualizarTime(true)
+}
+async function atualizarTime(comFade = false) {
+  gravarHash()
+  montarTimeLado()
+  montarTimeInfo()
+  const alvos = ['pas-cab', 'pas-passo', 'pas-time-info'].map($).filter(Boolean).concat(tabuleiro ? [tabuleiro.camada] : [])
+  if (comFade && !reduzido.matches) {
+    cena?.parar()
+    await Promise.all(alvos.map((e) => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' }).finished.catch(() => {})))
+  }
+  montarCabTime()
+  iniciarCena(PORID.get(estado.sel))
+  for (const e of alvos) { e.getAnimations().forEach((a) => a.cancel()); if (comFade && !reduzido.matches) e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280 }) }
+}
+function montarCabTime() {
+  const T = membros()
+  $('pas-palco').style.setProperty('--t', '#e2a93f')
+  const ic = el('span', { class: 'pas-ic grande time', 'aria-hidden': 'true' })
+  ic.innerHTML = ICO_TIME
+  $('pas-cab').replaceChildren(ic, el('span', { class: 'pas-cab-txt' }, [
+    el('h2', { text: 'Monte seu time' }),
+    el('span', { class: 'pas-cab-chips' }, [
+      el('span', { class: 'pas-tipo', text: `${T.length}/${TIME_MAX} pokémon` }),
+      el('span', { class: 'pas-lado time', text: `${T.filter((m) => m.p).length} com passiva` }),
+      el('span', { class: 'pas-gat', text: `${T.filter((m) => !m.p).length} sem` })
+    ]),
+    el('span', { class: 'pas-resumo', text: 'Toque numa peça e depois numa casa para mover.' })
+  ]))
+}
+function linhaMembro(m) {
+  const pas = m.x ? el('span', { class: 'pas-achado-pas', style: `--t:${COR_TIPO[m.x.tipo]}` }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), m.x.id), m.x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
+  return el('div', { class: `pt-membro${estado.timeSel === m.i ? ' sel' : ''}`, 'data-i': String(m.i) }, [
+    el('span', { class: 'pas-pk-img' }, [imgSprite(m.e?.looktype, m.sp)]),
+    el('span', { class: 'pt-membro-txt' }, [el('b', { text: m.e?.nome || `#${m.sp}` }), el('small', { text: m.bst ? `BST ${m.bst}` : '' })]),
+    pas,
+    el('button', { type: 'button', class: 'pt-tirar', 'data-tirar': String(m.i), 'aria-label': `Tirar ${m.e?.nome || 'pokémon'} do time`, title: 'Tirar do time', html: ICO_X })
+  ])
+}
+function montarTimeLado() {
+  const T = membros()
+  $('pt-lista').replaceChildren(...(T.length ? T.map(linhaMembro) : [el('p', { class: 'pt-vazio', text: 'Nenhum pokémon ainda. Busque acima.' })]))
+  $('pt-n').textContent = `${T.length}/${TIME_MAX}`
+  $('pt-busca').disabled = T.length >= TIME_MAX
+  $('pt-busca').placeholder = T.length >= TIME_MAX ? 'Time cheio (5 pokémon)' : 'Adicionar pokémon ao time'
+}
+function montarTimeInfo() {
+  const T = membros()
+  const { alertas } = analisar(T)
+  const caixa = $('pas-time-info')
+  const itens = T.map((m) => el('li', { class: 'pt-info-li' }, [
+    el('span', { class: 'pas-pk-img' }, [imgSprite(m.e?.looktype, m.sp)]),
+    el('span', {}, [el('b', { text: m.e?.nome || '' }), ' ', el('span', { class: 'pt-info-pas', text: m.x ? `${m.x.nome}: ${m.x.curto}` : 'Sem passiva: luta só com os golpes.' })])
+  ]))
+  caixa.replaceChildren(
+    el('h3', {}, ['Regras do time']),
+    alertas.length ? el('ul', { class: 'pt-alertas' }, alertas.map(([id, t]) => el('li', {}, [comIcone(el('span', { class: 'pt-alerta-ic', 'aria-hidden': 'true' }), id), t]))) : el('p', { class: 'pt-ok', text: T.length ? 'Nenhuma regra limitando as passivas deste time.' : 'Monte o time para ver as regras.' }),
+    el('h3', {}, ['Cada um']),
+    el('ul', { class: 'pt-info' }, itens)
+  )
+}
+function adicionarAoTime(sp) {
+  if (estado.time.length >= TIME_MAX) return
+  const livre = ORDEM_CASAS.find((c) => !estado.time.some((m) => m.col === c.col && m.f === c.f))
+  if (!livre) return
+  estado.time.push({ sp, ...livre })
+  som('clique', { forca: 0.6 })
+  atualizarTime()
+}
+function ligarTime() {
+  document.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.modo === 'time') irParaTime(); else escolher(estado.sel) }))
+  $('pt-lista').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tirar]')
+    if (t) { estado.time.splice(Number(t.dataset.tirar), 1); estado.timeSel = null; return atualizarTime() }
+    const m = e.target.closest('[data-i]')
+    if (m) { estado.timeSel = estado.timeSel === Number(m.dataset.i) ? null : Number(m.dataset.i); montarTimeLado(); marcarSel() }
+  })
+  $('pt-exemplo').addEventListener('click', () => { estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f })); estado.timeSel = null; atualizarTime(true) })
+  $('pt-limpar').addEventListener('click', () => { estado.time = []; estado.timeSel = null; atualizarTime(true) })
+  $('pas-tab').addEventListener('click', (e) => {
+    if (estado.modo !== 'time') return
+    const pc = e.target.closest('.pas-peca.nos[data-i]')
+    if (pc) { const i = Number(pc.dataset.i); estado.timeSel = estado.timeSel === i ? null : i; montarTimeLado(); marcarSel(); return }
+    const casa = e.target.closest('.pas-casa.nos')
+    if (!casa || estado.timeSel == null) return
+    const [, col, f] = casa.dataset.k.split(':').map((v, i) => (i ? Number(v) : v))
+    const m = estado.time[estado.timeSel]
+    if (!m || estado.time.some((o) => o.col === col && o.f === f)) return
+    m.col = col; m.f = f
+    estado.timeSel = null
+    atualizarTime()
+  })
+  const campo = $('pt-busca'), caixa = $('pt-achados')
+  const fechar = () => { caixa.hidden = true; caixa.replaceChildren() }
+  const pintar = () => {
+    const q = campo.value
+    if (!normal(q) || !motorPronto) return fechar()
+    let achados = []
+    try { achados = motorPronto.buscarEspecies(q, 8) } catch {}
+    caixa.replaceChildren(...(achados.length ? achados.map((a) => {
+      const pas = P.passivaDaEspecie(a.speciesId)
+      const x = pas ? PORID.get(pas.id) : null
+      return el('button', { type: 'button', class: 'pas-achado', 'data-sp': String(a.speciesId), style: x ? `--t:${COR_TIPO[x.tipo]}` : null }, [
+        el('span', { class: 'pas-pk-img' }, [imgSprite(a.looktype, a.speciesId)]),
+        el('span', { class: 'pas-achado-txt' }, [el('b', { text: a.nome }), el('small', { text: `BST ${bstDe(especie(a.speciesId)) ?? '?'}` })]),
+        x ? el('span', { class: 'pas-achado-pas' }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), x.id), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
+      ])
+    }) : [el('p', { class: 'pas-achados-vazio', text: 'Nenhum pokémon com esse nome.' })]))
+    caixa.hidden = false
+  }
+  campo.addEventListener('input', pintar)
+  campo.addEventListener('focus', pintar)
+  campo.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fechar()
+    if (e.key === 'Enter') { const b = caixa.querySelector('[data-sp]'); if (b) { e.preventDefault(); adicionarAoTime(Number(b.dataset.sp)); campo.value = ''; fechar() } }
+  })
+  caixa.addEventListener('mousedown', (e) => e.preventDefault())
+  caixa.addEventListener('click', (e) => { const b = e.target.closest('[data-sp]'); if (b) { adicionarAoTime(Number(b.dataset.sp)); campo.value = ''; fechar(); campo.focus() } })
+  campo.addEventListener('blur', () => setTimeout(fechar, 120))
+}
+function marcarSel() {
+  for (const p of cena?.pecas || []) if (p.n.dataset.i != null) p.n.classList.toggle('sel', Number(p.n.dataset.i) === estado.timeSel)
+  document.documentElement.classList.toggle('pt-movendo', estado.timeSel != null)
+}
+
+const distCasa = (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(yDe(a.lado, a.f) - yDe(b.lado, b.f)))
+const ICONE_CICLO = { burn: '🔥', poison: '☠️', freeze: '❄️', paralyze: '⚡', leech_seed: '🌱', confusion: '💫', fear: '👻', rock_smash: '👊', whirlwind: '🌪️', assurance: '🌑', charm: '💗' }
+const COR_CICLO = { burn: COR.fogo, poison: COR.veneno, freeze: COR.gelo, paralyze: COR.raio, leech_seed: COR.planta, confusion: COR.psi, fear: COR.fantasma, rock_smash: COR.luta, whirlwind: COR.vento, assurance: COR.sombra, charm: COR.fada }
+
+async function cenaTime(c) {
+  c.dono = null
+  const T = membros()
+  const E = Object.values(inimigos(c, { apagados: !T.length }))
+  if (!T.length) { await c.legenda('Busque pokémon e monte o time.'); await c.espera(4000); return }
+  const { insetos, intimOk } = analisar(T)
+  for (const m of T) {
+    m.pc = c.peca('nos', m.col, m.f, { sp: m.sp, lt: m.e?.looktype, papel: m.p ? 'dono' : 'aliado', rotulo: m.p ? null : 'sem passiva' })
+    m.pc.n.dataset.i = String(m.i)
+    if (m.x) { m.pc.n.style.setProperty('--t', COR_TIPO[m.x.tipo]); c.status(m.pc, m.x.id) }
+  }
+  marcarSel()
+  await c.legenda('Começa a luta: passivas de início.')
+  await c.espera(500)
+  const rain = T.filter((m) => m.p?.id === 'rain_dance')
+  if (rain.length) {
+    c.efeito('chuva', 'nos'); som('chuva', { forca: 0.7 })
+    for (const m of T) if (m.p?.id === 'rain_dance' || m.bst <= P.BST_MAX_PASSIVA) { c.aura(m.pc, COR.agua); c.texto(m.pc, `+${pct(rain[0].x.n.pct)} dano`, 'buff') } else c.texto(m.pc, 'sem chuva', 'nada')
+    await c.espera(900)
+  }
+  for (const m of T) {
+    const id = m.p?.id
+    if (id === 'swarm') { const n = insetos.filter((o) => o !== m).length; c.aura(m.pc, COR.inseto); c.particulas(m.pc, COR.inseto, 8, 'sobe'); c.texto(m.pc, `+${Math.min(num(m.x.n.teto), num(m.x.n.pct) + n * num(m.x.n.porInseto))}% dano`, 'buff'); som('inseto', { forca: 0.6 }) }
+    else if (id === 'iron_defense') { c.marca(m.pc, 'escudo'); c.texto(m.pc, `+${pct(m.x.n.pct)} DEF`, 'buff'); som('metal', { forca: 0.6 }) }
+    else if (id === 'rocky_helmet') { c.aura(m.pc, COR.pedra); c.texto(m.pc, `devolve ${pct(m.x.n.pct)}`, 'buff') }
+    else if (id === 'intimidate') {
+      if (intimOk) { c.onda(m.pc, COR.dragao); som('rugido', { forca: 0.7 }); for (const e of E) { c.aura(e, COR.dragao); c.texto(e, `−${pct(m.x.n.pct)}`, 'deb') } }
+      else { c.texto(m.pc, 'desligado', 'nada'); c.marca(m.pc, 'apagado') }
+    } else if (id === 'dig') c.texto(m.pc, 'pronto p/ desviar', 'buff')
+    else if (id === 'recover') c.texto(m.pc, `cura a ${m.x.n.gatilhoHp}%`, 'buff')
+    await c.espera(250)
+  }
+  await c.espera(1400)
+  await c.legenda('A cada ciclo, as passivas disparam juntas.')
+  const ocup = new Set(E.map((e) => `${e.col}:${e.f}`))
+  const planos = T.map((m) => {
+    const id = m.p?.id
+    const me = { lado: 'nos', col: m.col, f: m.f }
+    const ord = [...E].sort((a, b) => distCasa(me, a) - distCasa(me, b) || a.col - b.col)
+    const alvo = id === 'charm' ? ord[ord.length - 1] : ord[0]
+    let destino = null
+    if (id === 'charm') {
+      const livres = []
+      for (let col = FILEIRAS[0][0]; col <= FILEIRAS[0][1]; col++) if (!ocup.has(`${col}:0`)) livres.push(col)
+      if (livres.length) { const col = livres.sort((a, b) => Math.abs(a - m.col) - Math.abs(b - m.col))[0]; destino = { col, f: 0 } }
+    } else if (id === 'whirlwind' || id === 'fear') {
+      let f = alvo.f, lim = id === 'fear' ? 2 : 4
+      while (lim-- > 0 && valida(alvo.col, f + 1) && !ocup.has(`${alvo.col}:${f + 1}`)) f++
+      if (f !== alvo.f) destino = { col: alvo.col, f }
+    }
+    if (destino) { ocup.delete(`${alvo.col}:${alvo.f}`); ocup.add(`${destino.col}:${destino.f}`) }
+    return { m, id, alvo, destino }
+  })
+  await Promise.all(planos.map((pl, k) => (async () => {
+    await c.espera(k * 260)
+    const { m, id, alvo, destino } = pl
+    const ciclo = id && ICONE_CICLO[id]
+    if (!ciclo) { await c.golpe(m.pc, alvo, '✦', 480, { cor: '#ffe9a3' }); c.texto(alvo, '−6%'); c.vida(alvo, alvo.hp - 6); return }
+    som(SOM_PASSIVA[id], { forca: 0.55 })
+    await c.golpe(m.pc, alvo, ciclo, 560, { cor: COR_CICLO[id] })
+    c.status(alvo, id); c.aura(alvo, COR_CICLO[id])
+    if (id === 'freeze') c.marca(alvo, 'gelo')
+    if (id === 'paralyze') c.marca(alvo, 'choque')
+    if (id === 'rock_smash') c.marca(alvo, 'quebrado')
+    if (id === 'leech_seed') { const f = c.fio(alvo, m.pc, COR.planta); c.golpe(alvo, m.pc, '✚', 520, { classe: 'cura', semImpacto: true }).catch(() => {}); setTimeout(() => f.remove(), 1600) }
+    if (destino) await c.mover(alvo, destino.col, destino.f, id === 'charm' ? 900 : 700, id === 'charm' ? 1.1 : 0)
+    const dano = { burn: '−4%/s', poison: '−1,5%/s', leech_seed: '−1,5%/s', whirlwind: `−${m.x.n.pct}%`, assurance: `−${m.x.n.pct}%+`, charm: `−${m.x.n.pct}%`, freeze: 'congelado', paralyze: 'recargas +3 s', confusion: 'confuso', fear: 'com medo', rock_smash: '−20% DEF' }[id]
+    c.texto(alvo, dano, ['freeze', 'paralyze', 'confusion', 'fear', 'rock_smash'].includes(id) ? 'deb' : 'dano')
+    c.vida(alvo, alvo.hp - 8)
+  })()))
+  await c.espera(1800)
+  const nSem = T.filter((m) => !m.p).length
+  await c.legenda(nSem ? `${nSem} sem passiva: só golpes.` : 'Todo o time tem passiva.')
+  await c.espera(1800)
 }
 
 async function precarregar() {
@@ -938,6 +1196,7 @@ async function precarregar() {
   avanca(1, 'Pronto')
   pronto = true
   montarQuemTem(PORID.get(estado.sel))
+  if (estado.modo === 'time') { montarTimeLado(); montarTimeInfo(); montarCabTime() }
   iniciarCena(PORID.get(estado.sel))
   const some = () => carga.remove()
   if (reduzido.matches) some()
@@ -946,6 +1205,8 @@ async function precarregar() {
 
 lerHash()
 ligar()
+ligarTime()
+aplicarModo()
 montarCiclo()
 montarLista()
 montarDetalhe()

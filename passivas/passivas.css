@@ -364,3 +364,47 @@ html.embed .envolve.largo { padding: 0; }
 .pas-achado-ic svg { width: 16px; height: 16px; }
 .pcp-notas span svg { width: 19px; height: 19px; }
 @media (max-width: 560px) { .pas-resumo { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } }
+
+.pas-modos { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 13px; background: rgba(8, 4, 6, 0.6); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.14); }
+.pas-modos button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; border: 0; border-radius: 10px; font: inherit; font-size: 13.5px; font-weight: 900; color: var(--suave); background: none; cursor: pointer; transition: background .2s, color .2s; }
+.pas-modos button svg { width: 16px; height: 16px; }
+.pas-modos button.ativo { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc, #7d5313); }
+.pt-lado, .pas-time-info { display: none; }
+.modo-time .pas-lista > .pas-busca, .modo-time .pas-filtros, .modo-time .pas-linhas, .modo-time .pas-como, .modo-time #pas-fatos, .modo-time #pas-quem { display: none; }
+.modo-time .pt-lado { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+.modo-time .pas-time-info { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.pt-cab { display: flex; align-items: center; gap: 6px; }
+.pt-cab b { font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--suave); }
+.pt-cab span { padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 900; line-height: 20px; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
+.pt-cab button { height: 26px; padding: 0 10px; border: 0; border-radius: 999px; font: inherit; font-size: 12px; font-weight: 800; color: var(--suave); background: rgba(8, 4, 6, 0.55); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.16); cursor: pointer; }
+.pt-cab button:first-of-type { margin-left: auto; }
+.pt-lista { display: grid; gap: 5px; align-content: start; flex: 1; min-height: 0; overflow-y: auto; }
+.pt-membro { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto 26px; align-items: center; gap: 7px; padding: 5px 6px 5px 4px; border-radius: 12px; background: rgba(21, 11, 16, 0.74); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.08); cursor: pointer; }
+.pt-membro.sel { box-shadow: inset 0 0 0 1.5px var(--ouro), 0 0 12px -4px var(--ouro); }
+.pt-membro-txt { display: grid; min-width: 0; }
+.pt-membro-txt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 900; }
+.pt-membro-txt small { font-size: 11px; font-weight: 700; color: var(--apagado); }
+.pt-membro .pas-achado-pas { height: 22px; padding: 0 8px; font-size: 11px; }
+.pt-tirar { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 50%; color: var(--suave); background: rgba(8, 4, 6, 0.6); cursor: pointer; }
+.pt-tirar:hover { color: #fff; background: #a8403a; }
+.pt-tirar svg { width: 13px; height: 13px; }
+.pt-vazio, .pt-dica, .pt-ok { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--apagado); }
+.pas-time-info h3 { margin: 2px 0 2px; font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--suave); }
+.pt-alertas, .pt-info { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.pt-alertas li { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 10px; font-size: 13px; font-weight: 700; line-height: 1.35; color: #fff3df; background: rgba(42, 10, 18, 0.55); box-shadow: inset 0 0 0 1px rgba(255, 111, 125, 0.25); }
+.pt-alerta-ic { flex: none; display: grid; place-items: center; width: 22px; height: 22px; }
+.pt-alerta-ic svg { width: 20px; height: 20px; }
+.pt-info-li { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; font-size: 12.5px; font-weight: 700; line-height: 1.35; background: rgba(8, 4, 6, 0.42); }
+.pt-info-li .pas-pk-img { width: 30px; height: 30px; }
+.pt-info-pas { color: var(--suave); }
+.pas-ic.time { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 3px 0 var(--ouro-esc, #7d5313); }
+.pas-ic.time svg { width: 62%; height: 62%; }
+.modo-time .pas-peca.nos[data-i] { pointer-events: auto; cursor: pointer; }
+.modo-time .pas-peca.sel { box-shadow: inset 0 0 0 2.5px #fff, 0 0 0 3px var(--ouro), 0 0 18px var(--ouro); }
+.pt-movendo .pas-casa.nos { cursor: pointer; }
+.pt-movendo .pas-casa.nos:hover { background-image: linear-gradient(rgba(255, 211, 77, 0.35), rgba(255, 211, 77, 0.35)); }
+@media (max-width: 900px) {
+  .modo-time .pt-lista { max-height: none; }
+}
+.pas-passo-ic.time { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
+.pas-passo-ic.time svg { width: 18px; height: 18px; color: #2a1a12; }
