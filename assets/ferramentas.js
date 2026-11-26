@@ -38,12 +38,17 @@
 })()
 
 ;(() => {
-  if (!new URLSearchParams(location.search).has('ferramentas')) return
+  const isolado = document.documentElement.dataset.isolado
+  if (!isolado) return
+  const fonte = new URL('../', document.baseURI).pathname
   const comModo = (href) => {
-    const u = new URL(href, location.href)
-    if (!/\/(calculadora|nivel|tier)\/$/.test(u.pathname)) return href
-    u.searchParams.set('ferramentas', '')
-    return u.toString().replace('ferramentas=', 'ferramentas')
+    const u = new URL(href, document.baseURI)
+    if (u.origin !== location.origin || u.pathname.startsWith(isolado) || !u.pathname.startsWith(fonte)) return href
+    const resto = u.pathname.slice(fonte.length)
+    const ehRaiz = resto === '' || resto === 'index.html'
+    const pagina = ehRaiz ? 'calculadora' : resto.match(/^(calculadora|nivel|tier|posicionamento)\/$/)?.[1]
+    if (!pagina) return href
+    return new URL(`${isolado}${pagina === 'calculadora' ? '' : pagina + '/'}${ehRaiz ? '' : u.search + u.hash}`, location.origin).toString()
   }
   const lista = document.querySelector('.ferr-lista')
   const fontes = lista ? [...lista.querySelectorAll('a')] : []
@@ -77,8 +82,9 @@
       return a
     }))
   }
-  document.addEventListener('click', (e) => {
+  const troca = (e) => {
     const a = e.target.closest?.('a[href]')
-    if (a && !a.target) { const novo = comModo(a.href); if (novo !== a.href) a.href = novo }
-  }, true)
+    if (a) { const novo = comModo(a.href); if (novo !== a.href) a.href = novo }
+  }
+  for (const ev of ['click', 'auxclick', 'contextmenu', 'mouseover', 'focusin', 'touchstart']) document.addEventListener(ev, troca, { capture: true, passive: true })
 })()

@@ -21,7 +21,7 @@
   <link rel="icon" href="../assets/icone.png" />
   <link rel="stylesheet" href="../assets/ferramentas.css" />
   <script src="../assets/ferramentas.js" defer></script>
-  <script>document.documentElement.classList.add('sem-vt'); if (new URLSearchParams(location.search).has('ferramentas')) document.documentElement.classList.add('so-ferr'); if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed')</script>
+  <script>document.documentElement.classList.add('sem-vt'); if (new URLSearchParams(location.search).has('ferramentas')) location.replace('/pokepocketferramentas/tier/' + location.hash); if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed')</script>
   <link rel="stylesheet" href="../calculadora/calc.css" />
   <link rel="stylesheet" href="tier.css" />
   <script type="module" src="tier.js"></script>
