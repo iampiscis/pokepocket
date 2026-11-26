@@ -54,7 +54,6 @@ function sprite(p) {
   proxima()
   return img
 }
-const linkCalc = (p) => `../calculadora/#e=${Number(p.speciesId)}&n=100&p=1&q=1.1&s=1&iv=20.20.20.20.20.20&sn=100`
 const zona = (casa) => { const f = CASAS[casa]?.fileira ?? 0; return f === 0 ? 'frente' : f <= 2 ? 'meio' : 'fundo' }
 const alcance = (a) => (a > 1 ? `alcance ${a}` : 'corpo a corpo')
 function indicador(icone, texto, titulo) {
@@ -149,7 +148,7 @@ function resumo(lista, n) {
     el('div', { class: 'pos-usos-lista' }, lista.map((r) => {
       const f = r.fileiras || []
       const z = [['frente', f[0] || 0], ['meio', (f[1] || 0) + (f[2] || 0)], ['fundo', (f[3] || 0) + (f[4] || 0)]].sort((a, b) => b[1] - a[1])[0][0]
-      return el('a', { class: 'pos-uso', href: linkCalc(r), title: `${r.nome}: em ${r.usos} de ${n} times, mais na ${z}`, style: `--p:${Math.min(1, r.usos / n)}` }, [
+      return el('div', { class: 'pos-uso', title: `${r.nome}: em ${r.usos} de ${n} times, mais na ${z}`, style: `--p:${Math.min(1, r.usos / n)}` }, [
         el('span', { class: 'poke-img' }, [sprite(r), r.shiny ? el('i', { class: 'poke-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
         el('span', { class: 'pos-uso-txt' }, [
           el('span', { class: 'pos-uso-nome', text: r.nome }),
