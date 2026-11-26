@@ -363,3 +363,4 @@ html.embed .envolve.largo { padding: 0; }
 .pas-achado-pas { background: #2a1f25; }
 .pas-achado-ic svg { width: 16px; height: 16px; }
 .pcp-notas span svg { width: 19px; height: 19px; }
+@media (max-width: 560px) { .pas-resumo { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } }
