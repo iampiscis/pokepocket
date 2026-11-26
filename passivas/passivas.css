@@ -213,14 +213,14 @@
 .pas-pk.sel .pas-pk-nome { color: #fff; }
 .pas-achado .pas-pk-img { width: 30px; height: 30px; }
 
-.pas-linha { --t: #e2a93f; container-type: size; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px; width: 100%; height: 100%; min-width: 0; min-height: 38px; padding: 4px 5px 4px 4px; border: 0; border-radius: 12px; font: inherit; text-align: left; color: #fff; background: rgba(21, 11, 16, 0.74); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.08); cursor: pointer; transition: transform .12s, box-shadow .15s, background .15s; }
-.pas-linha .pas-ic { width: auto; height: min(100cqh - 8px, 44px); aspect-ratio: 1; border-radius: 9px; font-size: min(52cqh, 24px); }
+.pas-linha { --t: #e2a93f; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 7px; width: 100%; height: 100%; min-width: 0; min-height: 38px; padding: 4px 5px 4px 4px; border: 0; border-radius: 12px; font: inherit; text-align: left; color: #fff; background: rgba(21, 11, 16, 0.74); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.08); cursor: pointer; transition: transform .12s, box-shadow .15s, background .15s; }
+.pas-linha .pas-ic { width: 40px; height: 40px; border-radius: 10px; font-size: 20px; }
 .pas-linha-txt { display: grid; gap: 3px; min-width: 0; justify-items: start; }
 .pas-linha-txt b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; line-height: 1.1; font-weight: 900; letter-spacing: -0.01em; }
 .pas-linha .pas-gat { padding: 0 6px; border-radius: 5px; font-size: 9.5px; line-height: 14px; }
 @media (max-width: 900px) {
-  .pas-linha { container-type: normal; flex: none; width: auto; height: 46px; }
-  .pas-linha .pas-ic { height: 36px; font-size: 19px; }
+  .pas-linha { flex: none; width: auto; height: 46px; grid-template-columns: 36px minmax(0, 1fr); }
+  .pas-linha .pas-ic { width: 36px; height: 36px; font-size: 19px; }
 }
 
 .pas-como { flex: none; display: flex; align-items: center; justify-content: center; gap: 7px; height: 36px; border: 0; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 800; color: var(--suave); background: rgba(21, 11, 16, 0.72); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.14); cursor: pointer; }
