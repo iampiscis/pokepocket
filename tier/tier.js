@@ -506,18 +506,14 @@ function pintarCabecalho() {
     $('atualizado').replaceChildren(...filhos)
     $('atualizado').hidden = false
   }
-  const rec = recorteDe(janelasDe(dados).dia)
   const versao = [temporadaTxt(dados.temporada), dados.versaoJogo ? `jogo ${dados.versaoJogo}` : ''].filter(Boolean).join(' · ')
   const bloco = (ico, tit, txt) => el('div', { class: 'ex-bloco' }, [el('span', { class: 'ex-ico', 'aria-hidden': 'true', text: ico }), el('b', { text: tit }), el('span', { text: txt })])
-  const fonte = dados.recorte ? 'Partidas do dia de Mestre, Grão-Mestre e Challenger' : `Partidas do ${rec ? rec.curto.toLowerCase() : 'topo'} do ranqueado`
   $('explica').replaceChildren(
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como o tier é feito' })]),
     el('div', { class: 'ex-grade' }, [
-      bloco('✦', 'Shiny padrão', 'Nv 100 · qualidade 1,1 · IV 20 · P1 · sem refino'),
-      ...(janelasDe(dados).dia?.criterio === 'nota'
-        ? [bloco('⚔', 'Uso no top 100', `Só formas em ${fmtPct.format(janelasDe(dados).dia?.minUsoTopo ?? 3)}% ou mais dos times do top 100. Sem lendários e míticos.`),
-          bloco('★', 'Força + uso', 'Metade Score PvP (o da calculadora), metade uso no top 100')]
-        : [bloco('⚔', 'Meta real', `${fonte}. Sem lendários e míticos.`), bloco('★', 'Score 0–1000', 'O mesmo da calculadora')])
+      bloco('⚔', 'Partidas reais', 'Lutas ranqueadas do dia, do Mestre ao Challenger. Sem lendários e míticos.'),
+      bloco('★', 'Força + uso', 'Quanto o pokémon bate e aguenta, somado a quanto o top escolhe ele.'),
+      bloco('↻', 'Todo dia', 'Renova ao meio-dia com as lutas novas.')
     ]),
     ...(versao ? [el('small', { class: 'ex-pe', text: versao })] : [])
   )
