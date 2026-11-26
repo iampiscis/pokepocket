@@ -52,6 +52,7 @@
   const secoes = document.querySelector('.topo .secoes')
   if (secoes && fontes.length) {
     secoes.setAttribute('aria-label', 'Ferramentas')
+    secoes.dataset.ferr = ''
     secoes.replaceChildren(...fontes.map((f) => {
       const a = document.createElement('a')
       a.href = comModo(f.href)
@@ -63,6 +64,7 @@
   const painel = document.querySelector('.painel-menu nav')
   if (painel && fontes.length) {
     painel.setAttribute('aria-label', 'Ferramentas')
+    painel.dataset.ferr = ''
     painel.replaceChildren(...fontes.map((f) => {
       const a = document.createElement('a')
       a.href = comModo(f.href)
@@ -75,7 +77,6 @@
       return a
     }))
   }
-  document.querySelectorAll('[data-ferramentas], .painel-pe .pe-rot, .painel-pe .pe-ferr').forEach((el) => { el.hidden = true; el.style.display = 'none' })
   document.addEventListener('click', (e) => {
     const a = e.target.closest?.('a[href]')
     if (a && !a.target) { const novo = comModo(a.href); if (novo !== a.href) a.href = novo }

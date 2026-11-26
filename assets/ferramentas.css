@@ -31,3 +31,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ferr-lista, .ferr-botao .seta { transition: none; }
 }
+
+.so-ferr .baixar, .so-ferr .coracao, .so-ferr .estrela, .so-ferr .painel-pe, .so-ferr [data-ferramentas], .so-ferr .final .final-txt, .so-ferr .final .acoes { display: none !important; }
+.so-ferr .topo .secoes:not([data-ferr]), .so-ferr .painel-menu nav:not([data-ferr]) { visibility: hidden; }
