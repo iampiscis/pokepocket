@@ -36,3 +36,48 @@
     })
   }
 })()
+
+;(() => {
+  if (!new URLSearchParams(location.search).has('ferramentas')) return
+  const comModo = (href) => {
+    const u = new URL(href, location.href)
+    if (!/\/(calculadora|nivel|tier)\/$/.test(u.pathname)) return href
+    u.searchParams.set('ferramentas', '')
+    return u.toString().replace('ferramentas=', 'ferramentas')
+  }
+  const lista = document.querySelector('.ferr-lista')
+  const fontes = lista ? [...lista.querySelectorAll('a')] : []
+  const curto = { 'Calculadora Pokémon': 'Calculadora' }
+  const nomeDe = (a) => { const t = a.querySelector('.ferr-txt b')?.firstChild?.textContent?.trim() || a.textContent.trim(); return curto[t] || t }
+  const secoes = document.querySelector('.topo .secoes')
+  if (secoes && fontes.length) {
+    secoes.setAttribute('aria-label', 'Ferramentas')
+    secoes.replaceChildren(...fontes.map((f) => {
+      const a = document.createElement('a')
+      a.href = comModo(f.href)
+      a.textContent = nomeDe(f)
+      if (f.getAttribute('aria-current') === 'page') { a.className = 'ativo'; a.setAttribute('aria-current', 'page') }
+      return a
+    }))
+  }
+  const painel = document.querySelector('.painel-menu nav')
+  if (painel && fontes.length) {
+    painel.setAttribute('aria-label', 'Ferramentas')
+    painel.replaceChildren(...fontes.map((f) => {
+      const a = document.createElement('a')
+      a.href = comModo(f.href)
+      const ic = document.createElement('span')
+      ic.className = 'ic'
+      const svg = f.querySelector('.ferr-ic svg')
+      if (svg) ic.append(svg.cloneNode(true))
+      a.append(ic, nomeDe(f))
+      if (f.getAttribute('aria-current') === 'page') a.setAttribute('aria-current', 'page')
+      return a
+    }))
+  }
+  document.querySelectorAll('[data-ferramentas], .painel-pe .pe-rot, .painel-pe .pe-ferr').forEach((el) => { el.hidden = true; el.style.display = 'none' })
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href]')
+    if (a && !a.target) { const novo = comModo(a.href); if (novo !== a.href) a.href = novo }
+  }, true)
+})()
