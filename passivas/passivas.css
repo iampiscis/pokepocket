@@ -408,3 +408,25 @@ html.embed .envolve.largo { padding: 0; }
 }
 .pas-passo-ic.time { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); }
 .pas-passo-ic.time svg { width: 18px; height: 18px; color: #2a1a12; }
+.pas-modos button { height: 32px; }
+.modo-time .pt-lado .pas-busca input { height: 40px; }
+.pt-lista { grid-template-rows: repeat(5, minmax(44px, 1fr)); gap: 6px; overflow: visible; }
+.pt-membro { grid-template-columns: 34px minmax(0, 1fr) 92px 26px; gap: 8px; min-height: 0; padding: 4px 6px 4px 5px; }
+.pt-membro .pas-pk-img { width: 34px; height: 34px; }
+.pt-membro .pas-achado-pas { justify-content: center; width: 92px; height: 24px; padding: 0 8px; font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; }
+.pt-vaga { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 0; border: 1.5px dashed rgba(255, 233, 163, 0.18); border-radius: 12px; font: inherit; font-size: 12.5px; font-weight: 800; color: var(--apagado); background: rgba(8, 4, 6, 0.25); cursor: pointer; }
+.pt-vaga:hover { color: var(--ouro); border-color: rgba(255, 233, 163, 0.45); }
+.pt-vaga svg { width: 15px; height: 15px; }
+.pt-dica { font-size: 12px; line-height: 1.4; }
+.pt-chip { display: inline-flex; align-items: center; height: 22px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 900; white-space: nowrap; color: #ffe9a3; background: rgba(226, 169, 63, 0.14); box-shadow: inset 0 0 0 1px rgba(226, 169, 63, 0.45); }
+.pas-time-info { gap: 6px; }
+.pas-time-info h3 { margin: 4px 0 0; font-size: 15px; }
+.pt-alertas, .pt-info { gap: 6px; }
+.pt-linha { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 46px; padding: 7px 12px 7px 8px; border-radius: 12px; font-size: 13px; font-weight: 700; line-height: 1.35; color: #fff3df; background: rgba(21, 11, 16, 0.74); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.08); }
+.pt-alertas .pt-linha { background: rgba(42, 10, 18, 0.5); box-shadow: inset 0 0 0 1px rgba(255, 111, 125, 0.22); }
+.pt-linha-ic { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: rgba(8, 4, 6, 0.5); }
+.pt-linha-ic svg { width: 21px; height: 21px; }
+.pt-linha-ic.sprite { position: relative; background: none; }
+.pt-linha-ic.sprite img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.pt-linha b { font-weight: 900; }
+.pt-ok { padding: 10px 12px; border-radius: 12px; background: rgba(21, 11, 16, 0.6); }

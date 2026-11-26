@@ -987,9 +987,9 @@ function montarCabTime() {
   $('pas-cab').replaceChildren(ic, el('span', { class: 'pas-cab-txt' }, [
     el('h2', { text: 'Monte seu time' }),
     el('span', { class: 'pas-cab-chips' }, [
-      el('span', { class: 'pas-tipo', text: `${T.length}/${TIME_MAX} pokémon` }),
-      el('span', { class: 'pas-lado time', text: `${T.filter((m) => m.p).length} com passiva` }),
-      el('span', { class: 'pas-gat', text: `${T.filter((m) => !m.p).length} sem` })
+      el('span', { class: 'pt-chip', text: `${T.length}/${TIME_MAX} pokémon` }),
+      el('span', { class: 'pt-chip', text: `${T.filter((m) => m.p).length} com passiva` }),
+      el('span', { class: 'pt-chip', text: `${T.filter((m) => !m.p).length} sem passiva` })
     ]),
     el('span', { class: 'pas-resumo', text: 'Toque numa peça e depois numa casa para mover.' })
   ]))
@@ -1005,7 +1005,8 @@ function linhaMembro(m) {
 }
 function montarTimeLado() {
   const T = membros()
-  $('pt-lista').replaceChildren(...(T.length ? T.map(linhaMembro) : [el('p', { class: 'pt-vazio', text: 'Nenhum pokémon ainda. Busque acima.' })]))
+  const vagas = Array.from({ length: TIME_MAX - T.length }, () => el('button', { type: 'button', class: 'pt-vaga', 'data-vaga': '', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>Vaga livre' }))
+  $('pt-lista').replaceChildren(...T.map(linhaMembro), ...vagas)
   $('pt-n').textContent = `${T.length}/${TIME_MAX}`
   $('pt-busca').disabled = T.length >= TIME_MAX
   $('pt-busca').placeholder = T.length >= TIME_MAX ? 'Time cheio (5 pokémon)' : 'Adicionar pokémon ao time'
@@ -1014,13 +1015,13 @@ function montarTimeInfo() {
   const T = membros()
   const { alertas } = analisar(T)
   const caixa = $('pas-time-info')
-  const itens = T.map((m) => el('li', { class: 'pt-info-li' }, [
-    el('span', { class: 'pas-pk-img' }, [imgSprite(m.e?.looktype, m.sp)]),
+  const itens = T.map((m) => el('li', { class: 'pt-linha' }, [
+    el('span', { class: 'pt-linha-ic sprite' }, [imgSprite(m.e?.looktype, m.sp)]),
     el('span', {}, [el('b', { text: m.e?.nome || '' }), ' ', el('span', { class: 'pt-info-pas', text: m.x ? `${m.x.nome}: ${m.x.curto}` : 'Sem passiva: luta só com os golpes.' })])
   ]))
   caixa.replaceChildren(
     el('h3', {}, ['Regras do time']),
-    alertas.length ? el('ul', { class: 'pt-alertas' }, alertas.map(([id, t]) => el('li', {}, [comIcone(el('span', { class: 'pt-alerta-ic', 'aria-hidden': 'true' }), id), t]))) : el('p', { class: 'pt-ok', text: T.length ? 'Nenhuma regra limitando as passivas deste time.' : 'Monte o time para ver as regras.' }),
+    alertas.length ? el('ul', { class: 'pt-alertas' }, alertas.map(([id, t]) => el('li', { class: 'pt-linha' }, [comIcone(el('span', { class: 'pt-linha-ic', 'aria-hidden': 'true' }), id), el('span', { text: t })]))) : el('p', { class: 'pt-ok', text: T.length ? 'Nenhuma regra limitando as passivas deste time.' : 'Monte o time para ver as regras.' }),
     el('h3', {}, ['Cada um']),
     el('ul', { class: 'pt-info' }, itens)
   )
@@ -1036,6 +1037,7 @@ function adicionarAoTime(sp) {
 function ligarTime() {
   document.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.modo === 'time') irParaTime(); else escolher(estado.sel) }))
   $('pt-lista').addEventListener('click', (e) => {
+    if (e.target.closest('[data-vaga]')) { $('pt-busca').focus(); return }
     const t = e.target.closest('[data-tirar]')
     if (t) { estado.time.splice(Number(t.dataset.tirar), 1); estado.timeSel = null; return atualizarTime() }
     const m = e.target.closest('[data-i]')
