@@ -236,10 +236,8 @@ html.embed, html.embed body { height: auto; overflow: visible; overscroll-behavi
 .pos-lugar { flex: none; min-width: 40px; padding: 2px 8px; border-radius: 999px; text-align: center; font-family: var(--display); font-size: 16px; line-height: 1.35; color: #2a1a12; background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 55%, #fff), var(--cor)); font-variant-numeric: tabular-nums; }
 .pos-nick { display: inline-flex; align-items: center; gap: 5px; min-width: 0; color: #fff; text-decoration: none; font-size: 16px; font-weight: 900; }
 .pos-nick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pos-nick svg { flex: none; width: 13px; height: 13px; color: var(--apagado); }
-.pos-nick:hover span { text-decoration: underline; text-underline-offset: 3px; }
-.pos-stats { display: flex; gap: 6px; list-style: none; }
-.pos-stats li { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px 0 7px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #fff3df; white-space: nowrap; background: rgba(8, 4, 6, 0.5); border: 1px solid rgba(255, 233, 163, 0.12); font-variant-numeric: tabular-nums; }
+.pos-stats { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; }
+.pos-stats li { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #fff3df; white-space: nowrap; background: rgba(8, 4, 6, 0.5); border: 1px solid rgba(255, 233, 163, 0.12); font-variant-numeric: tabular-nums; }
 .pos-stats svg { width: 14px; height: 14px; color: var(--ouro); }
 .pos-frente { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 2px 0 -4px; font-size: 10.5px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }
 .pos-frente svg { width: 12px; height: 12px; }

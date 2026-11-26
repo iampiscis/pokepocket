@@ -19,8 +19,7 @@ const ICO = {
   usados: '<path d="M5 20v-6M12 20V5M19 20v-9"/>',
   pontos: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   vitorias: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
-  frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>',
-  fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>'
+  frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>'
 }
 
 function el(tag, attrs = {}, filhos = []) {
@@ -162,6 +161,12 @@ function alcanceInfo(a) {
   ])
 }
 
+function usadoEm(dia) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dia || ''))) return null
+  const d = new Date(`${dia}T12:00:00`)
+  return el('li', { class: 'pos-usado', title: 'Última partida em que essa formação foi usada' }, [ico('semana'), el('span', { text: `usada em ${fmtDia.format(d)}` })])
+}
+
 function cartao(j) {
   const ocupa = new Map(j.pks.map((p) => [p.casa, p]))
   const casas = new Map()
@@ -200,11 +205,12 @@ function cartao(j) {
   return el('article', { class: `pos-card${podio}` }, [
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
-      el('a', { class: 'pos-nick', href: `https://pokeidle.io/tracker/j/${encodeURIComponent(j.nick)}`, target: '_blank', rel: 'noopener', title: `${j.nick} no tracker do jogo` }, [el('span', { text: j.nick }), ico('fora')])
+      el('strong', { class: 'pos-nick', title: j.nick }, [el('span', { text: j.nick })])
     ]),
     el('ul', { class: 'pos-stats' }, [
       el('li', { title: 'Pontos no mês' }, [ico('pontos'), el('span', { text: `${fmt.format(j.pontos || 0)} pts` })]),
-      wr != null ? el('li', { title: `${fmt.format(j.vitorias)} vitórias e ${fmt.format(j.derrotas)} derrotas no mês` }, [ico('vitorias'), el('span', { text: `${wr}% vitórias` })]) : null
+      wr != null ? el('li', { title: `${fmt.format(j.vitorias)} vitórias e ${fmt.format(j.derrotas)} derrotas no mês` }, [ico('vitorias'), el('span', { text: `${wr}%` })]) : null,
+      usadoEm(j.usadoEm)
     ]),
     el('p', { class: 'pos-frente', 'aria-hidden': 'true' }, [ico('frente'), 'Frente']),
     tab,
