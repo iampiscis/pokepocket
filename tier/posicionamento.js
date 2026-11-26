@@ -16,6 +16,8 @@ const ICO = {
   topo: '<path d="M8 3.5h8V9a4 4 0 0 1-8 0zM12 13v3.5M8.5 20.5h7M8 5.5H5.5c0 2.6 1.2 4 3 4.3M16 5.5h2.5c0 2.6-1.2 4-3 4.3"/>',
   formacoes: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/>',
   hora: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  espada: '<path d="M20 4l-1.2 4.6L9.6 17.8 6.2 14.4 15.4 5.2z"/><path d="M5 13.2l5.8 5.8M7.6 16.4 4 20"/>',
+  arco: '<path d="M6.5 4.2c7.3.3 13 6 13.3 13.3"/><path d="M6.5 4.2 19.8 17.5"/><path d="M4 20 15.6 8.4M15.6 8.4h-3.7M15.6 8.4v3.7M4 20h2.6M4 20v-2.6"/>',
   usados: '<path d="M5 20v-6M12 20V5M19 20v-9"/>',
   pontos: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   vitorias: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
@@ -60,6 +62,25 @@ function indicador(icone, texto, titulo) {
 }
 
 let dados = null
+let tiers = new Map()
+const COR_TIER = { 'S+': '#ff6fae', S: '#ff7676', 'S-': '#b495ff', 'A+': '#f5b13d', A: '#ffa25a', 'A-': '#ffd95e', 'B+': '#8c93f0', B: '#5f9ad6', 'B-': '#3fd4c6', C: '#9aa0aa', D: '#e4e7ec' }
+
+async function lerTiers() {
+  try {
+    const r = await fetch('tier.json', { cache: 'no-cache' })
+    if (!r.ok) return
+    const j = (await r.json())?.janelas?.dia
+    const m = new Map()
+    for (const g of j?.tiers || []) for (const x of g.itens || []) m.set(Number(x.speciesId), g.tier)
+    for (const x of j?.foraDoMeta || []) if (!m.has(Number(x.speciesId)) && COR_TIER[x.tier]) m.set(Number(x.speciesId), x.tier)
+    tiers = m
+  } catch {}
+}
+const tierDe = (p) => tiers.get(Number(p.speciesId)) || null
+function seloTier(p, cls = 'pos-tier') {
+  const t = tierDe(p)
+  return t ? el('span', { class: cls, style: `--t:${COR_TIER[t]}`, title: `Tier ${t} no tier de hoje` }, [t]) : null
+}
 let carregando = null
 
 function aba() { return location.hash === '#posicionamento' ? 'pos' : 'tier' }
@@ -77,7 +98,7 @@ async function carregar() {
   corpo.replaceChildren(el('div', { class: 'carga vao' }, [el('img', { class: 'carga-bola', src: BOLA, alt: '' }), el('b', { text: 'Carregando as formações' })]))
   carregando = (async () => {
     try {
-      const r = await fetch('posicionamento.json', { cache: 'no-cache' })
+      const [r] = await Promise.all([fetch('posicionamento.json', { cache: 'no-cache' }), lerTiers()])
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       dados = await r.json()
       pintar()
@@ -111,7 +132,7 @@ function pintar() {
       bloco('⚔', 'Formação real', 'Casas tiradas de partidas ranqueadas da semana'),
       bloco('★', 'Variedade', 'Times e posições diferentes entre si'),
       bloco('↑', 'Tabuleiro', 'Adversário em cima; toque num pokémon para ver as casas que ele alcança'),
-      bloco('🏹', 'Alcance', '🗡️ corpo a corpo, 🏹 de longe; o número é quantas casas o golpe alcança')
+      bloco('➶', 'Alcance', 'Espada é corpo a corpo, arco ataca de longe; o número é quantas casas ele alcança')
     ])
   ])
   const info = el('button', { type: 'button', class: 'info', 'aria-expanded': 'false', 'aria-controls': 'pos-explica', 'aria-label': 'Como as formações são escolhidas', text: 'i' })
@@ -141,7 +162,7 @@ function resumo(lista, n) {
         el('span', { class: 'poke-img' }, [sprite(r), r.shiny ? el('i', { class: 'poke-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
         el('span', { class: 'pos-uso-txt' }, [
           el('span', { class: 'pos-uso-nome', text: r.nome }),
-          el('span', { class: 'pos-uso-meta' }, [el('b', { text: `${r.usos}/${n}` }), el('span', { text: z })])
+          el('span', { class: 'pos-uso-meta' }, [seloTier(r, 'pos-tier mini'), el('b', { text: `${r.usos}/${n}` }), el('span', { text: z })])
         ]),
         el('i', { class: 'pos-uso-barra', 'aria-hidden': 'true' })
       ])
@@ -176,22 +197,26 @@ function cartao(j) {
     for (let cx = 11; cx <= 18; cx++) {
       const c = CASAS.find((x) => x.fileira === f && x.cx === 29 - cx)
       if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
-      const s = el('span', { class: 'pos-casa inimiga', 'aria-hidden': 'true' })
+      const s = el('span', { class: `pos-casa inimiga${(cx + f) % 2 ? ' alt' : ''}`, 'aria-hidden': 'true' })
       deles.push({ el: s, xy: [cx, CY_DELES(f)] })
       tab.append(s)
     }
   }
-  tab.append(el('span', { class: 'pos-meio', 'aria-hidden': 'true' }))
+  const meio = el('span', { class: 'pos-meio', 'aria-hidden': 'true' })
+  meio.innerHTML = '<svg class="pos-emblema" viewBox="0 0 100 100"><circle class="pos-emb-claro" cx="50" cy="50" r="48"/><path class="pos-emb-vermelho" d="M2 50a48 48 0 0 1 96 0z"/><rect class="pos-emb-faixa" x="2" y="47" width="96" height="6"/><circle class="pos-emb-faixa" cx="50" cy="50" r="13"/><circle class="pos-emb-botao" cx="50" cy="50" r="8"/></svg>'
+  tab.append(meio)
   for (let f = 0; f < FILEIRAS.length; f++) {
     for (let cx = 11; cx <= 18; cx++) {
       const c = CASAS.find((x) => x.fileira === f && x.cx === cx)
       if (!c) { tab.append(el('span', { class: 'pos-fora', 'aria-hidden': 'true' })); continue }
       const p = ocupa.get(c.casa)
-      if (!p) { tab.append(el('span', { class: 'pos-casa', 'aria-hidden': 'true' })); continue }
+      const alt = (cx + f) % 2 ? ' alt' : ''
+      if (!p) { tab.append(el('span', { class: `pos-casa nossa${alt}`, 'aria-hidden': 'true' })); continue }
       const n = alcanceN(p.alcance)
-      const b = el('button', { type: 'button', class: `pos-casa ocupada${n > 1 ? ' longe' : ''}`, title: `${p.nome} · ${alcance(n)}`, 'aria-label': `${p.nome}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
+      const t = tierDe(p)
+      const b = el('button', { type: 'button', class: `pos-casa nossa ocupada${alt}${n > 1 ? ' longe' : ''}`, title: `${p.nome}${t ? ` · tier ${t}` : ''} · ${alcance(n)}`, 'aria-label': `${p.nome}${t ? `, tier ${t}` : ''}, ${alcance(n)}`, 'aria-pressed': 'false' }, [
         sprite(p),
-        el('b', { class: `pos-casa-alc${n > 1 ? ' longe' : ''}`, 'aria-hidden': 'true' }, [el('i', { text: n > 1 ? '🏹' : '🗡️' }), String(n)])
+        el('span', { class: 'pos-casa-info', 'aria-hidden': 'true' }, [seloTier(p, 'pos-tier mini'), el('b', { class: `pos-casa-alc${n > 1 ? ' longe' : ''}` }, [ico(n > 1 ? 'arco' : 'espada'), String(n)])])
       ])
       nossas.push({ el: b, p, n, xy: [cx, CY_NOSSO(f)] })
       tab.append(b)
@@ -214,7 +239,8 @@ function cartao(j) {
     }
     legenda.replaceChildren(
       el('b', { text: o.p.nome }),
-      el('span', { class: `pos-legenda-alc${o.n > 1 ? ' longe' : ''}` }, [o.n > 1 ? '🏹' : '🗡️', ` ${o.n > 1 ? `${o.n} casas` : 'corpo a corpo'}`]),
+      seloTier(o.p),
+      el('span', { class: `pos-legenda-alc${o.n > 1 ? ' longe' : ''}` }, [ico(o.n > 1 ? 'arco' : 'espada'), o.n > 1 ? `${o.n} casas` : 'corpo a corpo']),
       el('span', { class: 'pos-legenda-n', text: total ? `alcança ${total} ${total === 1 ? 'casa' : 'casas'} do adversário` : 'precisa andar para alcançar' })
     )
   }
