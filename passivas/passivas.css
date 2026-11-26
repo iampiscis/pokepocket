@@ -333,3 +333,8 @@
 .pas-passo { height: 52px; min-height: 52px; max-height: 52px; }
 .pas-passo-txt { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pas-passo-ic { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; font-size: 16px; line-height: 1; background: linear-gradient(160deg, color-mix(in srgb, var(--t) 55%, #2a1620), color-mix(in srgb, var(--t) 22%, #150b10)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--t) 70%, #000); }
+html.embed, html.embed body { background: transparent; }
+html.embed body { padding-top: 0; }
+html.embed .ceu, html.embed .topo, html.embed .abre, html.embed .final, html.embed .pas-lista, html.embed .pas-acoes, html.embed .pas-legenda-tab { display: none; }
+html.embed .pas { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+html.embed .envolve.largo { padding: 0; }

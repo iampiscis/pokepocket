@@ -10,7 +10,9 @@ const BASE = 'https://iampiscis.github.io/pokepocket/assets/'
 const LIMITE = 400 * 1024
 const PREVIAS = [
   { html: 'ferramentas/previas/site.html', png: 'previa-site.png', paginas: ['index.html'] },
-  { html: 'ferramentas/previas/nivel.html', png: 'previa-nivel.png', paginas: ['nivel/index.html'] }
+  { html: 'ferramentas/previas/nivel.html', png: 'previa-nivel.png', paginas: ['nivel/index.html'] },
+  { html: 'ferramentas/previas/passivas.html', png: 'previa-passivas.png', paginas: ['passivas/index.html'] },
+  { html: 'ferramentas/previas/posicionamento.html', png: 'previa-posicionamento.png', paginas: ['posicionamento/index.html'] }
 ]
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.webp': 'image/webp' }
 const CHROMES = [process.env.CHROME_BIN, 'google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].filter(Boolean)
@@ -72,7 +74,8 @@ async function main() {
   const perfil = await mkdtemp(path.join(tmpdir(), 'previa-paginas-'))
   const carimbo = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')
   try {
-    for (const p of PREVIAS) {
+    const so = process.argv.slice(2)
+    for (const p of PREVIAS.filter((x) => !so.length || so.includes(x.png))) {
       const temp = path.join(perfil, p.png)
       await capturar(chrome, `http://127.0.0.1:${srv.address().port}/${p.html}`, temp, perfil)
       const png = await readFile(temp)

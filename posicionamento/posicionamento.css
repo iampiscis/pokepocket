@@ -93,3 +93,8 @@ button.pos-casa:hover, button.pos-casa:focus-visible { outline: none; box-shadow
 }
 
 .pos-casa-bola { position: absolute; inset: 0; border-radius: inherit; background-repeat: no-repeat; pointer-events: none; }
+html.embed, html.embed body { background: transparent; }
+html.embed body { padding-top: 0; }
+html.embed .ceu, html.embed .topo, html.embed .abre, html.embed .final, html.embed .pos-usos { display: none; }
+html.embed .envolve.largo { padding: 0; }
+html.embed .pos-corpo { margin-top: 0; }
