@@ -13,13 +13,14 @@ const ISOLADO = '/pokepocketferramentas/'
 const caminho = (p) => `${p}/`
 const MODO_VELHO = (p) => `if (new URLSearchParams(location.search).has('ferramentas')) location.replace('${ISOLADO}${caminho(p)}' + location.hash)`
 const MODO_NOVO = `document.documentElement.classList.add('so-ferr'); document.documentElement.dataset.isolado = '${ISOLADO}'`
-const FORA = [/PokePocket-Setup\.exe/, /github\.com\/iampiscis\/pokepocket"/, /class="(coracao|apoio)"/, /href="\.\.\/#/, /class="final-txt"/]
+const FORA = [/PokePocket-Setup\.exe/, /github\.com\/iampiscis\/pokepocket"/, /href="\.\.\/#(?!apoie")/, /class="final-txt"/]
+const APOIE = (l) => (/class="(coracao|apoio)"/.test(l) ? l.replace('href="../#apoie"', 'href="#apoie"') : l)
 
 const falhou = []
 for (const pagina of PAGINAS) {
   const original = readFileSync(resolve(origem, pagina, 'index.html'), 'utf8')
   if (!original.includes(MODO_VELHO(pagina)) || !original.includes('<meta charset="utf-8" />')) { falhou.push(pagina); continue }
-  const linhas = original.split('\n').filter((l) => !FORA.some((r) => r.test(l)))
+  const linhas = original.split('\n').map(APOIE).filter((l) => !FORA.some((r) => r.test(l)))
   const html = linhas.join('\n')
     .replace('<meta charset="utf-8" />', `<meta charset="utf-8" />\n  <!-- gerado a partir de iampiscis/pokepocket ${pagina}/index.html; não editar -->\n  <base href="${FONTE}${pagina}/" />`)
     .replace(MODO_VELHO(pagina), MODO_NOVO)

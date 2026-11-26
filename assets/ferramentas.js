@@ -46,7 +46,7 @@
     if (u.origin !== location.origin || u.pathname.startsWith(isolado) || !u.pathname.startsWith(fonte)) return href
     const resto = u.pathname.slice(fonte.length)
     const ehRaiz = resto === '' || resto === 'index.html'
-    const pagina = ehRaiz ? '' : resto.match(/^(calculadora|nivel|tier|posicionamento)\/$/)?.[1]
+    const pagina = ehRaiz ? '' : resto.match(/^(calculadora|nivel|tier|posicionamento|passivas)\/$/)?.[1]
     if (pagina == null) return href
     return new URL(`${isolado}${pagina ? pagina + '/' : ''}${ehRaiz ? '' : u.search + u.hash}`, location.origin).toString()
   }
@@ -88,4 +88,71 @@
     if (a) { const novo = comModo(a.href); if (novo !== a.href) a.href = novo }
   }
   for (const ev of ['click', 'auxclick', 'contextmenu', 'mouseover', 'focusin', 'touchstart']) document.addEventListener(ev, troca, { capture: true, passive: true })
+})()
+
+;(() => {
+  if (!document.documentElement.dataset.isolado) return
+  const fonte = new URL('../', document.baseURI).pathname
+  const CORACAO = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>'
+  let pop = null
+  const montar = () => {
+    pop = document.createElement('dialog')
+    pop.className = 'apoie-pop'
+    pop.setAttribute('aria-labelledby', 'apoie-tit')
+    const it = (n, w, d) => `<img class="pix" src="${fonte}assets/itens/${n}.png" alt="" style="width:${w}px;animation-delay:${d}s" />`
+    pop.innerHTML = `
+      <button type="button" class="apoie-fechar" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="apoie-cab"><span class="apoie-rot">Créditos</span><h2 id="apoie-tit">Feito por fãs</h2><p>É grátis e continua grátis.</p></div>
+      <div class="apoie-grade">
+        <div class="apoie-autor">
+          <div class="apoie-palco">
+            <div class="apoie-luz"></div>
+            <span class="apoie-nota" style="left:18%;top:22%">♪</span><span class="apoie-nota" style="left:74%;top:16%;animation-delay:.8s">♫</span><span class="apoie-nota" style="left:52%;top:30%;animation-delay:1.6s">♪</span>
+            <div class="apoie-dancam">${it('bulbasaur', 64, 0)}${it('charmander', 70, 0.15)}${it('squirtle', 62, 0.3)}${it('pikachu', 80, 0.45)}</div>
+          </div>
+          <div class="apoie-nome"><small>Feito com carinho pela</small><b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Equipe PokePocket</b></div>
+        </div>
+        <div class="apoie-doar">
+          <h3><span class="apoie-gema" style="background-image:url('${fonte}assets/gema.svg')"></span>Apoie o projeto</h3>
+          <ol class="apoie-passos">
+            <li><span>1</span>Copie o endereço abaixo.</li>
+            <li><span>2</span>Envie USDT pela rede Solana (SPL).</li>
+            <li><span>3</span>Sua doação mantém as melhorias e o PokePocket sempre gratuito.</li>
+          </ol>
+          <code class="apoie-carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
+          <button type="button" class="apoie-copiar">Copiar endereço</button>
+          <p class="apoie-alerta">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
+        </div>
+      </div>`
+    document.body.append(pop)
+    pop.querySelector('.apoie-fechar').addEventListener('click', () => pop.close())
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
+    const bt = pop.querySelector('.apoie-copiar')
+    bt.addEventListener('click', async () => {
+      const cod = pop.querySelector('.apoie-carteira')
+      const txt = cod.textContent.trim()
+      try { await navigator.clipboard.writeText(txt) } catch { const r = document.createRange(); r.selectNodeContents(cod); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges() }
+      bt.textContent = 'Endereço copiado ✓'
+      bt.classList.add('ok')
+      setTimeout(() => { bt.textContent = 'Copiar endereço'; bt.classList.remove('ok') }, 2500)
+    })
+  }
+  const abrir = () => { if (!pop) montar(); if (!pop.open) pop.showModal() }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('.coracao, .apoio, a[href$="#apoie"]')
+    if (!a) return
+    e.preventDefault()
+    abrir()
+  }, true)
+  const acoes = document.querySelector('.topo .acoes-topo')
+  if (acoes && !acoes.querySelector('.coracao')) {
+    const b = document.createElement('a')
+    b.className = 'coracao'
+    b.href = '#apoie'
+    b.setAttribute('aria-label', 'Apoie o projeto')
+    b.title = 'Apoie'
+    b.innerHTML = CORACAO
+    acoes.prepend(b)
+  }
+  if (location.hash === '#apoie') abrir()
 })()
