@@ -137,24 +137,39 @@ function especie(id) {
 }
 let motorPronto = null
 
-const estado = { sel: 'charm', filtro: 'todas', caster: null, modo: 'passivas', time: [], timeSel: null }
+const estado = { sel: 'charm', filtro: 'todas', caster: null, modo: 'passivas', time: [], ini: [], lado: 'nos', timeSel: null }
 const TIME_MAX = 5
+const INI_PADRAO = [[132, 3, 0], [132, 6, 1], [132, 0, 1], [132, 4, 2], [132, 3, 4]]
 const TIME_EXEMPLO = [[210, 3, 0], [184, 4, 0], [12, 2, 1], [621, 5, 1], [3149, 3, 1]]
 
+const codigoTime = (l) => l.map((m) => `${Number(m.sp).toString(36)}${m.col}${m.f}`).join('-')
+const lerCodigo = (txt) => (txt ? txt.split('-').map((t) => [parseInt(t.slice(0, -2), 36), Number(t.at(-2)), Number(t.at(-1))]).filter((v) => v.every(Number.isFinite) && valida(v[1], v[2])) : null)
 function lerHash() {
   const h = decodeURIComponent(location.hash.slice(1))
-  if (h === 'time' || h.startsWith('time=')) {
+  if (h === 'time' || h.startsWith('time=') || h.startsWith('t=')) {
     estado.modo = 'time'
-    const lista = h.startsWith('time=') ? h.slice(5).split(',').map((t) => t.split('.').map(Number)).filter((v) => v.length === 3 && v.every(Number.isFinite) && valida(v[1], v[2])) : null
-    estado.time = (lista ?? TIME_EXEMPLO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
+    const partes = Object.fromEntries(h.split('&').map((t) => t.split('=')))
+    const velho = (txt) => (txt == null ? null : txt.split(',').filter(Boolean).map((t) => t.split('.').map(Number)).filter((v) => v.length === 3 && v.every(Number.isFinite) && valida(v[1], v[2])))
+    const nos = partes.t != null ? lerCodigo(partes.t) : velho(partes.time)
+    const ini = partes.i != null ? lerCodigo(partes.i) : velho(partes.ini)
+    estado.time = (nos ?? TIME_EXEMPLO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
+    estado.ini = (ini ?? INI_PADRAO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
     return
   }
-  estado.modo = 'passivas'
-  if (PORID.has(h)) estado.sel = h
+  if (PORID.has(h)) { estado.modo = 'passivas'; estado.sel = h; return }
+  estado.modo = 'time'
+  estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f }))
+  estado.ini = INI_PADRAO.map(([sp, col, f]) => ({ sp, col, f }))
 }
 function gravarHash() {
-  if (estado.modo === 'time') history.replaceState(null, '', `#time=${estado.time.map((m) => `${m.sp}.${m.col}.${m.f}`).join(',')}`)
-  else history.replaceState(null, '', `#${estado.sel}`)
+  const limpo = location.pathname + location.search
+  if (estado.modo === 'time') { if (location.hash) history.replaceState(null, '', limpo) }
+  else history.replaceState(null, '', `${limpo}#${estado.sel}`)
+}
+function linkDoTime() {
+  const u = new URL(location.href)
+  u.hash = `t=${codigoTime(estado.time)}&i=${codigoTime(estado.ini)}`
+  return u.toString()
 }
 
 function montarLista() {
@@ -379,11 +394,13 @@ class Cena {
     if (!this.vivo) throw new Error('fim')
   }
   legendaRapida(txt) {
-    const l = $('pas-passo')
-    const corpo = el('span', { class: 'pas-passo-txt', text: txt })
-    l.replaceChildren(el('span', { class: 'pas-passo-ic svg time', 'aria-hidden': 'true', html: ICO_TIME }), corpo)
+    const r = $('pt-rodada')
+    const curto = txt.replace(/^(Rodada \d+):.*$/, '$1')
+    if (r.textContent !== curto) { r.textContent = curto; if (this.vel) r.animate([{ transform: 'scale(.85)', opacity: 0.4 }, { transform: 'scale(1)', opacity: 1 }], { duration: 220, easing: 'ease-out' }) }
+    r.classList.toggle('fim', /venceu|esgotado/.test(txt))
     this.leituraAte = 0
   }
+
   async investida(p, alvo, ms = 380) {
     setTimeout(() => som('soco', { forca: 0.7 }), this.ms(ms) * 0.4)
     const a = this.centro(p), b = this.centro(alvo)
@@ -490,12 +507,12 @@ class Cena {
   }
   marca(p, classe, on = true) { p.n.classList.toggle(classe, on) }
   efeito(classe, sobre = 'nos', on = true) {
-    let o = this.camada.querySelector(`.pas-fx.${classe}`)
+    let o = this.camada.querySelector(`.pas-fx.${classe}[data-sobre="${sobre}"]`)
     if (!on) { o?.remove(); return }
     const cs = [...this.casas.entries()].filter(([k]) => k.startsWith(`${sobre}:`)).map(([, c]) => c)
     const x0 = Math.min(...cs.map((c) => c.offsetLeft)), y0 = Math.min(...cs.map((c) => c.offsetTop))
     const x1 = Math.max(...cs.map((c) => c.offsetLeft + c.offsetWidth)), y1 = Math.max(...cs.map((c) => c.offsetTop + c.offsetHeight))
-    if (!o) { o = el('span', { class: `pas-fx ${classe}` }); this.camada.prepend(o) }
+    if (!o) { o = el('span', { class: `pas-fx ${classe}`, 'data-sobre': sobre }); this.camada.prepend(o) }
     Object.assign(o.style, { left: `${x0 - 4}px`, top: `${y0 - 4}px`, width: `${x1 - x0 + 8}px`, height: `${y1 - y0 + 8}px` })
     if (classe === 'chuva' && !o.childElementCount) {
       const alt = y1 - y0 + 60, larg = x1 - x0 + 8
@@ -521,6 +538,7 @@ class Cena {
     o2.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: 0.8 }, { transform: 'translate(-50%,-50%) scale(7)', opacity: 0 }], { duration: 1000, delay: 160, easing: 'ease-out', fill: 'both' }).finished.then(fim2, fim2)
   }
   async legenda(txt) {
+    if (estado.modo === 'time') return this.legendaRapida(txt)
     if (this.vel && this.leituraAte) { const falta = this.leituraAte - performance.now(); if (falta > 0) await this.espera(falta) }
     if (!this.vivo) throw new Error('fim')
     this.leituraAte = performance.now() + Math.max(1500, txt.length * 55)
@@ -947,11 +965,13 @@ const bstDe = (e) => (e ? Object.values(e.base || {}).reduce((t, v) => t + (Numb
 const ICO_TIME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.8 19.5c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5M10.8 19.5c.6-3.2 2.6-5 5.2-5s4.6 1.8 5.2 5"/></svg>'
 const ICO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>'
 
-function membros() {
-  return estado.time.map((m, i) => {
+const listaDe = (lado) => (lado === 'ini' ? estado.ini : estado.time)
+const NOME_LADO = { nos: 'Seu time', ini: 'Inimigo' }
+function membros(lado = 'nos') {
+  return listaDe(lado).map((m, i) => {
     const e = especie(m.sp)
     const p = P.passivaDaEspecie(m.sp)
-    return { ...m, i, e, p, x: p ? PORID.get(p.id) : null, bst: bstDe(e), tipos: e?.tipos || [] }
+    return { ...m, i, lado, k: `${lado}:${i}`, e, p, x: p ? PORID.get(p.id) : null, bst: bstDe(e), tipos: e?.tipos || [] }
   })
 }
 function analisar(T) {
@@ -967,7 +987,7 @@ function analisar(T) {
     if (fora.length) alertas.push({ id: 'rain_dance', estado: 'aviso', titulo: 'Fora da Rain Dance', detalhe: `${nomes(fora)} (BST acima de ${P.BST_MAX_PASSIVA})` })
   }
   const intim = tem('intimidate')
-  if (intim.length) alertas.push(dragoes.length > 1 ? { id: 'intimidate', estado: 'off', titulo: 'Intimidate desligado', detalhe: `${dragoes.length} Dragões no time (megas contam)` } : { id: 'intimidate', estado: 'ok', titulo: 'Intimidate ativo', detalhe: `Inimigos causam ${intim[0].x.n.pct}% menos dano` })
+  if (intim.length) alertas.push(dragoes.length > 1 ? { id: 'intimidate', estado: 'off', titulo: 'Intimidate desligado', detalhe: `${dragoes.length} Dragões no time (megas contam)` } : { id: 'intimidate', estado: 'ok', titulo: 'Intimidate ativo', detalhe: `O outro lado causa ${intim[0].x.n.pct}% menos dano` })
   for (const m of tem('swarm')) {
     const n = insetos.filter((o) => o !== m).length
     alertas.push({ id: 'swarm', estado: 'ok', titulo: `Swarm +${Math.min(num(m.x.n.teto), num(m.x.n.pct) + n * num(m.x.n.porInseto))}%`, detalhe: `${m.e?.nome} · ${n} outro${n === 1 ? '' : 's'} Inseto${n === 1 ? '' : 's'}` })
@@ -988,6 +1008,7 @@ function irParaTime() {
   if (estado.modo === 'time') return
   estado.modo = 'time'
   if (!estado.time.length) estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f }))
+  if (!estado.ini.length) estado.ini = INI_PADRAO.map(([sp, col, f]) => ({ sp, col, f }))
   aplicarModo()
   atualizarTime(true)
 }
@@ -1005,83 +1026,130 @@ async function atualizarTime(comFade = false) {
   for (const e of alvos) { e.getAnimations().forEach((a) => a.cancel()); if (comFade && !reduzido.matches) e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280 }) }
 }
 function montarCabTime() {
-  const T = membros()
+  const N = membros('nos'), I = membros('ini')
   $('pas-palco').style.setProperty('--t', '#e2a93f')
   const ic = el('span', { class: 'pas-ic grande time', 'aria-hidden': 'true' })
   ic.innerHTML = ICO_TIME
   $('pas-cab').replaceChildren(ic, el('span', { class: 'pas-cab-txt' }, [
     el('h2', { text: 'Monte seu time' }),
     el('span', { class: 'pas-cab-chips' }, [
-      el('span', { class: 'pt-chip', text: `${T.length}/${TIME_MAX} pokémon` }),
-      el('span', { class: 'pt-chip', text: `${T.filter((m) => m.p).length} com passiva` }),
-      el('span', { class: 'pt-chip', text: `${T.filter((m) => !m.p).length} sem passiva` })
+      el('span', { class: 'pt-chip', text: `Seu time ${N.length}/${TIME_MAX}` }),
+      el('span', { class: 'pt-chip ini', text: `Inimigo ${I.length}/${TIME_MAX}` }),
+      el('span', { class: 'pt-chip', text: `${[...N, ...I].filter((m) => m.p).length} com passiva` })
     ]),
-    el('span', { class: 'pas-resumo', text: 'Arraste as peças para montar a formação.' })
   ]))
 }
+function chipPassiva(m) {
+  return m.x ? el('span', { class: 'pas-achado-pas', style: `--t:${COR_TIPO[m.x.tipo]}` }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), m.x.id), m.x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
+}
 function linhaMembro(m) {
-  const pas = m.x ? el('span', { class: 'pas-achado-pas', style: `--t:${COR_TIPO[m.x.tipo]}` }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), m.x.id), m.x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
-  return el('div', { class: `pt-membro${estado.timeSel === m.i ? ' sel' : ''}`, 'data-i': String(m.i) }, [
+  return el('div', { class: `pt-membro${estado.timeSel === m.k ? ' sel' : ''}`, 'data-k': m.k }, [
     el('span', { class: 'pas-pk-img' }, [imgSprite(m.e?.looktype, m.sp)]),
     el('span', { class: 'pt-membro-txt' }, [el('b', { text: m.e?.nome || `#${m.sp}` }), el('small', { text: m.bst ? `BST ${m.bst} · alcance ${alcanceDe(m.e)}` : '' })]),
-    pas,
-    el('button', { type: 'button', class: 'pt-tirar', 'data-tirar': String(m.i), 'aria-label': `Tirar ${m.e?.nome || 'pokémon'} do time`, title: 'Tirar do time', html: ICO_X })
+    chipPassiva(m),
+    el('button', { type: 'button', class: 'pt-tirar', 'data-tirar': m.k, 'aria-label': `Tirar ${m.e?.nome || 'pokémon'}`, title: 'Tirar', html: ICO_X })
   ])
 }
 function montarTimeLado() {
-  const T = membros()
+  const lado = estado.lado
+  const T = membros(lado)
   const vagas = Array.from({ length: TIME_MAX - T.length }, () => el('button', { type: 'button', class: 'pt-vaga', 'data-vaga': '', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>Vaga livre' }))
   $('pt-lista').replaceChildren(...T.map(linhaMembro), ...vagas)
-  $('pt-n').textContent = `${T.length}/${TIME_MAX}`
-  $('pt-busca').disabled = T.length >= TIME_MAX
-  $('pt-busca').placeholder = T.length >= TIME_MAX ? 'Time cheio (5 pokémon)' : 'Adicionar pokémon ao time'
+  for (const l of ['nos', 'ini']) {
+    const b = document.querySelector(`[data-lado="${l}"]`)
+    b.classList.toggle('ativo', l === lado)
+    b.setAttribute('aria-selected', String(l === lado))
+    b.querySelector('em').textContent = `${listaDe(l).length}/${TIME_MAX}`
+  }
+  document.querySelector('.pt-lado').classList.toggle('ini', lado === 'ini')
+  $('pt-exemplo').textContent = lado === 'ini' ? 'Ditto' : 'Exemplo'
+  $('pt-exemplo').title = lado === 'ini' ? 'Voltar aos 5 Ditto de teste' : 'Carregar um time de exemplo'
+  const cheio = T.length >= TIME_MAX
+  $('pt-busca').disabled = cheio
+  $('pt-busca').placeholder = cheio ? `${NOME_LADO[lado]} cheio (5 pokémon)` : lado === 'ini' ? 'Adicionar pokémon ao inimigo' : 'Adicionar pokémon ao seu time'
+}
+function blocoRegras(titulo, T) {
+  const { alertas } = analisar(T)
+  if (!alertas.length) return [el('h3', {}, [titulo]), el('p', { class: 'pt-ok', text: T.length ? 'Nenhuma regra limitando as passivas.' : 'Sem pokémon.' })]
+  return [el('h3', {}, [titulo]), el('ul', { class: 'pt-alertas' }, alertas.map((a) => el('li', { class: `pt-linha pt-regra ${a.estado}` }, [comIcone(el('span', { class: 'pt-linha-ic', 'aria-hidden': 'true' }), a.id), el('span', { class: 'pt-regra-txt' }, [el('b', { text: a.titulo }), el('small', { text: a.detalhe })]), el('span', { class: 'pt-estado', text: { ok: 'Ativo', aviso: 'Atenção', off: 'Desligado' }[a.estado] })])))]
 }
 function montarTimeInfo() {
-  const T = membros()
-  const { alertas } = analisar(T)
-  const caixa = $('pas-time-info')
+  const N = membros('nos'), I = membros('ini')
+  const T = estado.lado === 'ini' ? I : N
   const itens = T.map((m) => el('li', { class: 'pt-linha' }, [
     el('span', { class: 'pt-linha-ic sprite' }, [imgSprite(m.e?.looktype, m.sp)]),
     el('span', {}, [el('b', { text: m.e?.nome || '' }), ' ', el('span', { class: 'pt-info-pas', text: m.x ? `${m.x.nome}: ${m.x.curto}` : 'Sem passiva: luta só com os golpes.' })])
   ]))
-  caixa.replaceChildren(
-    el('h3', {}, ['Regras do time']),
-    alertas.length ? el('ul', { class: 'pt-alertas' }, alertas.map((a) => el('li', { class: `pt-linha pt-regra ${a.estado}` }, [comIcone(el('span', { class: 'pt-linha-ic', 'aria-hidden': 'true' }), a.id), el('span', { class: 'pt-regra-txt' }, [el('b', { text: a.titulo }), el('small', { text: a.detalhe })]), el('span', { class: 'pt-estado', text: { ok: 'Ativo', aviso: 'Atenção', off: 'Desligado' }[a.estado] })]))) : el('p', { class: 'pt-ok', text: T.length ? 'Nenhuma regra limitando as passivas deste time.' : 'Monte o time para ver as regras.' }),
-    el('h3', {}, ['Cada um']),
-    el('ul', { class: 'pt-info' }, itens)
+  $('pas-time-info').replaceChildren(
+    ...blocoRegras('Regras do seu time', N),
+    ...(I.some((m) => m.p) ? blocoRegras('Regras do inimigo', I) : []),
+    el('h3', {}, [estado.lado === 'ini' ? 'Cada inimigo' : 'Cada um do seu time']),
+    T.length ? el('ul', { class: 'pt-info' }, itens) : el('p', { class: 'pt-ok', text: 'Sem pokémon.' })
   )
 }
 function adicionarAoTime(sp) {
-  if (estado.time.length >= TIME_MAX) return
-  const livre = ORDEM_CASAS.find((c) => !estado.time.some((m) => m.col === c.col && m.f === c.f))
+  const lista = listaDe(estado.lado)
+  if (lista.length >= TIME_MAX) return
+  const livre = ORDEM_CASAS.find((c) => !lista.some((m) => m.col === c.col && m.f === c.f))
   if (!livre) return
-  estado.time.push({ sp, ...livre })
+  lista.push({ sp, ...livre })
   som('clique', { forca: 0.6 })
-  atualizarTime()
+  atualizarTime(true)
+}
+const parteK = (k) => { const [lado, i] = k.split(':'); return { lado, i: Number(i) } }
+function moverMembro(k, col, f) {
+  const { lado, i } = parteK(k)
+  const lista = listaDe(lado)
+  const m = lista[i]
+  if (!m || !valida(col, f)) return false
+  const outro = lista.findIndex((o) => o.col === col && o.f === f)
+  if (outro === i) return false
+  if (outro >= 0) { lista[outro].col = m.col; lista[outro].f = m.f }
+  m.col = col; m.f = f
+  return true
+}
+function trocarLado(lado) {
+  if (estado.lado === lado) return
+  estado.lado = lado
+  estado.timeSel = null
+  montarTimeLado()
+  montarTimeInfo()
 }
 function ligarTime() {
   document.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.modo === 'time') irParaTime(); else escolher(estado.sel) }))
+  document.querySelectorAll('[data-lado]').forEach((b) => b.addEventListener('click', () => trocarLado(b.dataset.lado)))
   $('pt-lista').addEventListener('click', (e) => {
     if (e.target.closest('[data-vaga]')) { $('pt-busca').focus(); return }
     const t = e.target.closest('[data-tirar]')
-    if (t) { estado.time.splice(Number(t.dataset.tirar), 1); estado.timeSel = null; return atualizarTime() }
-    const m = e.target.closest('[data-i]')
-    if (m) { estado.timeSel = estado.timeSel === Number(m.dataset.i) ? null : Number(m.dataset.i); montarTimeLado(); marcarSel() }
+    if (t) { const { lado, i } = parteK(t.dataset.tirar); listaDe(lado).splice(i, 1); estado.timeSel = null; return atualizarTime(true) }
+    const m = e.target.closest('.pt-membro[data-k]')
+    if (m) { estado.timeSel = estado.timeSel === m.dataset.k ? null : m.dataset.k; montarTimeLado(); marcarSel() }
   })
-  $('pt-exemplo').addEventListener('click', () => { estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f })); estado.timeSel = null; atualizarTime(true) })
-  $('pt-limpar').addEventListener('click', () => { estado.time = []; estado.timeSel = null; atualizarTime(true) })
+  $('pt-exemplo').addEventListener('click', () => {
+    if (estado.lado === 'ini') estado.ini = INI_PADRAO.map(([sp, col, f]) => ({ sp, col, f }))
+    else estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f }))
+    estado.timeSel = null
+    atualizarTime(true)
+  })
+  $('pt-copiar').addEventListener('click', async () => {
+    const bt = $('pt-copiar'), txt = linkDoTime()
+    try { await navigator.clipboard.writeText(txt) } catch { const t = el('textarea', { style: 'position:fixed;opacity:0' }); t.value = txt; document.body.append(t); t.select(); document.execCommand('copy'); t.remove() }
+    som('clique', { forca: 0.6 })
+    bt.classList.add('ok'); bt.querySelector('span').textContent = 'Link copiado'
+    setTimeout(() => { bt.classList.remove('ok'); bt.querySelector('span').textContent = 'Copiar link' }, 2000)
+  })
+  $('pt-limpar').addEventListener('click', () => { listaDe(estado.lado).length = 0; estado.timeSel = null; atualizarTime(true) })
   $('pas-tab').addEventListener('click', (e) => {
     if (estado.modo !== 'time' || ignorarClique) return
-    const pc = e.target.closest('.pas-peca.nos[data-i]')
-    if (pc) { const i = Number(pc.dataset.i); estado.timeSel = estado.timeSel === i ? null : i; montarTimeLado(); marcarSel(); return }
-    const casa = e.target.closest('.pas-casa.nos')
-    if (!casa || estado.timeSel == null) return
-    const [, col, f] = casa.dataset.k.split(':').map((v, i) => (i ? Number(v) : v))
-    const m = estado.time[estado.timeSel]
-    if (!m || estado.time.some((o) => o.col === col && o.f === f)) return
-    m.col = col; m.f = f
+    const pc = e.target.closest('.pas-peca[data-k]')
+    if (pc) { const k = pc.dataset.k; trocarLado(parteK(k).lado); estado.timeSel = estado.timeSel === k ? null : k; montarTimeLado(); marcarSel(); return }
+    const casa = e.target.closest('.pas-casa[data-k]')
+    if (!casa || !estado.timeSel) return
+    const [lado, col, f] = casa.dataset.k.split(':').map((v, i) => (i ? Number(v) : v))
+    if (lado !== parteK(estado.timeSel).lado) return
+    const k = estado.timeSel
     estado.timeSel = null
-    atualizarTime()
+    if (moverMembro(k, col, f)) { som('passo', { forca: 0.7 }); atualizarTime(true) } else { montarTimeLado(); marcarSel() }
   })
   const campo = $('pt-busca'), caixa = $('pt-achados')
   const fechar = () => { caixa.hidden = true; caixa.replaceChildren() }
@@ -1095,7 +1163,7 @@ function ligarTime() {
       const x = pas ? PORID.get(pas.id) : null
       return el('button', { type: 'button', class: 'pas-achado', 'data-sp': String(a.speciesId), style: x ? `--t:${COR_TIPO[x.tipo]}` : null }, [
         el('span', { class: 'pas-pk-img' }, [imgSprite(a.looktype, a.speciesId)]),
-        el('span', { class: 'pas-achado-txt' }, [el('b', { text: a.nome }), el('small', { text: `BST ${bstDe(especie(a.speciesId)) ?? '?'}` })]),
+        el('span', { class: 'pas-achado-txt' }, [el('b', { text: a.nome }), el('small', { text: `BST ${bstDe(especie(a.speciesId)) ?? '?'} · alcance ${alcanceDe(especie(a.speciesId))}` })]),
         x ? el('span', { class: 'pas-achado-pas' }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), x.id), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
       ])
     }) : [el('p', { class: 'pas-achados-vazio', text: 'Nenhum pokémon com esse nome.' })]))
@@ -1111,76 +1179,109 @@ function ligarTime() {
   caixa.addEventListener('click', (e) => { const b = e.target.closest('[data-sp]'); if (b) { adicionarAoTime(Number(b.dataset.sp)); campo.value = ''; fechar(); campo.focus() } })
   campo.addEventListener('blur', () => setTimeout(fechar, 120))
 }
+
+function desenharFormacao(c) {
+  const unidades = []
+  for (const lado of ['nos', 'ini']) for (const m of membros(lado)) {
+    const papel = lado === 'nos' ? (m.p ? 'dono' : 'aliado sem-passiva') : (m.p ? 'teste com-passiva' : 'teste')
+    const pc = c.peca(lado, m.col, m.f, { sp: m.sp, lt: m.e?.looktype, papel })
+    pc.n.dataset.k = m.k
+    if (m.x) pc.n.style.setProperty('--t', COR_TIPO[m.x.tipo])
+    unidades.push({ pc, m })
+  }
+  return unidades
+}
+
 let ignorarClique = false
 function ligarArraste() {
   const tab = $('pas-tab')
   let arr = null
-  const casaEm = (x, y) => document.elementsFromPoint(x, y).find((n) => n.classList?.contains('pas-casa') && n.classList.contains('nos'))
-  const limpar = () => {
-    tab.querySelectorAll('.alvo-drop').forEach((n) => n.classList.remove('alvo-drop'))
-    if (arr) { arr.fant?.remove(); arr.pc.classList.remove('arrastando') }
-    arr = null
+  const casasDo = (lado) => [...tabuleiro.casas.entries()].filter(([k]) => k.startsWith(`${lado}:`))
+  const maisPerto = (lado, cx, cy) => {
+    let melhor = null
+    for (const [k, c] of casasDo(lado)) {
+      const d = Math.hypot(c.offsetLeft + c.offsetWidth / 2 - cx, c.offsetTop + c.offsetHeight / 2 - cy)
+      if (!melhor || d < melhor.d) melhor = { k, c, d }
+    }
+    return melhor
   }
+  const limites = (lado) => {
+    const cs = casasDo(lado).map(([, c]) => c)
+    return { x0: Math.min(...cs.map((c) => c.offsetLeft)), y0: Math.min(...cs.map((c) => c.offsetTop)), x1: Math.max(...cs.map((c) => c.offsetLeft + c.offsetWidth)), y1: Math.max(...cs.map((c) => c.offsetTop + c.offsetHeight)) }
+  }
+  const pontoNoTab = (e) => { const r = tab.getBoundingClientRect(); return { x: e.clientX - r.left - tab.clientLeft, y: e.clientY - r.top - tab.clientTop } }
   tab.addEventListener('pointerdown', (e) => {
     if (estado.modo !== 'time' || e.button > 0) return
-    const pc = e.target.closest('.pas-peca.nos[data-i]')
+    const pc = e.target.closest('.pas-peca[data-k]')
     if (!pc) return
     e.preventDefault()
-    const r = pc.getBoundingClientRect()
-    arr = { i: Number(pc.dataset.i), pc, x0: e.clientX, y0: e.clientY, ox: e.clientX - r.left, oy: e.clientY - r.top, w: r.width, mov: false, fant: null }
-    try { pc.setPointerCapture(e.pointerId) } catch {}
+    arr = { k: pc.dataset.k, lado: parteK(pc.dataset.k).lado, x0: e.clientX, y0: e.clientY, mov: false, id: e.pointerId }
+    try { tab.setPointerCapture(e.pointerId) } catch {}
   })
   tab.addEventListener('pointermove', (e) => {
-    if (!arr) return
+    if (!arr || e.pointerId !== arr.id) return
     if (!arr.mov) {
-      if (Math.hypot(e.clientX - arr.x0, e.clientY - arr.y0) < 6) return
+      if (Math.hypot(e.clientX - arr.x0, e.clientY - arr.y0) < 5) return
       arr.mov = true
       cena?.parar()
-      arr.fant = arr.pc.cloneNode(true)
-      arr.fant.classList.add('pt-fantasma')
-      arr.fant.style.width = arr.fant.style.height = `${arr.w}px`
-      document.body.append(arr.fant)
-      arr.pc.classList.add('arrastando')
+      const c = new Cena(PORID.get(estado.sel), true)
+      cena = c
+      c.legendaRapida('Posicionando')
+      desenharFormacao(c)
+      const p = c.pecas.find((q) => q.n.dataset.k === arr.k)
+      if (!p) { arr = null; return }
+      arr.p = p
+      arr.lim = limites(arr.lado)
+      arr.w = p.n.offsetWidth
+      const pt = pontoNoTab(e)
+      arr.ox = pt.x - p.n.offsetLeft
+      arr.oy = pt.y - p.n.offsetTop
+      p.n.classList.add('arrastando')
+      tab.classList.add('com-arraste')
     }
-    arr.fant.style.left = `${e.clientX - arr.ox}px`
-    arr.fant.style.top = `${e.clientY - arr.oy}px`
-    const alvo = casaEm(e.clientX, e.clientY)
-    tab.querySelectorAll('.alvo-drop').forEach((n) => { if (n !== alvo) n.classList.remove('alvo-drop') })
-    alvo?.classList.add('alvo-drop')
+    const pt = pontoNoTab(e)
+    const L = arr.lim
+    const x = Math.max(L.x0, Math.min(L.x1 - arr.w, pt.x - arr.ox))
+    const y = Math.max(L.y0, Math.min(L.y1 - arr.w, pt.y - arr.oy))
+    arr.p.n.style.left = `${x}px`
+    arr.p.n.style.top = `${y}px`
+    const alvo = maisPerto(arr.lado, x + arr.w / 2, y + arr.w / 2)
+    if (arr.alvo !== alvo?.c) { arr.alvo?.classList.remove('alvo-drop'); arr.alvo = alvo?.c; arr.alvoK = alvo?.k; arr.alvo?.classList.add('alvo-drop') }
   })
-  const soltar = (e, cancelou) => {
-    if (!arr) return
-    const { i, mov } = arr
-    const alvo = mov && !cancelou ? casaEm(e.clientX, e.clientY) : null
-    limpar()
-    if (!mov) return
+  const soltar = async (e, cancelou) => {
+    if (!arr || e.pointerId !== arr.id) return
+    const a = arr
+    arr = null
+    tab.classList.remove('com-arraste')
+    if (!a.mov) return
     ignorarClique = true
     setTimeout(() => { ignorarClique = false }, 0)
-    if (alvo) {
-      const [, col, f] = alvo.dataset.k.split(':').map((v, k) => (k ? Number(v) : v))
-      const m = estado.time[i]
-      const outro = estado.time.findIndex((o) => o.col === col && o.f === f)
-      if (m) {
-        if (outro >= 0 && outro !== i) { estado.time[outro].col = m.col; estado.time[outro].f = m.f }
-        m.col = col; m.f = f
-        som('passo', { forca: 0.7 })
-      }
+    a.alvo?.classList.remove('alvo-drop')
+    let mudou = false
+    if (!cancelou && a.alvoK) {
+      const [, col, f] = a.alvoK.split(':').map((v, i) => (i ? Number(v) : v))
+      const c0 = a.alvo
+      if (a.p && !reduzido.matches) await a.p.n.animate([{ left: a.p.n.style.left, top: a.p.n.style.top }, { left: `${c0.offsetLeft}px`, top: `${c0.offsetTop}px` }], { duration: 140, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {})
+      mudou = moverMembro(a.k, col, f)
+      if (mudou) som('passo', { forca: 0.7 })
     }
     estado.timeSel = null
-    atualizarTime()
+    trocarLado(a.lado)
+    atualizarTime(true)
   }
   tab.addEventListener('pointerup', (e) => soltar(e, false))
   tab.addEventListener('pointercancel', (e) => soltar(e, true))
+  tab.addEventListener('lostpointercapture', (e) => { if (arr && e.pointerId === arr.id) soltar(e, true) })
 }
 function marcarSel() {
-  for (const p of cena?.pecas || []) if (p.n.dataset.i != null) p.n.classList.toggle('sel', Number(p.n.dataset.i) === estado.timeSel)
+  for (const p of cena?.pecas || []) if (p.n.dataset.k) p.n.classList.toggle('sel', p.n.dataset.k === estado.timeSel)
   document.documentElement.classList.toggle('pt-movendo', estado.timeSel != null)
+  document.documentElement.dataset.movendo = estado.timeSel ? parteK(estado.timeSel).lado : ''
 }
 
 const distCasa = (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(yDe(a.lado, a.f) - yDe(b.lado, b.f)))
 const ICONE_CICLO = { burn: '🔥', poison: '☠️', freeze: '❄️', paralyze: '⚡', leech_seed: '🌱', confusion: '💫', fear: '👻', rock_smash: '👊', whirlwind: '🌪️', assurance: '🌑', charm: '💗' }
 const COR_CICLO = { burn: COR.fogo, poison: COR.veneno, freeze: COR.gelo, paralyze: COR.raio, leech_seed: COR.planta, confusion: COR.psi, fear: COR.fantasma, rock_smash: COR.luta, whirlwind: COR.vento, assurance: COR.sombra, charm: COR.fada }
-
 const alcanceDe = (e) => {
   if (!e?.base) return 1
   const folga = Number(e.base.spAtk) - Math.max(Number(e.base.atk) || 0, Number(e.base.hp) || 0)
@@ -1193,22 +1294,20 @@ const distU = (a, b) => { const p = mundo(a), q = mundo(b); return Math.max(Math
 
 async function cenaTime(c) {
   c.dono = null
-  const T = membros()
-  const Eobj = inimigos(c, { apagados: !T.length })
-  if (!T.length) { await c.legenda('Busque pokémon e monte o time.'); await c.espera(4000); return }
-  const { insetos, intimOk } = analisar(T)
-  const rainOn = T.some((m) => m.p?.id === 'rain_dance')
-  const nos = T.map((m) => {
-    const pc = c.peca('nos', m.col, m.f, { sp: m.sp, lt: m.e?.looktype, papel: m.p ? 'dono' : 'aliado sem-passiva' })
-    pc.n.dataset.i = String(m.i)
-    if (m.x) pc.n.style.setProperty('--t', COR_TIPO[m.x.tipo])
-    const swarm = m.p?.id === 'swarm' ? Math.min(num(m.x.n.teto), num(m.x.n.pct) + insetos.filter((o) => o !== m).length * num(m.x.n.porInseto)) / 100 : 0
-    return { pc, m, time: true, id: m.p?.id || null, alc: alcanceDe(m.e), vivo: true, mult: 1 + (rainOn && (m.p?.id === 'rain_dance' || m.bst <= P.BST_MAX_PASSIVA) ? 0.2 : 0) + swarm, defesa: m.p?.id === 'iron_defense' ? 1 / 1.35 : 1, cavar: m.p?.id === 'dig', curaPronta: m.p?.id === 'recover', ef: {} }
-  })
-  const eles = Object.values(Eobj).map((pc) => ({ pc, time: false, id: null, alc: 1, vivo: true, mult: rainOn && false ? 1 : 1, defesa: 1, ef: {} }))
-  const todos = [...nos, ...eles]
+  const N = membros('nos'), I = membros('ini')
+  const pecas = desenharFormacao(c)
   marcarSel()
-  const ocupado = (x, y) => todos.some((u) => u.vivo && mundo(u).x === x && mundo(u).y === y)
+  if (!N.length || !I.length) { await c.legenda(!N.length ? 'Adicione ao seu time' : 'Adicione inimigos'); await c.espera(4000); return }
+  const lados = { nos: analisar(N), ini: analisar(I) }
+  const rainDe = { nos: N.some((m) => m.p?.id === 'rain_dance'), ini: I.some((m) => m.p?.id === 'rain_dance') }
+  const unid = pecas.map(({ pc, m }) => {
+    const L = lados[m.lado]
+    const swarm = m.p?.id === 'swarm' ? Math.min(num(m.x.n.teto), num(m.x.n.pct) + L.insetos.filter((o) => o !== m).length * num(m.x.n.porInseto)) / 100 : 0
+    const chuva = rainDe[m.lado] && (m.p?.id === 'rain_dance' || m.bst <= P.BST_MAX_PASSIVA) ? 0.2 : 0
+    return { pc, m, time: m.lado === 'nos', id: m.p?.id || null, alc: alcanceDe(m.e), vivo: true, mult: 1 + chuva + swarm, chuva: !!chuva, defesa: m.p?.id === 'iron_defense' ? 1 / 1.35 : 1, cavar: m.p?.id === 'dig', curaPronta: m.p?.id === 'recover', ef: {} }
+  })
+  const nos = unid.filter((u) => u.time), eles = unid.filter((u) => !u.time)
+  const ocupado = (x, y) => unid.some((u) => u.vivo && mundo(u).x === x && mundo(u).y === y)
   const inimigosDe = (u) => (u.time ? eles : nos).filter((o) => o.vivo)
   const aliadosDe = (u) => (u.time ? nos : eles).filter((o) => o.vivo && o !== u)
   const maisPerto = (u, lista) => [...lista].sort((a, b) => distU(u, a) - distU(u, b) || mundo(a).x - mundo(b).x)[0]
@@ -1228,44 +1327,47 @@ async function cenaTime(c) {
     return melhor
   }
   const caiu = (u) => {
+    if (!u.vivo) return
     u.vivo = false
     c.texto(u.pc, 'caiu', 'nada')
     u.pc.n.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.6)' }], { duration: c.ms(420) || 1, fill: 'forwards' })
   }
   const dano = (alvo, v, de = null) => {
     if (!alvo.vivo) return
-    let d = v * alvo.defesa * (alvo.ef.gelo ? 1.2 : 1) * (alvo.ef.quebrado ? 1.2 : 1)
-    d = Math.round(d)
+    const d = Math.round(v * alvo.defesa * (alvo.ef.gelo ? 1.2 : 1) * (alvo.ef.quebrado ? 1.2 : 1))
     c.texto(alvo.pc, `−${d}%`)
     c.vida(alvo.pc, alvo.pc.hp - d)
-    if (de && alvo.id === 'rocky_helmet' && de.vivo) { const r = Math.max(1, Math.round(d * 0.2)); setTimeout(() => { c.texto(de.pc, `−${r}% capacete`, 'refl'); c.vida(de.pc, de.pc.hp - r); if (de.pc.hp <= 0) caiu(de) }, c.ms(250)) }
+    if (de && alvo.id === 'rocky_helmet' && de.vivo) { const r = Math.max(1, Math.round(d * 0.2)); setTimeout(() => { if (!de.vivo) return; c.texto(de.pc, `−${r}%`, 'refl'); c.vida(de.pc, de.pc.hp - r); if (de.pc.hp <= 0) caiu(de) }, c.ms(250)) }
     if (alvo.pc.hp <= 0) caiu(alvo)
   }
 
-  await c.legenda('Começa a luta: passivas de início.')
-  if (rainOn) { c.efeito('chuva', 'nos'); som('chuva', { forca: 0.6 }) }
-  for (const u of nos) {
-    await c.espera(220)
-    if (u.mult > 1) { c.aura(u.pc, rainOn ? COR.agua : COR.inseto); c.texto(u.pc, `+${Math.round((u.mult - 1) * 100)}% dano`, 'buff') }
+  await c.legenda('Início')
+  for (const lado of ['nos', 'ini']) if (rainDe[lado]) c.efeito('chuva', lado)
+  if (rainDe.nos || rainDe.ini) som('chuva', { forca: 0.6 })
+  for (const u of unid) {
+    if (!u.id && !u.chuva) continue
+    await c.espera(180)
+    if (u.mult > 1) { c.aura(u.pc, u.chuva ? COR.agua : COR.inseto); c.texto(u.pc, `+${Math.round((u.mult - 1) * 100)}% dano`, 'buff') }
     if (u.id === 'iron_defense') { c.marca(u.pc, 'escudo'); c.texto(u.pc, `+${pct(u.m.x.n.pct)} DEF`, 'buff') }
     if (u.id === 'rocky_helmet') c.aura(u.pc, COR.pedra)
     if (u.id === 'intimidate') {
-      if (intimOk) { c.onda(u.pc, COR.dragao); som('rugido', { forca: 0.6 }); for (const e of eles) { e.mult *= 0.8; c.texto(e.pc, '−20% dano', 'deb') } }
-      else { c.texto(u.pc, 'desligado', 'nada') }
+      if (lados[u.m.lado].intimOk) { c.onda(u.pc, COR.dragao); som('rugido', { forca: 0.6 }); for (const e of (u.time ? eles : nos)) { e.mult *= 0.8; c.texto(e.pc, '−20% dano', 'deb') } }
+      else c.texto(u.pc, 'desligado', 'nada')
     }
   }
   await c.espera(1300)
 
-  const cicloPassiva = async (u, rodada) => {
+  const cicloPassiva = async (u) => {
     const id = u.id
-    if (!id || !ICONE_CICLO[id] && id !== 'dig' && id !== 'recover') return
-    if (id === 'dig') { u.cavar = true; c.status(u.pc, 'dig'); return }
+    if (id === 'dig') { u.cavar = true; return }
     if (id === 'recover') { u.curaPronta = true; return }
+    if (!id || !ICONE_CICLO[id]) return
     const lista = inimigosDe(u)
     if (!lista.length) return
     const alvo = id === 'charm' ? [...lista].sort((a, b) => distU(u, b) - distU(u, a))[0] : (u.alvo?.vivo ? u.alvo : maisPerto(u, lista))
     som(SOM_PASSIVA[id], { forca: 0.5 })
     await c.golpe(u.pc, alvo.pc, ICONE_CICLO[id], 480, { cor: COR_CICLO[id] })
+    if (!alvo.vivo) return
     c.status(alvo.pc, id)
     const n = u.m.x.n
     if (id === 'burn') alvo.ef.dot = { v: num(n.pct), r: 3, de: u, cor: COR.fogo }
@@ -1279,30 +1381,28 @@ async function cenaTime(c) {
     if (id === 'assurance') dano(alvo, num(n.pct) + (100 - alvo.pc.hp) * num(n.faltando) / 100, u)
     if (id === 'whirlwind' || id === 'charm') {
       dano(alvo, num(n.pct), u)
-      if (alvo.vivo) {
-        const q = mundo(alvo)
-        let dest = null
-        if (id === 'whirlwind') { const dir = alvo.time ? 1 : -1; let y = q.y; while (celulaOk(q.x, y + dir) && !ocupado(q.x, y + dir)) y += dir; if (y !== q.y) dest = { x: q.x, y } }
-        else {
-          const frente = alvo.time ? 13 : 12
-          const cols = []
-          for (let x = 0; x < 8; x++) if (celulaOk(x, frente) && !ocupado(x, frente)) cols.push(x)
-          if (cols.length) dest = { x: cols.sort((a, b) => Math.abs(a - mundo(u).x) - Math.abs(b - mundo(u).x))[0], y: frente }
-        }
-        if (dest) { const k = daMundo(dest.x, dest.y); await c.moverPara(alvo.pc, k.lado, k.col, k.f, id === 'charm' ? 820 : 620, id === 'charm' ? 1 : 0) }
+      if (!alvo.vivo) return
+      const q = mundo(alvo)
+      let dest = null
+      if (id === 'whirlwind') { const dir = alvo.time ? 1 : -1; let y = q.y; while (celulaOk(q.x, y + dir) && !ocupado(q.x, y + dir)) y += dir; if (y !== q.y) dest = { x: q.x, y } }
+      else {
+        const frente = alvo.time ? 13 : 12
+        const cols = []
+        for (let x = 0; x < 8; x++) if (celulaOk(x, frente) && !ocupado(x, frente)) cols.push(x)
+        if (cols.length) dest = { x: cols.sort((a, b) => Math.abs(a - mundo(u).x) - Math.abs(b - mundo(u).x))[0], y: frente }
       }
+      if (dest) { const k = daMundo(dest.x, dest.y); await c.moverPara(alvo.pc, k.lado, k.col, k.f, id === 'charm' ? 820 : 620, id === 'charm' ? 1 : 0) }
     }
   }
 
   let rodada = 0
-  while (rodada < 14 && nos.some((u) => u.vivo) && eles.some((u) => u.vivo)) {
+  while (rodada < 16 && nos.some((u) => u.vivo) && eles.some((u) => u.vivo)) {
     rodada++
-    const ciclo = rodada === 1 || rodada % 4 === 1
+    const ciclo = rodada % 4 === 1
     c.legendaRapida(ciclo ? `Rodada ${rodada}: ${rodada === 1 ? 'as passivas de ciclo disparam.' : 'novo ciclo, as passivas disparam de novo.'}` : `Rodada ${rodada}: quem alcança ataca, quem não alcança avança.`)
-    if (ciclo) { await Promise.all(nos.filter((u) => u.vivo && u.id).map((u, k) => (async () => { await c.espera(k * 160); await cicloPassiva(u, rodada) })())); await c.espera(350) }
-    const vivos = todos.filter((u) => u.vivo)
+    if (ciclo) { await Promise.all(unid.filter((u) => u.vivo && u.id).map((u, k) => (async () => { await c.espera(k * 140); await cicloPassiva(u) })())); await c.espera(350) }
     const moves = [], ataques = []
-    for (const u of vivos) {
+    for (const u of unid.filter((v) => v.vivo)) {
       if (u.ef.gelo) { u.ef.gelo--; if (!u.ef.gelo) c.marca(u.pc, 'gelo', false); continue }
       const lista = inimigosDe(u)
       if (!lista.length) continue
@@ -1322,44 +1422,44 @@ async function cenaTime(c) {
       }
     }
     if (moves.length) {
-      for (const [u, k] of moves) if (k.de) { u.pc.lado = k.de.lado; u.pc.col = k.de.col; u.pc.f = k.de.f }
+      for (const [u, k] of moves) { u.pc.lado = k.de.lado; u.pc.col = k.de.col; u.pc.f = k.de.f }
       await Promise.all(moves.map(([u, k]) => c.moverPara(u.pc, k.lado, k.col, k.f, 360)))
     }
     await Promise.all(ataques.map(([u, alvo], k) => (async () => {
       await c.espera(k * 70)
       if (!u.vivo) return
-      if (u.ef.para) { u.ef.para--; if (rodada % 2 === 0) { c.texto(u.pc, 'Falhou!', 'nada'); return } if (!u.ef.para) c.marca(u.pc, 'choque', false) }
+      if (u.ef.para) { u.ef.para--; const falhou = rodada % 2 === 0; if (!u.ef.para) c.marca(u.pc, 'choque', false); if (falhou) { c.texto(u.pc, 'Falhou!', 'nada'); return } }
       let quem = alvo
       if (u.ef.conf) { u.ef.conf = false; const al = maisPerto(u, aliadosDe(u)); if (al) { quem = al; c.texto(u.pc, 'Confuso!', 'nada') } c.status(u.pc, '') }
       if (!quem.vivo) return
       if (quem.cavar && quem !== u) {
         await c.golpe(u.pc, quem.pc, '✦', 380, { cor: '#ffb3ba', passa: true })
-        quem.cavar = false; c.texto(quem.pc, 'Esquivou!', 'nada'); c.status(quem.pc, '')
+        quem.cavar = false; c.texto(quem.pc, 'Esquivou!', 'nada')
         return
       }
       if (u.alc > 1) await c.golpe(u.pc, quem.pc, '✦', 380, { cor: u.time ? '#ffe9a3' : '#ffb3ba' })
       else { await c.investida(u.pc, quem.pc, 320); c.impacto(quem.pc, u.time ? '#ffe9a3' : '#ffb3ba', 0.6) }
-      dano(quem, (u.time ? 10 : 8) * u.mult, u)
+      dano(quem, 9 * u.mult, u)
     })()))
-    for (const u of todos.filter((v) => v.vivo && v.ef.dot)) {
+    for (const u of unid.filter((v) => v.vivo && v.ef.dot)) {
       const d = u.ef.dot
       dano(u, d.v * 2)
       c.particulas(u.pc, d.cor, 4, 'sobe')
       if (d.cura && d.de.vivo) { c.vida(d.de.pc, d.de.pc.hp + d.v * 2); c.texto(d.de.pc, `+${d.v * 2}%`, 'cura') }
       if (!--d.r) { u.ef.dot = null; c.status(u.pc, '') }
     }
-    for (const u of todos.filter((v) => v.ef.quebrado)) if (!--u.ef.quebrado) c.marca(u.pc, 'quebrado', false)
-    for (const r of nos.filter((u) => u.vivo && u.curaPronta)) {
-      const ferido = nos.filter((o) => o.vivo && o.pc.hp <= 50 && (o === r || o.m.bst <= P.BST_MAX_PASSIVA)).sort((a, b) => a.pc.hp - b.pc.hp)[0]
+    for (const u of unid.filter((v) => v.ef.quebrado)) if (!--u.ef.quebrado) c.marca(u.pc, 'quebrado', false)
+    for (const r of unid.filter((u) => u.vivo && u.curaPronta)) {
+      const ferido = (r.time ? nos : eles).filter((o) => o.vivo && o.pc.hp <= 50 && (o === r || o.m.bst <= P.BST_MAX_PASSIVA)).sort((a, b) => a.pc.hp - b.pc.hp)[0]
       if (!ferido) continue
       r.curaPronta = false
       await c.golpe(r.pc, ferido.pc, '💚', 420, { classe: 'cura' })
-      c.vida(ferido.pc, ferido.pc.hp + num(r.m.x.n.pct)); c.texto(ferido.pc, `+${pct(r.m.x.n.pct)}`, 'cura'); c.particulas(ferido.pc, COR.cura, 6, 'sobe', '✚')
+      c.vida(ferido.pc, ferido.pc.hp + num(r.m.x.n.pct)); c.texto(ferido.pc, `+${pct(r.m.x.n.pct)}`, 'cura')
     }
     await c.espera(420)
   }
-  const ganhou = nos.some((u) => u.vivo) && !eles.some((u) => u.vivo)
-  await c.legenda(ganhou ? `Seu time venceu em ${rodada} rodadas.` : nos.some((u) => u.vivo) ? 'Tempo esgotado.' : 'Os pokémon de teste venceram.')
+  const vNos = nos.some((u) => u.vivo), vIni = eles.some((u) => u.vivo)
+  await c.legenda(vNos && !vIni ? `Seu time venceu · ${rodada} rodadas` : vIni && !vNos ? `Inimigo venceu · ${rodada} rodadas` : 'Tempo esgotado')
   await c.espera(2200)
 }
 
@@ -1398,6 +1498,7 @@ async function precarregar() {
 }
 
 lerHash()
+if (estado.modo === 'time') gravarHash()
 ligar()
 ligarTime()
 ligarArraste()

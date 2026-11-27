@@ -456,3 +456,47 @@ html.embed .envolve.largo { padding: 0; }
 .pas-casa.nos.alvo-drop { background-image: linear-gradient(rgba(255, 211, 77, 0.45), rgba(255, 211, 77, 0.45)); box-shadow: inset 0 0 0 2px #fff, 0 0 12px rgba(255, 211, 77, 0.6); }
 .modo-time .pas-peca.nos[data-i] { touch-action: none; cursor: grab; }
 .pt-alertas li.pt-regra { display: grid; grid-template-columns: 30px minmax(0, 1fr) 82px; gap: 10px; padding: 7px 10px 7px 8px; }
+.pt-lados { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 13px; background: rgba(8, 4, 6, 0.6); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.12); }
+.pt-lados button { display: flex; align-items: center; justify-content: center; gap: 7px; height: 34px; border: 0; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 900; color: var(--suave); background: none; cursor: pointer; }
+.pt-lados button em { font-style: normal; font-size: 11px; font-weight: 800; color: var(--apagado); }
+.pt-lados button.ativo { color: #fff6ef; background: rgba(255, 233, 163, 0.1); box-shadow: inset 0 0 0 1.5px rgba(226, 169, 63, 0.7); }
+.pt-lados button[data-lado="ini"].ativo { box-shadow: inset 0 0 0 1.5px rgba(255, 111, 125, 0.75); }
+.pt-lados button.ativo em { color: var(--suave); }
+.pt-bola { width: 9px; height: 9px; border-radius: 50%; }
+.pt-bola.nos { background: #e2a93f; box-shadow: 0 0 6px #e2a93f; }
+.pt-bola.ini { background: #ff6f7d; box-shadow: 0 0 6px #ff6f7d; }
+.pt-cab { justify-content: flex-end; gap: 6px; }
+.pt-cab button:first-of-type { margin-left: 0; }
+.pt-lista { flex: none; grid-template-rows: repeat(5, 50px); gap: 6px; }
+.pt-membro { height: 50px; grid-template-columns: 36px minmax(0, 1fr) 96px 24px; gap: 8px; padding: 0 6px 0 6px; border-radius: 12px; }
+.pt-membro .pas-pk-img { width: 36px; height: 36px; }
+.pt-membro-txt b { font-size: 13.5px; line-height: 1.2; }
+.pt-membro-txt small { font-size: 11px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt-membro .pas-achado-pas { width: 96px; height: 24px; justify-content: center; }
+.pt-tirar { width: 24px; height: 24px; }
+.pt-vaga { height: 50px; }
+.pt-lado.ini .pt-membro.sel { box-shadow: inset 0 0 0 1.5px #ff6f7d, 0 0 12px -4px #ff6f7d; }
+.pt-dica { margin-top: auto; }
+.pt-chip.ini { color: #ffd0d5; background: rgba(255, 111, 125, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 111, 125, 0.45); }
+.pas-peca.ini.com-passiva { box-shadow: inset 0 0 0 2.5px var(--t), 0 0 10px color-mix(in srgb, var(--t) 60%, transparent), 0 3px 8px rgba(0, 0, 0, 0.65); }
+.modo-time .pas-peca[data-k] { pointer-events: auto; touch-action: none; cursor: grab; }
+.pas-tab.com-arraste { cursor: grabbing; }
+.pas-tab.com-arraste .pas-peca[data-k] { transition: none; }
+.pas-peca.arrastando { z-index: 30; opacity: 1; cursor: grabbing; transform: scale(1.1); box-shadow: inset 0 0 0 2.5px #fff, 0 10px 22px rgba(0, 0, 0, 0.7); }
+.pas-casa.ini.alvo-drop { background-image: linear-gradient(rgba(255, 111, 125, 0.4), rgba(255, 111, 125, 0.4)); box-shadow: inset 0 0 0 2px #fff, 0 0 12px rgba(255, 111, 125, 0.6); }
+[data-movendo="ini"] .pas-casa.ini { cursor: pointer; }
+[data-movendo="ini"] .pas-casa.nos { cursor: default; }
+[data-movendo="ini"] .pas-casa.nos:hover { background-image: none; }
+@media (max-width: 900px) {
+  .pt-lista { grid-template-rows: repeat(5, 48px); }
+  .pt-membro, .pt-vaga { height: 48px; }
+}
+.modo-time .pas-passo { display: none; }
+.pt-rodada { display: none; }
+.modo-time .pt-rodada { position: absolute; z-index: 12; top: 9px; left: calc(50% + 66px); display: inline-flex; align-items: center; height: 22px; padding: 0 10px; border-radius: 999px; font-size: 11.5px; font-weight: 900; letter-spacing: 0.02em; color: #ffe9a3; background: rgba(21, 11, 16, 0.9); box-shadow: inset 0 0 0 1px rgba(226, 169, 63, 0.5); pointer-events: none; }
+.modo-time .pt-rodada:empty { display: none; }
+.modo-time .pt-rodada.fim { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc, #7d5313); }
+.pt-cab .pt-copiar { display: inline-flex; align-items: center; gap: 5px; margin-right: auto; color: #ffe9a3; box-shadow: inset 0 0 0 1px rgba(226, 169, 63, 0.5); }
+.pt-cab .pt-copiar svg { width: 13px; height: 13px; }
+.pt-cab .pt-copiar.ok { color: #8ff0ad; box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.55); }
+.pt-cab .pt-copiar span { padding: 0; border-radius: 0; font-size: 12px; font-weight: 800; line-height: 1; color: inherit; background: none; }
