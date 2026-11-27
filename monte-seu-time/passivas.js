@@ -173,6 +173,12 @@ function gravarHash() {
   if (estado.modo === 'time') { if (location.hash) history.replaceState(null, '', limpo) }
   else history.replaceState(null, '', `${limpo}#${estado.sel}`)
 }
+const previaMod = import('../assets/previa-formacao.js')
+function desenharTime(m) {
+  const item = (x, lado) => ({ lt: x.e?.looktype, sp: x.sp, col: x.col, f: x.f, nome: x.e?.nome || `#${x.sp}`, cor: x.x ? COR_TIPO[x.x.tipo] : lado === 'ini' ? '#ff6f7d' : '#8b919c', chip: x.x ? { texto: x.x.nome, cor: COR_TIPO[x.x.tipo], fundo: 'rgba(21,11,16,.9)' } : { texto: 'Sem passiva', cor: '#a88e86', fundo: 'rgba(21,11,16,.9)' } })
+  const N = membros('nos').map((x) => item(x, 'nos')), I = membros('ini').map((x) => item(x, 'ini'))
+  return m.desenharFormacao({ titulo: 'Monte seu time', subtitulo: `${N.length} contra ${I.length} · passivas do PvP`, nos: N, ini: I, colunas: [{ rotulo: 'Seu time', cor: '#e2a93f', itens: N }, { rotulo: 'Inimigo', cor: '#ff6f7d', itens: I }] })
+}
 function linkDoTime() {
   const u = new URL(location.href)
   u.hash = `t=${codigoTime(estado.time)}&i=${codigoTime(estado.ini)}`
@@ -1153,12 +1159,16 @@ function ligarTime() {
     estado.timeSel = null
     atualizarTime(true)
   })
-  $('pt-copiar').addEventListener('click', async () => {
-    const bt = $('pt-copiar'), txt = linkDoTime()
-    try { await navigator.clipboard.writeText(txt) } catch { const t = el('textarea', { style: 'position:fixed;opacity:0' }); t.value = txt; document.body.append(t); t.select(); document.execCommand('copy'); t.remove() }
+  $('pt-copiar').addEventListener('click', () => {
+    const bt = $('pt-copiar'), rot = bt.querySelector('span')
+    if (bt.classList.contains('gerando')) return
+    bt.classList.add('gerando'); rot.textContent = 'Gerando prévia…'
     som('clique', { forca: 0.6 })
-    bt.classList.add('ok'); bt.querySelector('span').textContent = 'Link copiado'
-    setTimeout(() => { bt.classList.remove('ok'); bt.querySelector('span').textContent = 'Copiar link' }, 2000)
+    const promessa = previaMod.then((m) => m.linkCurto(`M${m.origem()}_${codigoTime(estado.time)}_${codigoTime(estado.ini)}`, () => desenharTime(m), linkDoTime())).catch(() => linkDoTime())
+    previaMod.then((m) => m.copiarTexto(promessa)).catch(() => promessa).finally(() => {
+      bt.classList.remove('gerando'); bt.classList.add('ok'); rot.textContent = 'Link copiado'
+      setTimeout(() => { bt.classList.remove('ok'); rot.textContent = 'Copiar link' }, 2200)
+    })
   })
   $('pt-limpar').addEventListener('click', () => { listaDe(estado.lado).length = 0; estado.timeSel = null; atualizarTime(true) })
   $('pas-tab').addEventListener('click', (e) => {

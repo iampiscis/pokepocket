@@ -162,3 +162,5 @@ html.embed .pos-busca { display: none; }
 .pos-aviso-link b { font-size: 15px; color: #fde68a; }
 .pos-aviso-link span { font-size: 13px; font-weight: 700; color: rgba(255, 246, 239, 0.75); }
 .pos-aviso-fechar { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; font-size: 18px; line-height: 1; color: #fff3df; background: rgba(255, 233, 163, 0.1); cursor: pointer; }
+.pos-link.gerando { opacity: .6; cursor: progress; animation: pos-girando 1s linear infinite; }
+@keyframes pos-girando { to { rotate: 360deg; } }

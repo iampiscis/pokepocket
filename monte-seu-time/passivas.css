@@ -510,3 +510,4 @@ html.embed .envolve.largo { padding: 0; }
 .pt-membro { grid-template-columns: 36px 22px minmax(0, 1fr) 96px 24px; gap: 6px; }
 #pt-achados .pas-achado { grid-template-columns: 30px 22px minmax(0, 1fr) auto; }
 @media (min-width: 901px) { html:not(.embed) .pas { grid-template-columns: 316px minmax(0, 1fr); } }
+.pt-cab .pt-copiar.gerando { opacity: .75; cursor: progress; }

@@ -182,8 +182,36 @@ function abrirDoLink() {
   $('pos-corpo').prepend(aviso)
 }
 addEventListener('hashchange', abrirDoLink)
+const previaMod = import('../assets/previa-formacao.js')
+const alcTxt = (n) => (n > 1 ? `alcance ${n}` : 'corpo a corpo')
+function desenharJogador(m, j) {
+  const itens = (j.pks || []).map((p) => {
+    const k = CASAS[p.casa]
+    const t = tierDe(p)
+    const n = alcanceN(p.alcance)
+    return { lt: p.looktype, sp: p.speciesId, col: k ? k.cx - 11 : -1, f: k ? k.fileira : -1, nome: p.nome, cor: t ? COR_TIER[t] : '#e2a93f', chip: { texto: t ? `Tier ${t} · ${alcTxt(n)}` : alcTxt(n), cor: t ? COR_TIER[t] : '#e6c9b9', fundo: 'rgba(21,11,16,.9)' } }
+  })
+  const jogos = (j.vitorias || 0) + (j.derrotas || 0)
+  const wr = jogos ? ` · ${Math.round((100 * j.vitorias) / jogos)}%` : ''
+  const sub = `${j.pos ? `${j.pos}º no PvP mensal · ` : ''}${fmt.format(j.pontos || 0)} pts${wr}`
+  return m.desenharFormacao({ titulo: `${j.nick}${j.guild?.tag ? ` [${j.guild.tag}]` : ''}`, subtitulo: sub, nos: itens, lados: false, colunas: [{ itens }] })
+}
+document.addEventListener('click', (e) => {
+  const bt = e.target.closest?.('[data-copiar-pos]')
+  if (!bt || bt.classList.contains('gerando')) return
+  const nick = bt.dataset.copiarPos
+  const k = normalizar(nick)
+  const j = [...(dados?.jogadores || []), ...(dados?.outros || [])].find((x) => normalizar(x.nick) === k)
+  const reserva = linkDe(nick)
+  bt.classList.add('gerando')
+  const promessa = j ? previaMod.then((m) => m.linkCurto(`P${m.origem()}_${m.b64url(nick)}`, () => desenharJogador(m, j), reserva)).catch(() => reserva) : Promise.resolve(reserva)
+  previaMod.then((m) => m.copiarTexto(promessa)).catch(() => promessa).finally(() => {
+    bt.classList.remove('gerando'); bt.classList.add('ok')
+    clearTimeout(bt._t); bt._t = setTimeout(() => bt.classList.remove('ok'), 2200)
+  })
+})
 function botaoLink(j) {
-  const b = el('button', { type: 'button', class: 'pos-link', 'data-copiar': linkDe(j.nick), title: 'Copiar link desta formação', 'aria-label': `Copiar link da formação de ${j.nick}` }, [ico('link')])
+  const b = el('button', { type: 'button', class: 'pos-link', 'data-copiar-pos': j.nick, title: 'Copiar link desta formação', 'aria-label': `Copiar link da formação de ${j.nick}` }, [ico('link')])
   return b
 }
 

@@ -1,14 +1,18 @@
-import { decodificarCompacto } from '../calculadora/link.js'
+import { decodificarCompacto, MARCA_ISOLADO } from '../calculadora/link.js'
 
-const CALC = 'https://iampiscis.github.io/pokepocket/calculadora/'
+const SITE = 'https://iampiscis.github.io'
+const BASE = { o: `${SITE}/pokepocket/`, i: `${SITE}/pokepocketferramentas/` }
+const CALC = `${BASE.o}calculadora/`
+const FORMACAO = /^([MP])([oi])_([0-9A-Za-z_-]{1,190})$/
+const LISTA = /^(?:[0-9a-z]{3,6}(?:-[0-9a-z]{3,6}){0,4})?$/
 const ICONE = 'https://iampiscis.github.io/pokepocket/assets/icone.png'
-const ORIGENS = ['https://iampiscis.github.io', 'http://localhost:4412']
+const ORIGENS = ['https://iampiscis.github.io', 'http://localhost:4412', 'http://localhost:4395']
 const ROBOS = /discordbot|twitterbot|facebookexternalhit|whatsapp|telegrambot|slackbot|linkedinbot|embedly|skypeuripreview|redditbot|googlebot|bingbot|applebot|vkshare|pinterest|mastodon|bluesky|cardyb/i
 const FAIXAS = [[0, 'Baixo', '#f87171'], [300, 'Regular', '#fb923c'], [500, 'Bom', '#facc15'], [700, 'Excelente', '#4ade80']]
 const FAIXAS_NOTA = [[1, 'Extremamente fraco'], [2, 'Fraco'], [3, 'Mediano'], [4, 'Razoável'], [5, 'Bom'], [6, 'Forte'], [7, 'Poderoso'], [8, 'Mítico'], [9, 'Lendário'], [10, 'Divino']]
 const ID = /^[0-9A-Za-z]{7}$/
 const TOKEN = /^[A-Za-z0-9_-]{8,200}$/
-const MAX_IMAGEM = 450 * 1024
+const MAX_IMAGEM = 900 * 1024
 
 const fmt = new Intl.NumberFormat('pt-BR')
 const fmt3 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
@@ -30,6 +34,20 @@ async function idDe(token) {
   return s
 }
 
+function jpgValido(b) {
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8 || b[2] !== 0xff) return false
+  let i = 2
+  while (i + 9 < b.length) {
+    if (b[i] !== 0xff) return false
+    const m = b[i + 1]
+    const tam = (b[i + 2] << 8) | b[i + 3]
+    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return ((b[i + 5] << 8) | b[i + 6]) === 630 && ((b[i + 7] << 8) | b[i + 8]) === 1200
+    i += 2 + tam
+  }
+  return false
+}
+const tipoImagem = (b) => (b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : 'image/png')
+
 function pngValido(b) {
   const sig = [137, 80, 78, 71, 13, 10, 26, 10]
   if (b.length < 33 || sig.some((v, i) => b[i] !== v)) return false
@@ -49,15 +67,53 @@ function textos(d) {
   return { titulo, descricao: linhas.length ? linhas.join('\n') : 'Simule nível, refino, potência e Z-Move.', cor: ehNum(r.pvp) ? faixa(r.pvp)[2] : '#ffd34d' }
 }
 
-function pagina({ titulo, descricao, cor }, destino, proprio, imagem) {
+function nickDe(b64) {
+  try {
+    const bin = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4))
+    const nick = new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))).trim()
+    return nick && nick.length <= 40 ? nick : null
+  } catch { return null }
+}
+
+function formacao(token) {
+  const m = FORMACAO.exec(token)
+  if (!m) return null
+  const [, tipo, origem, dados] = m
+  const base = BASE[origem]
+  if (tipo === 'M') {
+    const [nos = '', ini = '', ...resto] = dados.split('_')
+    if (resto.length || !LISTA.test(nos) || !LISTA.test(ini) || (!nos && !ini)) return null
+    const n = nos ? nos.split('-').length : 0, k = ini ? ini.split('-').length : 0
+    return {
+      destino: `${base}monte-seu-time/#t=${nos}&i=${ini}`,
+      site: 'Monte seu time · PokePocket',
+      abrir: 'Abrir no Monte seu time',
+      titulo: `Monte seu time · ${n} contra ${k}`,
+      descricao: 'Formação montada no PokePocket, com as passivas do PvP agindo no tabuleiro.',
+      cor: '#ffd34d'
+    }
+  }
+  const nick = nickDe(dados)
+  if (!nick) return null
+  return {
+    destino: `${base}posicionamento/#j=${encodeURIComponent(nick)}`,
+    site: 'Posicionamento dos top · PokePocket',
+    abrir: 'Abrir no Posicionamento',
+    titulo: `Formação de ${nick}`,
+    descricao: 'Formação real do top do PvP mensal: onde cada pokémon fica no tabuleiro, com tier e alcance.',
+    cor: '#ffd34d'
+  }
+}
+
+function pagina({ titulo, descricao, cor, site = 'Calculadora Pokémon · PokePocket', abrir = 'Abrir na calculadora' }, destino, proprio, imagem) {
   return `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>${esc(titulo)} · Calculadora Pokémon · PokePocket</title>
+<title>${esc(titulo)} · ${esc(site)}</title>
 <meta name="description" content="${esc(descricao)}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Calculadora Pokémon · PokePocket">
+<meta property="og:site_name" content="${esc(site)}">
 <meta property="og:title" content="${esc(titulo)}">
 <meta property="og:description" content="${esc(descricao)}">
 <meta property="og:url" content="${esc(proprio)}">
@@ -66,14 +122,20 @@ ${imagem ? '<meta property="og:image:width" content="1200">\n<meta property="og:
 <meta name="theme-color" content="${cor}">
 <meta http-equiv="refresh" content="0;url=${esc(destino)}">
 </head>
-<body><a href="${esc(destino)}">Abrir na calculadora</a></body>
+<body><a href="${esc(destino)}">${esc(abrir)}</a></body>
 </html>`
 }
 
 function responderLink(req, url, token, id, temImagem) {
+  const f = formacao(token)
+  if (f) {
+    if (!ROBOS.test(req.headers.get('user-agent') || '')) return Response.redirect(f.destino, 302)
+    const imagem = id && temImagem ? `${url.origin}/i/${id}.png` : null
+    return new Response(pagina(f, f.destino, url.href, imagem), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=600' } })
+  }
   let d
   try { d = decodificarCompacto(token) } catch { return Response.redirect(CALC, 302) }
-  const destino = `${CALC}#k=${token}`
+  const destino = `${token.endsWith(MARCA_ISOLADO) ? `${BASE.i}calculadora/` : CALC}#k=${token}`
   if (!ROBOS.test(req.headers.get('user-agent') || '')) return Response.redirect(destino, 302)
   const imagem = id && temImagem ? `${url.origin}/i/${id}.png` : null
   return new Response(pagina(textos(d), destino, url.href, imagem), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=600' } })
@@ -81,8 +143,8 @@ function responderLink(req, url, token, id, temImagem) {
 
 async function criarLink(req, env) {
   const token = (await req.text()).trim()
-  if (!TOKEN.test(token)) return new Response('link inválido', { status: 400, headers: cors(req) })
-  try { decodificarCompacto(token) } catch { return new Response('link inválido', { status: 400, headers: cors(req) }) }
+  if (!TOKEN.test(token) && !FORMACAO.test(token)) return new Response('link inválido', { status: 400, headers: cors(req) })
+  if (!formacao(token)) { try { decodificarCompacto(token) } catch { return new Response('link inválido', { status: 400, headers: cors(req) }) } }
   const id = await idDe(token)
   const atual = await env.LINKS.get(`l:${id}`)
   if (atual !== token) await env.LINKS.put(`l:${id}`, token)
@@ -96,7 +158,7 @@ async function guardarImagem(req, env, id) {
   const tam = Number(req.headers.get('content-length') || 0)
   if (tam > MAX_IMAGEM) return new Response('imagem grande demais', { status: 413, headers: cors(req) })
   const b = new Uint8Array(await req.arrayBuffer())
-  if (b.length > MAX_IMAGEM || !pngValido(b)) return new Response('imagem inválida', { status: 400, headers: cors(req) })
+  if (b.length > MAX_IMAGEM || !(pngValido(b) || jpgValido(b))) return new Response('imagem inválida', { status: 400, headers: cors(req) })
   await env.LINKS.put(`i:${id}`, b, { expirationTtl: 60 * 60 * 24 * 180 })
   return new Response(null, { status: 201, headers: cors(req) })
 }
@@ -118,9 +180,9 @@ export default {
     if (mi) {
       const b = await env.LINKS.get(`i:${mi[1]}`, { type: 'arrayBuffer' })
       if (!b) return new Response('não encontrado', { status: 404 })
-      return new Response(b, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=31536000, immutable' } })
+      return new Response(b, { headers: { 'content-type': tipoImagem(new Uint8Array(b)), 'cache-control': 'public, max-age=31536000, immutable' } })
     }
-    const mp = /^\/p\/([A-Za-z0-9_-]{8,200})$/.exec(p)
+    const mp = /^\/p\/([A-Za-z0-9_-]{6,200})$/.exec(p)
     if (mp) return responderLink(req, url, mp[1], null, false)
     const id = p.slice(1)
     if (ID.test(id)) {
