@@ -200,14 +200,8 @@
 @media (prefers-reduced-motion: reduce) { .apoie-pop .apoie-palco::before { animation: none; } }
 .coracao-pika, .coracao-txt { display: none; }
 @media (min-width: 900px) {
-  .so-ferr .topo .acoes-topo .coracao.coracao-pilula { display: inline-flex !important; align-items: center; gap: 6px; width: auto; height: 50px; padding: 0 18px 0 8px; overflow: hidden; border-radius: 999px; color: #fbcfe8; font-size: 14px; font-weight: 900; text-decoration: none; background: linear-gradient(180deg, rgba(236, 72, 153, 0.22), rgba(21, 11, 16, 0.72)); border: 1px solid rgba(244, 114, 182, 0.5); box-shadow: 0 0 18px rgba(236, 72, 153, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06); transition: box-shadow .2s, border-color .2s, transform .2s; }
-  .so-ferr .topo .acoes-topo .coracao.coracao-pilula:hover { border-color: rgba(244, 114, 182, 0.85); box-shadow: 0 0 26px rgba(236, 72, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
-  .coracao-pilula .coracao-txt { display: inline; }
-  .coracao-pilula svg { width: 16px !important; height: 16px !important; color: #f472b6; animation: coracao-bate 5s ease-in-out infinite; }
 }
 @keyframes pika-tchau { 0%, 58%, 100% { transform: rotate(0) translateY(0); } 62% { transform: rotate(-14deg) translateY(-3px); } 67% { transform: rotate(12deg) translateY(-3px); } 72% { transform: rotate(-12deg) translateY(-2px); } 77% { transform: rotate(10deg) translateY(-1px); } 82% { transform: rotate(0) translateY(0); } }
-@keyframes coracao-bate { 0%, 84%, 100% { transform: scale(1); } 87% { transform: scale(1.25); } 90% { transform: scale(1); } 93% { transform: scale(1.2); } 96% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .coracao-pilula .coracao-pika, .coracao-pilula svg { animation: none !important; } }
 @media (min-width: 900px) {
   .coracao-pilula .coracao-pika { position: relative; display: block; flex: none; align-self: stretch; width: 62px; margin: 0 -2px 0 -4px; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%); mask-image: linear-gradient(180deg, #000 86%, transparent 100%); }
   .coracao-pilula .pk-luz { position: absolute; inset: 0; filter: brightness(2) contrast(1.06); }
@@ -236,3 +230,27 @@
 @keyframes pk-portal { 0% { opacity: .3; transform: scaleX(.7); } 6% { opacity: .9; transform: scaleX(1.1); } 20%, 52% { opacity: .25; transform: scaleX(.85); } 64% { opacity: .85; transform: scaleX(1.1); } 80%, 100% { opacity: .3; transform: scaleX(.7); } }
 @keyframes pk-quadro { 0%, 22% { background-position: 0% 0; } 25% { background-position: 100% 0; } 29% { background-position: 0% 0; } 33% { background-position: 100% 0; } 37% { background-position: 0% 0; } 41% { background-position: 100% 0; } 45% { background-position: 0% 0; } 49% { background-position: 100% 0; } 53%, 100% { background-position: 0% 0; } }
 @media (prefers-reduced-motion: reduce) { .coracao-pilula .pk-gg { animation: none !important; opacity: 1; } .coracao-pilula .pk-eco, .coracao-pilula .pk-portal { display: none; } }
+@property --pk-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --pk-aura { syntax: '<number>'; inherits: false; initial-value: 0.14; }
+@media (min-width: 900px) {
+  .so-ferr .topo .acoes-topo .coracao.coracao-pilula { position: relative; isolation: isolate; display: inline-flex !important; align-items: center; gap: 6px; width: auto; height: 50px; padding: 0 18px 0 8px; overflow: hidden; border: 1.5px solid transparent; border-radius: 999px; color: #ede9fe; font-size: 14px; font-weight: 900; letter-spacing: 0.01em; text-decoration: none; background: radial-gradient(64px 44px at 34px 78%, rgba(168, 85, 247, var(--pk-aura)), transparent 72%) padding-box, linear-gradient(180deg, #25132f, #140a18) padding-box, conic-gradient(from var(--pk-ang), rgba(168, 85, 247, 0.9), rgba(74, 227, 125, 0.75), rgba(244, 114, 182, 0.85), rgba(168, 85, 247, 0.9)) border-box; box-shadow: 0 0 16px rgba(168, 85, 247, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05); animation: pk-borda 7.2s linear infinite, pk-pilula 7.2s ease-in-out infinite; transition: transform .2s cubic-bezier(.3, 1.4, .5, 1); }
+  .coracao-pilula::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: radial-gradient(46px 16px at 30% 86%, rgba(196, 181, 253, 0.16), transparent 70%), radial-gradient(60px 18px at 80% 92%, rgba(167, 139, 250, 0.12), transparent 70%), radial-gradient(40px 14px at 55% 10%, rgba(74, 227, 125, 0.06), transparent 70%); background-size: 200% 100%; animation: pk-nevoa 10s linear infinite; }
+  .coracao-pilula .coracao-txt { display: inline-block; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); animation: pk-texto 7.2s ease-in-out infinite; }
+  .coracao-pilula svg { width: 16px !important; height: 16px !important; color: #f472b6; filter: drop-shadow(0 0 4px rgba(244, 114, 182, 0.6)); animation: pk-batida 7.2s ease-out infinite; }
+  .so-ferr .topo .acoes-topo .coracao.coracao-pilula:hover, .so-ferr .topo .acoes-topo .coracao.coracao-pilula:focus-visible { transform: translateY(-2px); --pk-aura: 0.55; box-shadow: 0 0 26px rgba(168, 85, 247, 0.45), 0 0 10px rgba(74, 227, 125, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06); animation: pk-borda 3.6s linear infinite; }
+  .coracao-pilula:active { transform: translateY(0) scale(.97) !important; }
+  .coracao-pilula:hover .pk-gg, .coracao-pilula:focus-visible .pk-gg { animation: pk-oi-entra .35s cubic-bezier(.3, 1.4, .5, 1) forwards, pk-quadro-oi .56s steps(1, end) infinite; }
+  .coracao-pilula:hover .pk-eco, .coracao-pilula:focus-visible .pk-eco { animation: none; opacity: 0; }
+  .coracao-pilula:hover .pk-portal, .coracao-pilula:focus-visible .pk-portal { animation: none; opacity: .9; transform: scaleX(1.1); }
+  .coracao-pilula:hover .coracao-txt, .coracao-pilula:focus-visible .coracao-txt { animation: none; transform: translateY(-1px); color: #f5f3ff; text-shadow: 0 0 10px rgba(74, 227, 125, 0.5), 0 0 4px rgba(168, 85, 247, 0.6); }
+  .coracao-pilula:hover svg, .coracao-pilula:focus-visible svg { animation: pk-batida-oi .56s ease-out infinite; }
+}
+@keyframes pk-borda { to { --pk-ang: 360deg; } }
+@keyframes pk-pilula { 0%, 4% { --pk-aura: 0.14; box-shadow: 0 0 14px rgba(168, 85, 247, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05); } 16%, 56% { --pk-aura: 0.5; box-shadow: 0 0 24px rgba(168, 85, 247, 0.42), 0 0 9px rgba(74, 227, 125, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06); } 70%, 100% { --pk-aura: 0.14; box-shadow: 0 0 14px rgba(168, 85, 247, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05); } }
+@keyframes pk-nevoa { to { background-position: -200% 0; } }
+@keyframes pk-texto { 0%, 14% { transform: translateY(0); color: #ede9fe; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); } 20%, 52% { transform: translateY(-1px); color: #f5f3ff; text-shadow: 0 0 10px rgba(74, 227, 125, 0.45), 0 0 4px rgba(168, 85, 247, 0.6); } 36% { transform: translateY(1px); } 62%, 100% { transform: translateY(0); color: #ede9fe; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); } }
+@keyframes pk-batida { 0%, 23%, 27.5%, 31%, 35.5%, 39%, 43.5%, 47%, 51.5%, 100% { transform: scale(1); } 25%, 33%, 41%, 49% { transform: scale(1.28); } }
+@keyframes pk-batida-oi { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.3); } }
+@keyframes pk-oi-entra { from { transform: translateY(62%) scale(.9, .96); opacity: 0; filter: blur(4px); } to { transform: translateY(0) scale(1); opacity: .95; filter: blur(0); } }
+@keyframes pk-quadro-oi { 0% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+@media (prefers-reduced-motion: reduce) { .coracao-pilula, .coracao-pilula::after, .coracao-pilula .coracao-txt, .coracao-pilula svg { animation: none !important; } }
