@@ -185,5 +185,17 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
     cor.classList.add('coracao-pilula')
     cor.insertAdjacentHTML('afterbegin', `<span class="pk-raio" aria-hidden="true"><i></i></span><span class="coracao-pika" aria-hidden="true" style="--gg:url('${fonte}assets/itens/gengar-tchau.png')"><span class="pk-portal"></span><span class="pk-luz"><span class="pk-eco"></span><span class="pk-gg"></span></span><span class="pk-mega-wrap"><span class="pk-mega" style="--mg:url('${fonte}assets/itens/gengar-mega.png')"><span class="pk-mega-olhos" style="background-image:url('${fonte}assets/itens/gengar-mega-olhos.png')"></span></span></span></span><span class="coracao-txt">Apoie</span>`)
   }
+  const gg = cor && cor.querySelector('.pk-gg')
+  if (gg) {
+    let dentro = false, espera = null
+    const visivel = () => parseFloat(getComputedStyle(gg).opacity) > 0.35
+    const checar = () => { if (!dentro) return; if (visivel()) { cor.classList.add('mega'); espera = null } else espera = setTimeout(checar, 100) }
+    const entra = () => { dentro = true; clearTimeout(espera); checar() }
+    const sai = () => { dentro = false; clearTimeout(espera); cor.classList.remove('mega') }
+    cor.addEventListener('pointerenter', entra)
+    cor.addEventListener('pointerleave', sai)
+    cor.addEventListener('focus', entra)
+    cor.addEventListener('blur', sai)
+  }
   if (iso && location.hash === '#apoie') abrir()
 })()
