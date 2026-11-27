@@ -114,11 +114,11 @@
         </div>
         <div class="apoie-doar">
           <h3><span class="apoie-gema" style="background-image:url('${fonte}assets/gema.svg')"></span>Apoie o projeto</h3>
-          <ol class="apoie-passos">
-            <li><span>1</span>Copie o endereço abaixo.</li>
-            <li><span>2</span>Envie USDT pela rede Solana (SPL).</li>
-            <li><span>3</span>Sua doação mantém as melhorias e o PokePocket sempre gratuito.</li>
-          </ol>
+          <p class="apoie-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
+          <ul class="apoie-passos">
+            <li><span><img src="${fonte}assets/coin.svg" alt="" /></span><em><b>Coins:</b> mande direto no jogo para o jogador <b class="apoie-nick">Piscis</b>.</em></li>
+            <li><span><img src="${fonte}assets/gema.svg" alt="" /></span><em><b>Gemas:</b> envie USDT pela rede Solana (SPL) para o endereço abaixo.</em></li>
+          </ul>
           <code class="apoie-carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
           <button type="button" class="apoie-copiar">Copiar endereço</button>
           <p class="apoie-alerta">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>

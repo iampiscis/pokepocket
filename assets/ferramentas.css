@@ -96,3 +96,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .apoie-nota, .apoie-dancam img, .apoie-pop[open] { animation: none; } }
 .so-ferr .topo .acoes-topo .coracao { display: grid !important; }
+.apoie-passos li em { font-style: normal; }
+.apoie-passos li span img { width: 18px; height: 18px; }
+.apoie-sub { margin: 8px 0 0; font-size: 14px; font-weight: 700; opacity: .85; }
+.apoie-nick { color: #f9a8d4; }

@@ -307,7 +307,11 @@
     .cartao-doar h3 .gema { width: 30px; height: 30px; }
     .passos-doar { list-style: none; display: grid; gap: 12px; margin-top: 18px; }
     .passos-doar li { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 17px; }
-    .passos-doar li span { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-weight: 900; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 3px 0 var(--ouro-esc); }
+    .passos-doar li span.doar-txt { all: unset; }
+    .passos-doar li span img { width: 20px; height: 20px; }
+    .doar-sub { margin-top: 8px; font-size: 15px; font-weight: 700; opacity: .85; }
+    .doar-nick { color: #f9a8d4; }
+    .passos-doar li span:not(.doar-txt) { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-weight: 900; color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 3px 0 var(--ouro-esc); }
     .carteira { display: block; margin-top: 20px; padding: 16px; border-radius: 14px; border: 2px dashed rgba(244, 114, 182, 0.4); background: rgba(0, 0, 0, 0.3); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; text-align: center; word-break: break-all; color: #fff; }
     .copiar { width: 100%; margin-top: 14px; cursor: pointer; font-family: var(--texto); font-size: 17px; text-transform: none; letter-spacing: 0.01em; }
     .copiar.ok { background: linear-gradient(180deg, #bbf7d0, #22c55e); border-color: #0b5323; box-shadow: 0 5px 0 #0b5323; }
@@ -680,11 +684,11 @@
           </div>
           <div class="cartao-doar revela">
             <h3><span class="gema"></span>Apoie o projeto</h3>
-            <ol class="passos-doar">
-              <li><span>1</span>Copie o endereço abaixo.</li>
-              <li><span>2</span>Envie USDT pela rede Solana (SPL).</li>
-              <li><span>3</span>Sua doação mantém as melhorias e o PokePocket sempre gratuito.</li>
-            </ol>
+            <p class="doar-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
+            <ul class="passos-doar">
+              <li><span><img src="assets/coin.svg" alt="" /></span><span class="doar-txt"><b>Coins:</b> mande direto no jogo para o jogador <b class="doar-nick">Piscis</b>.</span></li>
+              <li><span><img src="assets/gema.svg" alt="" /></span><span class="doar-txt"><b>Gemas:</b> envie USDT pela rede Solana (SPL) para o endereço abaixo.</span></li>
+            </ul>
             <code class="carteira" id="carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
             <button type="button" class="botao copiar" id="copiar">Copiar endereço</button>
             <p class="alerta-rede">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
