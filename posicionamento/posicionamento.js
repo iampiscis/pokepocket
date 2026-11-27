@@ -150,34 +150,40 @@ function outrosSecao(lista) {
   ])
 }
 
+let pop = null
+function abrirPop(j) {
+  if (!pop) {
+    pop = el('dialog', { class: 'pos-pop', 'aria-label': 'Formação' })
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
+    document.body.append(pop)
+  }
+  const fechar = el('button', { type: 'button', class: 'pos-pop-fechar', 'aria-label': 'Fechar' })
+  fechar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+  fechar.onclick = () => pop.close()
+  pop.setAttribute('aria-label', `Formação de ${j.nick}`)
+  pop.replaceChildren(fechar, cartao(j))
+  if (!pop.open) pop.showModal()
+}
+
 function outro(j) {
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const d = /^\d{4}-\d{2}-\d{2}$/.test(String(j.usadoEm || '')) ? fmtDia.format(new Date(`${j.usadoEm}T12:00:00`)) : null
   const pks = [...j.pks].sort((a, b) => (CASAS[a.casa]?.fileira ?? 0) - (CASAS[b.casa]?.fileira ?? 0) || a.casa - b.casa)
-  const corpo = el('div', { class: 'pos-outro-corpo' })
-  const item = el('details', { class: 'pos-outro', 'data-busca': textoBusca(j) }, [
-    el('summary', { title: `Ver a formação de ${j.nick}` }, [
-      el('span', { class: 'pos-lugar', text: `${j.pos}º` }),
-      el('span', { class: 'pos-outro-quem' }, [
-        el('span', { class: 'pos-outro-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
-        el('span', { class: 'pos-outro-meta' }, [
-          el('span', { text: `${fmt.format(j.pontos || 0)} pts` }),
-          wr != null ? el('span', { text: `${wr}%` }) : null,
-          d ? el('span', { title: 'Última partida em que essa formação foi usada', text: `usada em ${d}` }) : null
-        ])
-      ]),
-      el('span', { class: 'pos-outro-pks', 'aria-label': pks.map((p) => p.nome).join(', ') }, pks.map((p) => el('span', { class: 'pos-outro-pk', title: p.nome }, [sprite(p)]))),
-      el('span', { class: 'pos-outro-seta', 'aria-hidden': 'true' })
+  const item = el('button', { type: 'button', class: 'pos-outro', 'data-busca': textoBusca(j), title: `Ver a formação de ${j.nick}` }, [
+    el('span', { class: 'pos-lugar', text: `${j.pos}º` }),
+    el('span', { class: 'pos-outro-quem' }, [
+      el('span', { class: 'pos-outro-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
+      el('span', { class: 'pos-outro-meta' }, [
+        el('span', { text: `${fmt.format(j.pontos || 0)} pts` }),
+        wr != null ? el('span', { text: `${wr}%` }) : null,
+        d ? el('span', { text: `usada em ${d}` }) : null
+      ])
     ]),
-    corpo
+    el('span', { class: 'pos-outro-pks', 'aria-label': pks.map((p) => p.nome).join(', ') }, pks.map((p) => el('span', { class: 'pos-outro-pk' }, [sprite(p)]))),
+    el('span', { class: 'pos-outro-seta', 'aria-hidden': 'true' })
   ])
-  item.addEventListener('toggle', () => {
-    if (!item.open || corpo.childElementCount) return
-    const c = cartao(j)
-    c.querySelector('.pos-card-cab')?.remove()
-    corpo.append(...c.children)
-  })
+  item.addEventListener('click', () => abrirPop(j))
   return item
 }
 
