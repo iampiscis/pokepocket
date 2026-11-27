@@ -204,7 +204,7 @@
 @keyframes pika-tchau { 0%, 58%, 100% { transform: rotate(0) translateY(0); } 62% { transform: rotate(-14deg) translateY(-3px); } 67% { transform: rotate(12deg) translateY(-3px); } 72% { transform: rotate(-12deg) translateY(-2px); } 77% { transform: rotate(10deg) translateY(-1px); } 82% { transform: rotate(0) translateY(0); } }
 @media (min-width: 900px) {
   .coracao-pilula .coracao-pika { position: relative; display: block; flex: none; align-self: stretch; width: 62px; margin: 0 -2px 0 -4px; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%); mask-image: linear-gradient(180deg, #000 86%, transparent 100%); }
-  .coracao-pilula .pk-luz { position: absolute; inset: 0; filter: brightness(2) contrast(1.06); transition: filter .25s ease, opacity .25s ease; }
+  .coracao-pilula .pk-luz { position: absolute; inset: 0; filter: brightness(2) contrast(1.06); transition: filter .45s .2s ease-out, opacity .25s .2s ease; }
   .coracao-pilula .pk-gg, .coracao-pilula .pk-eco { position: absolute; left: 0; bottom: 0; width: 61.4px; height: 44.3px; background: var(--gg) 0% 0 / 200% 100% no-repeat; transform-origin: 50% 100%; opacity: 0; animation: pk-fantasma 7.2s cubic-bezier(.35, 0, .25, 1) infinite, pk-quadro 7.2s steps(1, end) infinite; }
   .coracao-pilula .pk-portal { position: absolute; left: 6px; right: 6px; bottom: 3px; height: 14px; border-radius: 50%; background: radial-gradient(closest-side, rgba(196, 181, 253, 0.55), rgba(139, 92, 246, 0.18) 60%, transparent); animation: pk-portal 7.2s ease-in-out infinite; }
   .coracao-pilula .pk-gg { filter: drop-shadow(0 0 1px rgba(226, 232, 240, 0.7)) drop-shadow(0 0 6px rgba(148, 163, 184, 0.45)); }
@@ -238,8 +238,12 @@
   .coracao-pilula .coracao-txt { display: inline-block; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); animation: pk-texto 7.2s ease-in-out infinite; }
   .coracao-pilula svg { width: 16px !important; height: 16px !important; color: #f472b6; filter: drop-shadow(0 0 4px rgba(244, 114, 182, 0.6)); animation: pk-batida 7.2s ease-out infinite; }
   .coracao-pilula:active { transform: translateY(0) scale(.97) !important; }
-  .coracao-pilula .pk-raio { position: absolute; z-index: 0; left: 38px; top: 60%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; opacity: 0; pointer-events: none; background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 18%, rgba(253, 89, 221, 0.75) 32%, rgba(168, 85, 247, 0.45) 50%, transparent 68%); box-shadow: 0 0 0 2px rgba(253, 200, 243, 0.8); }
-  .coracao-pilula:hover .pk-raio, .coracao-pilula:focus-visible .pk-raio { animation: pk-mega-raio .7s .42s ease-out forwards; }
+  .coracao-pilula .pk-raio { position: absolute; z-index: 0; left: 36px; top: 62%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; opacity: 0; pointer-events: none; background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 16%, rgba(253, 89, 221, 0.7) 30%, rgba(168, 85, 247, 0.4) 48%, transparent 66%); box-shadow: 0 0 0 1.5px rgba(253, 200, 243, 0.8); }
+  .coracao-pilula .pk-raio::before { content: ''; position: absolute; inset: -30px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.55) 0 4deg, transparent 4deg 22deg); -webkit-mask-image: radial-gradient(closest-side, transparent 22%, #000 40%, transparent 100%); mask-image: radial-gradient(closest-side, transparent 22%, #000 40%, transparent 100%); }
+  .coracao-pilula .pk-raio i { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px; border-radius: 50%; background: #fff; box-shadow: 14px -10px 0 #fdc8f3, -16px -8px 0 #fff, 18px 8px 0 #f0abfc, -12px 12px 0 #fdc8f3, 2px -18px 0 #fff, -2px 16px 0 #e879f9, 22px -2px 0 #fff, -22px 2px 0 #f5d0fe; }
+  .coracao-pilula:hover .pk-raio, .coracao-pilula:focus-visible .pk-raio { animation: pk-mega-raio .75s .38s ease-out both; }
+  .coracao-pilula:hover .pk-raio::before, .coracao-pilula:focus-visible .pk-raio::before { animation: pk-raios .75s .38s linear both; }
+  .coracao-pilula:hover .pk-raio i, .coracao-pilula:focus-visible .pk-raio i { animation: pk-faiscas .75s .38s ease-out both; }
 }
 @keyframes pk-borda { to { --pk-ang: 360deg; } }
 @keyframes pk-pilula { 0%, 4% { --pk-aura: 0.14; box-shadow: 0 0 14px rgba(168, 85, 247, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05); } 16%, 56% { --pk-aura: 0.5; box-shadow: 0 0 24px rgba(168, 85, 247, 0.42), 0 0 9px rgba(74, 227, 125, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06); } 70%, 100% { --pk-aura: 0.14; box-shadow: 0 0 14px rgba(168, 85, 247, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05); } }
@@ -247,15 +251,22 @@
 @keyframes pk-texto { 0%, 14% { transform: translateY(0); color: #ede9fe; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); } 20%, 52% { transform: translateY(-1px); color: #f5f3ff; text-shadow: 0 0 10px rgba(74, 227, 125, 0.45), 0 0 4px rgba(168, 85, 247, 0.6); } 36% { transform: translateY(1px); } 62%, 100% { transform: translateY(0); color: #ede9fe; text-shadow: 0 0 8px rgba(168, 85, 247, 0.55); } }
 @keyframes pk-batida { 0%, 23%, 27.5%, 31%, 35.5%, 39%, 43.5%, 47%, 51.5%, 100% { transform: scale(1); } 25%, 33%, 41%, 49% { transform: scale(1.28); } }
 @media (prefers-reduced-motion: reduce) { .coracao-pilula, .coracao-pilula::after, .coracao-pilula .coracao-txt, .coracao-pilula svg { animation: none !important; } }
-@keyframes pk-mega-raio { 0% { opacity: 1; transform: scale(.2); } 60% { opacity: .9; } 100% { opacity: 0; transform: scale(3.2); } }
+@keyframes pk-mega-raio { 0% { opacity: 0; transform: scale(.15); } 12% { opacity: 1; } 70% { opacity: .85; } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes pk-raios { from { transform: rotate(0) scale(.6); } to { transform: rotate(70deg) scale(1.2); } }
+@keyframes pk-faiscas { 0% { transform: scale(.2); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+@keyframes pk-tremor { 0%, 100% { translate: 0 0; } 15% { translate: -1px 0; } 30% { translate: 1px -.5px; } 45% { translate: -1px .5px; } 60% { translate: 1.5px 0; } 75% { translate: -1.5px -.5px; } 90% { translate: 1px .5px; } }
+@keyframes pk-pop { 0% { scale: 1.28; } 55% { scale: .94; } 80% { scale: 1.03; } 100% { scale: 1; } }
+@keyframes pk-pisca { 0%, 26.5% { background-position: 0% 0; } 26.6%, 28.2% { background-position: 100% 0; } 28.3%, 43.5% { background-position: 0% 0; } 43.6%, 45.2% { background-position: 100% 0; } 45.3%, 100% { background-position: 0% 0; } }
+@keyframes pk-olhos { 0%, 17% { opacity: 0; } 22% { opacity: .95; } 26.4% { opacity: .55; } 26.5%, 28.3% { opacity: 0; } 31% { opacity: 1; } 37% { opacity: .45; } 43.5% { opacity: .9; } 43.6%, 45.3% { opacity: 0; } 48% { opacity: 1; } 54% { opacity: .5; } 62%, 100% { opacity: 0; } }
 @media (min-width: 900px) {
-  .coracao-pilula .pk-mega-wrap { position: absolute; inset: 0; opacity: 0; filter: brightness(4) saturate(0); transition: opacity .25s ease, filter .3s ease; pointer-events: none; }
-  .coracao-pilula .pk-mega { position: absolute; left: 0; bottom: 0; width: 62px; height: 41.3px; background: var(--mg) 0% 0 / 200% 100% no-repeat; transform-origin: 50% 100%; opacity: 0; animation: pk-fantasma 7.2s cubic-bezier(.35, 0, .25, 1) infinite, pk-quadro 7.2s steps(1, end) infinite; }
+  .coracao-pilula .pk-mega-wrap { position: absolute; inset: 0; opacity: 0; filter: brightness(5) saturate(0) blur(1.5px); transform-origin: 50% 85%; transition: opacity .35s ease, filter .35s ease; pointer-events: none; }
+  .coracao-pilula .pk-mega { position: absolute; left: 0; bottom: 0; width: 62px; height: 41.3px; background: var(--mg) 0% 0 / 200% 100% no-repeat; transform-origin: 50% 100%; opacity: 0; animation: pk-fantasma 7.2s cubic-bezier(.35, 0, .25, 1) infinite, pk-pisca 7.2s steps(1, end) infinite; }
+  .coracao-pilula .pk-mega-olhos { position: absolute; inset: 0; background-size: 100% 100%; background-repeat: no-repeat; mix-blend-mode: screen; opacity: 0; filter: drop-shadow(0 0 2px rgba(255, 61, 154, 0.9)) drop-shadow(0 0 5px rgba(192, 38, 211, 0.75)); animation: pk-olhos 7.2s ease-in-out infinite; }
   .coracao-pilula::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0; box-shadow: inset 0 0 20px rgba(253, 89, 221, 0.5), inset 0 0 4px rgba(255, 255, 255, 0.25); transition: opacity .35s ease; }
   .so-ferr .topo .acoes-topo .coracao.coracao-pilula:hover, .so-ferr .topo .acoes-topo .coracao.coracao-pilula:focus-visible { transform: translateY(-2px); }
   .coracao-pilula:hover::before, .coracao-pilula:focus-visible::before { opacity: 1; transition-delay: .4s; }
-  .coracao-pilula:hover .pk-luz, .coracao-pilula:focus-visible .pk-luz { filter: brightness(6) saturate(0); opacity: 0; transition: filter .45s ease-in, opacity .25s .45s ease; }
-  .coracao-pilula:hover .pk-mega-wrap, .coracao-pilula:focus-visible .pk-mega-wrap { opacity: 1; filter: none; transition: opacity .3s .5s ease, filter .55s .5s ease; }
+  .coracao-pilula:hover .pk-luz, .coracao-pilula:focus-visible .pk-luz { filter: brightness(6) saturate(0) blur(.5px); opacity: 0; transition: filter .4s ease-in, opacity .2s .4s ease; animation: pk-tremor .42s linear; }
+  .coracao-pilula:hover .pk-mega-wrap, .coracao-pilula:focus-visible .pk-mega-wrap { opacity: 1; filter: none; transition: opacity .2s .42s ease, filter .6s .45s ease-out; animation: pk-pop .7s .42s cubic-bezier(.3, 1.5, .5, 1) backwards; }
   .coracao-pilula:hover .pk-portal, .coracao-pilula:focus-visible .pk-portal { background: radial-gradient(closest-side, rgba(253, 200, 243, 0.7), rgba(253, 89, 221, 0.25) 60%, transparent); }
 }
-@media (prefers-reduced-motion: reduce) { .coracao-pilula .pk-mega { animation: none !important; opacity: 1; } .coracao-pilula .pk-raio { display: none; } .coracao-pilula .pk-luz, .coracao-pilula .pk-mega-wrap { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .coracao-pilula .pk-mega { animation: none !important; opacity: 1; } .coracao-pilula .pk-mega-olhos { animation: none !important; opacity: .8; } .coracao-pilula .pk-raio { display: none; } .coracao-pilula .pk-luz, .coracao-pilula .pk-mega-wrap { transition: none !important; } }
