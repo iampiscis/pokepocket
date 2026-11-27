@@ -134,7 +134,47 @@ function pintar() {
   }
   document.addEventListener('click', (e) => { if (!explica.hidden && !explica.contains(e.target)) { explica.hidden = true; info.setAttribute('aria-expanded', 'false') } })
   const linha = el('div', { class: 'info-linha' }, [el('ul', { class: 'indicadores', 'aria-label': 'Resumo' }, inds), info, explica])
-  corpo.replaceChildren(linha, resumo(dados.resumo || [], n), el('div', { class: 'pos-grade' }, js.map(cartao)))
+  const outros = Array.isArray(dados.outros) ? dados.outros : []
+  corpo.replaceChildren(linha, resumo(dados.resumo || [], n), el('div', { class: 'pos-grade' }, js.map(cartao)), outrosSecao(outros))
+}
+
+function outrosSecao(lista) {
+  if (!lista.length) return null
+  return el('section', { class: 'pos-outros', 'aria-labelledby': 'pos-outros-t' }, [
+    el('h2', { id: 'pos-outros-t', class: 'pos-sub' }, [ico('formacoes'), el('span', { text: `Mais formações do top 200 · ${lista.length}` })]),
+    el('div', { class: 'pos-outros-lista' }, lista.map(outro))
+  ])
+}
+
+function outro(j) {
+  const jogos = (j.vitorias || 0) + (j.derrotas || 0)
+  const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(String(j.usadoEm || '')) ? fmtDia.format(new Date(`${j.usadoEm}T12:00:00`)) : null
+  const pks = [...j.pks].sort((a, b) => (CASAS[a.casa]?.fileira ?? 0) - (CASAS[b.casa]?.fileira ?? 0) || a.casa - b.casa)
+  const corpo = el('div', { class: 'pos-outro-corpo' })
+  const item = el('details', { class: 'pos-outro' }, [
+    el('summary', { title: `Ver a formação de ${j.nick}` }, [
+      el('span', { class: 'pos-lugar', text: `${j.pos}º` }),
+      el('span', { class: 'pos-outro-quem' }, [
+        el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]),
+        el('span', { class: 'pos-outro-meta' }, [
+          el('span', { text: `${fmt.format(j.pontos || 0)} pts` }),
+          wr != null ? el('span', { text: `${wr}%` }) : null,
+          d ? el('span', { title: 'Última partida em que essa formação foi usada', text: `usada em ${d}` }) : null
+        ])
+      ]),
+      el('span', { class: 'pos-outro-pks', 'aria-label': pks.map((p) => p.nome).join(', ') }, pks.map((p) => el('span', { class: 'pos-outro-pk', title: p.nome }, [sprite(p)]))),
+      el('span', { class: 'pos-outro-seta', 'aria-hidden': 'true' })
+    ]),
+    corpo
+  ])
+  item.addEventListener('toggle', () => {
+    if (!item.open || corpo.childElementCount) return
+    const c = cartao(j)
+    c.querySelector('.pos-card-cab')?.remove()
+    corpo.append(...c.children)
+  })
+  return item
 }
 
 function bloco(icone, titulo, texto) {
