@@ -3,7 +3,7 @@
     {
       "imagem": "login-google.jpg",
       "titulo": "Login com Google",
-      "texto": "Entre pelo navegador e traga o login para o app.",
+      "texto": "Passo a passo guiado: o app acha o login sozinho.",
       "novo": true
     },
     {
