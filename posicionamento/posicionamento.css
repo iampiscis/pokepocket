@@ -139,3 +139,9 @@ html.embed .pos-busca { display: none; }
 #pos-explica .ex-bloco { grid-template-columns: 30px minmax(0, 1fr); column-gap: 10px; align-items: start; }
 #pos-explica .ex-bloco .ex-ico { grid-row: span 2; }
 @media (max-width: 560px) { #pos-explica .ex-grade { grid-template-columns: minmax(0, 1fr); } }
+.pos-casa.inimiga.alcanca { z-index: 2; background: color-mix(in srgb, var(--alcance) 82%, #4a2a0c); background-image: none; box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(0, 0, 0, 0.7), 0 0 14px color-mix(in srgb, var(--alcance) 80%, transparent); }
+.pos-casa.inimiga.alcanca::after { content: ''; position: absolute; inset: 30%; border-radius: 50%; border: 2px solid rgba(42, 20, 6, 0.8); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35); }
+.pos-casa.inimiga .pos-casa-bola { transition: opacity .15s; }
+.pos-casa.inimiga.alcanca .pos-casa-bola { opacity: 0; }
+.pos-tab.mirando .pos-casa.inimiga:not(.alcanca) { opacity: 0.45; }
+@keyframes pos-pulso { to { box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(0, 0, 0, 0.7), 0 0 6px color-mix(in srgb, var(--alcance) 50%, transparent); } }
