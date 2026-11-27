@@ -286,6 +286,14 @@ export const PVP_PODA_PARTIDAS_DIAS = 14;
 export const PVP_HISTORICO_PARTIDAS = 20;
 
 
+
+
+
+
+
+export const PVP_HISTORICO_JOGO = 12;
+
+
 export const PVP_PR_DIAMANTE = PVP_TIERS.find((x) => x.id === 'diamante').de;
 
 

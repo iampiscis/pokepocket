@@ -19,6 +19,13 @@ const CAMPOS_STAT = ['baseHp', 'baseAtk', 'baseDef', 'baseSpAtk', 'baseSpDef', '
 
 
 
+
+
+
+
+
+
+
 export function herdarBaseOutland(lista) {
   const porId = new Map(lista.map((c) => [c.pokeId, c]));
   for (const esp of lista) {
@@ -33,6 +40,11 @@ export function herdarBaseOutland(lista) {
     for (const k of CAMPOS_STAT) {
       if (typeof base[k] === 'number') esp[k] = base[k];
     }
-    if (!proprios && Array.isArray(base.attacks)) esp.attacks = base.attacks.map((a) => ({ ...a }));
+    if (!proprios && Array.isArray(base.attacks)) {
+      esp.attacks = base.attacks.map((a) => ({ ...a }));
+
+
+      if (base.golpesFechados) esp.golpesFechados = true;
+    }
   }
 }

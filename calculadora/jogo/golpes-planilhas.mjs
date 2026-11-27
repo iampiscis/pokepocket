@@ -105,6 +105,27 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { cooldownDoPoder, COOLDOWN_MEGA_MS } from './cooldown-golpes.mjs';
 
 
@@ -117,6 +138,7 @@ import { cooldownDoPoder, COOLDOWN_MEGA_MS } from './cooldown-golpes.mjs';
 
 
 export const GOLPES_INICIAIS = {};
+
 
 
 
@@ -486,21 +508,12 @@ export const GOLPES_REWORK_2026_10_13 = {
 
 
 
-export const GOLPES_OUTLAND_2026_10_13 = {
-  2020: [
-    ['Sand Tomb',              'GROUND',   'PHYSICAL',  35],
-    ['Quick Attack',           'NORMAL',   'PHYSICAL',  40],
-    ['Bonemerang',             'GROUND',   'PHYSICAL',  50],
-    ['Stone Axe',              'ROCK',     'PHYSICAL',  65],
-    ['Stomping Tantrum',       'GROUND',   'PHYSICAL',  75],
-    ['Mega Punch',             'NORMAL',   'PHYSICAL',  80],
-    ['Thousand Waves',         'GROUND',   'PHYSICAL',  90],
-    ['Headlong Rush',          'GROUND',   'PHYSICAL', 120],
-    ['Stone Edge',             'ROCK',     'PHYSICAL', 120],
-    ["Land's Wrath",           'GROUND',   'PHYSICAL', 600],
-    ['Crumbling Rain',         'ROCK',     'PHYSICAL', 600],
-  ],
-};
+
+
+
+
+
+export const GOLPES_OUTLAND_2026_10_13 = {};
 
 
 
@@ -516,6 +529,11 @@ export const GOLPES_OUTLAND_2026_10_13 = {
 
 
 export const GOLPES_REWORK_2026_10_15 = {};
+
+
+
+
+
 
 
 
@@ -607,17 +625,6 @@ export const GOLPES_SEGUNDA_EVO_2026_10_15 = {
     ['First Impression',            'BUG',      'PHYSICAL',  90],
     ['Attack Order',                'BUG',      'PHYSICAL', 120],
     ['Hive Crush',                  'BUG',      'SPECIAL',  600],
-  ],
-  17: [
-    ['Aerial Ace',                  'FLYING',   'PHYSICAL',  25],
-    ['Quick Attack',                'NORMAL',   'PHYSICAL',  40],
-    ['Flail',                       'NORMAL',   'PHYSICAL',  50],
-    ['Covet',                       'NORMAL',   'PHYSICAL',  60],
-    ['Relic Song',                  'NORMAL',   'SPECIAL',   75],
-    ['Oblivion Wing',               'FLYING',   'SPECIAL',   80],
-    ['Hyper Voice',                 'NORMAL',   'SPECIAL',   90],
-    ['Thrash',                      'NORMAL',   'PHYSICAL', 120],
-    ['Ultimate Force',              'NORMAL',   'PHYSICAL', 600],
   ],
   25: [
     ['Shock Wave',                  'ELECTRIC', 'SPECIAL',   25],
@@ -1187,17 +1194,6 @@ export const GOLPES_SEGUNDA_EVO_2026_10_15 = {
     ['Hydro Pump',                  'WATER',    'SPECIAL',  120],
     ['Hydro Cannon',                'WATER',    'SPECIAL',  600],
   ],
-  397: [
-    ['Aerial Ace',                  'FLYING',   'PHYSICAL',  25],
-    ['Quick Attack',                'NORMAL',   'PHYSICAL',  40],
-    ['Flail',                       'NORMAL',   'PHYSICAL',  50],
-    ['Covet',                       'NORMAL',   'PHYSICAL',  60],
-    ['Chip Away',                   'NORMAL',   'PHYSICAL',  70],
-    ['Mega Punch',                  'NORMAL',   'PHYSICAL',  80],
-    ['Fly',                         'FLYING',   'PHYSICAL',  90],
-    ['Thrash',                      'NORMAL',   'PHYSICAL', 120],
-    ['Ultimate Force',              'NORMAL',   'PHYSICAL', 600],
-  ],
   404: [
     ['Nuzzle',                      'ELECTRIC', 'PHYSICAL',  25],
     ['Thunder Shock',               'ELECTRIC', 'SPECIAL',   40],
@@ -1258,17 +1254,6 @@ export const GOLPES_SEGUNDA_EVO_2026_10_15 = {
     ['Muddy Water',                 'WATER',    'SPECIAL',   90],
     ['Hydro Pump',                  'WATER',    'SPECIAL',  120],
     ['Cyclonic Tide',               'WATER',    'PHYSICAL', 600],
-  ],
-  520: [
-    ['Double Slap',                 'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',                'NORMAL',   'PHYSICAL',  40],
-    ['Acrobatics',                  'FLYING',   'PHYSICAL',  55],
-    ['Covet',                       'NORMAL',   'PHYSICAL',  60],
-    ['Chip Away',                   'NORMAL',   'PHYSICAL',  70],
-    ['Mega Punch',                  'NORMAL',   'PHYSICAL',  80],
-    ['Fly',                         'FLYING',   'PHYSICAL',  90],
-    ['Thrash',                      'NORMAL',   'PHYSICAL', 120],
-    ['Ultimate Force',              'NORMAL',   'PHYSICAL', 600],
   ],
   536: [
     ['Surging Strikes',             'WATER',    'PHYSICAL',  25],
@@ -1452,17 +1437,6 @@ export const GOLPES_SEGUNDA_EVO_2026_10_15 = {
     ['Hydro Pump',                  'WATER',    'SPECIAL',  120],
     ['Hydro Cannon',                'WATER',    'SPECIAL',  600],
   ],
-  732: [
-    ['Double Slap',                 'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',                'NORMAL',   'PHYSICAL',  40],
-    ['Acrobatics',                  'FLYING',   'PHYSICAL',  55],
-    ['Covet',                       'NORMAL',   'PHYSICAL',  60],
-    ['Air Slash',                   'FLYING',   'SPECIAL',   75],
-    ['Mega Punch',                  'NORMAL',   'PHYSICAL',  80],
-    ['Hyper Drill',                 'NORMAL',   'PHYSICAL', 100],
-    ['Thrash',                      'NORMAL',   'PHYSICAL', 120],
-    ['Ultimate Force',              'NORMAL',   'PHYSICAL', 600],
-  ],
   737: [
     ['Pin Missile',                 'BUG',      'PHYSICAL',  25],
     ['Thunder Shock',               'ELECTRIC', 'SPECIAL',   40],
@@ -1534,63 +1508,13 @@ export const GOLPES_SEGUNDA_EVO_2026_10_15 = {
 
 
 
-export const GOLPES_OUTLAND_2026_10_15 = {
-  2010: [
-    ['Shock Wave',        'ELECTRIC', 'SPECIAL',   25],
-    ['Thunder Shock',     'ELECTRIC', 'SPECIAL',   40],
-    ['Electroweb',        'ELECTRIC', 'SPECIAL',   55],
-    ['Parabolic Charge',  'ELECTRIC', 'SPECIAL',   65],
-    ['Volt Switch',       'ELECTRIC', 'SPECIAL',   70],
-    ['Overdrive',         'ELECTRIC', 'SPECIAL',   80],
-    ['Buzzy Buzz',        'ELECTRIC', 'SPECIAL',   90],
-    ['Double Shock',      'ELECTRIC', 'PHYSICAL', 120],
-    ['Mega Thunderstorm', 'ELECTRIC', 'SPECIAL',  600],
-  ],
-  2011: [
-    ['Scale Shot',        'DRAGON',   'PHYSICAL',  25],
-    ['Dual Chop',         'DRAGON',   'PHYSICAL',  40],
-    ['Dragon Darts',      'DRAGON',   'PHYSICAL',  50],
-    ['Dragon Tail',       'DRAGON',   'PHYSICAL',  60],
-    ['Relic Song',        'NORMAL',   'SPECIAL',   75],
-    ['Dragon Pulse',      'DRAGON',   'SPECIAL',   85],
-    ['Spacial Rend',      'DRAGON',   'SPECIAL',  100],
-    ['Draco Meteor',      'DRAGON',   'SPECIAL',  120],
-    ['Eternal Dragon',    'DRAGON',   'PHYSICAL', 600],
-  ],
-  2015: [
-    ['Triple Axel',       'ICE',      'PHYSICAL',  25],
-    ['Quick Attack',      'NORMAL',   'PHYSICAL',  40],
-    ['Bonemerang',        'GROUND',   'PHYSICAL',  50],
-    ['Ice Fang',          'ICE',      'PHYSICAL',  65],
-    ['Ice Punch',         'ICE',      'PHYSICAL',  75],
-    ['Icicle Crash',      'ICE',      'PHYSICAL',  85],
-    ['Mountain Gale',     'ICE',      'PHYSICAL', 100],
-    ['Freeze Shock',      'ICE',      'PHYSICAL', 120],
-    ['Glacial Lance',     'ICE',      'PHYSICAL', 600],
-  ],
-  2032: [
-    ['Fire Spin',         'FIRE',     'SPECIAL',   30],
-    ['Ember',             'FIRE',     'SPECIAL',   45],
-    ['Flame Charge',      'FIRE',     'PHYSICAL',  55],
-    ['Fire Fang',         'FIRE',     'PHYSICAL',  65],
-    ['Mystical Fire',     'FIRE',     'SPECIAL',   75],
-    ['Fire Pledge',       'FIRE',     'SPECIAL',   80],
-    ['Sacred Fire',       'FIRE',     'PHYSICAL', 100],
-    ['Armor Cannon',      'FIRE',     'SPECIAL',  120],
-    ['Ignition Point',    'FIRE',     'SPECIAL',  600],
-  ],
-  2033: [
-    ['Sand Tomb',         'GROUND',   'PHYSICAL',  35],
-    ['Quick Attack',      'NORMAL',   'PHYSICAL',  40],
-    ['Rock Throw',        'ROCK',     'PHYSICAL',  50],
-    ['Stone Axe',         'ROCK',     'PHYSICAL',  65],
-    ['Rock Slide',        'ROCK',     'PHYSICAL',  75],
-    ['Mega Punch',        'NORMAL',   'PHYSICAL',  80],
-    ['Diamond Storm',     'ROCK',     'PHYSICAL', 100],
-    ['Stone Edge',        'ROCK',     'PHYSICAL', 120],
-    ['Crumbling Rain',    'ROCK',     'PHYSICAL', 600],
-  ],
-};
+
+
+
+
+
+
+export const GOLPES_OUTLAND_2026_10_15 = {};
 
 
 
@@ -2166,6 +2090,10 @@ export const GOLPES_MEGAS_2026_10_23 = {};
 
 
 
+
+
+
+
 export const GOLPES_REWORK_2026_10_26 = {
   3: [
     ['Absorb',        'GRASS',    'SPECIAL',   25],
@@ -2436,20 +2364,6 @@ export const GOLPES_REWORK_2026_10_26 = {
     ['Bee Swarm',     'BUG',      'PHYSICAL', 150],
     ['Alloy Breaker', 'STEEL',    'PHYSICAL', 600],
     ['Hive Crush',    'BUG',      'PHYSICAL', 600],
-  ],
-  214: [
-    ['Arm Thrust',       'FIGHTING', 'PHYSICAL',  25],
-    ['Rock Smash',       'FIGHTING', 'PHYSICAL',  40],
-    ['Low Kick',         'FIGHTING', 'PHYSICAL',  55],
-    ['Counter',          'FIGHTING', 'PHYSICAL',  60],
-    ['Brick Break',      'FIGHTING', 'PHYSICAL',  75],
-    ['Lunge',            'BUG',      'PHYSICAL',  80],
-    ['Collision Course', 'FIGHTING', 'PHYSICAL', 100],
-    ['Close Combat',     'FIGHTING', 'PHYSICAL', 120],
-    ['Megahorn',         'BUG',      'PHYSICAL', 120],
-    ['Focus Punch',      'FIGHTING', 'PHYSICAL', 150],
-    ['Hive Crush',       'BUG',      'PHYSICAL', 600],
-    ['Meteor Fists',     'FIGHTING', 'PHYSICAL', 600],
   ],
   227: [
     ['Metal Claw',        'STEEL',    'PHYSICAL',  35],
@@ -3221,6 +3135,14 @@ export const GOLPES_MEGAS_2026_10_26 = {};
 
 
 
+
+
+
+
+
+
+
+
 export const GOLPES_REWORK_2026_10_27 = {
   12: [
     ['Infestation',       'BUG',      'SPECIAL',   25],
@@ -3838,20 +3760,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Comet Punch',    'NORMAL',   'PHYSICAL', 150],
     ['Giga Impact',    'NORMAL',   'PHYSICAL', 600],
     ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
-  164: [
-    ['Weather Ball',      'NORMAL',   'SPECIAL',   35],
-    ['Echoed Voice',      'NORMAL',   'SPECIAL',   40],
-    ['Terrain Pulse',     'NORMAL',   'SPECIAL',   50],
-    ['Round',             'NORMAL',   'SPECIAL',   60],
-    ['Air Slash',         'FLYING',   'SPECIAL',   75],
-    ['Razor Wind',        'NORMAL',   'SPECIAL',   80],
-    ['Hyper Voice',       'NORMAL',   'SPECIAL',   90],
-    ['Hurricane',         'FLYING',   'SPECIAL',  120],
-    ['Techno Blast',      'NORMAL',   'SPECIAL',  120],
-    ['Hyper Beam',        'NORMAL',   'SPECIAL',  150],
-    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
-    ['Mega Onslaught',    'NORMAL',   'SPECIAL',  600],
   ],
   166: [
     ['Infestation',       'BUG',      'SPECIAL',   25],
@@ -5169,20 +5077,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Mega Mindbreak',     'PSYCHIC',  'SPECIAL',  600],
     ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
   ],
-  521: [
-    ['Quick Attack',   'NORMAL',   'PHYSICAL',  35],
-    ['Pay Day',        'NORMAL',   'PHYSICAL',  40],
-    ['Flail',          'NORMAL',   'PHYSICAL',  50],
-    ['Covet',          'NORMAL',   'PHYSICAL',  60],
-    ['Fly',            'FLYING',   'PHYSICAL',  75],
-    ['Mega Punch',     'NORMAL',   'PHYSICAL',  80],
-    ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
-    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
-    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
-    ['Comet Punch',    'NORMAL',   'PHYSICAL', 150],
-    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
-    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
   523: [
     ['Nuzzle',          'ELECTRIC', 'PHYSICAL',  25],
     ['Zippy Zap',       'ELECTRIC', 'PHYSICAL',  45],
@@ -5323,20 +5217,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Ice Time',         'ICE',      'PHYSICAL', 600],
     ['Ignition Point',   'FIRE',     'PHYSICAL', 600],
   ],
-  561: [
-    ['Gust',               'FLYING',   'SPECIAL',   35],
-    ['Air Cutter',         'FLYING',   'SPECIAL',   45],
-    ['Confusion',          'PSYCHIC',  'SPECIAL',   50],
-    ['Chatter',            'FLYING',   'SPECIAL',   65],
-    ['Air Slash',          'FLYING',   'SPECIAL',   75],
-    ['Oblivion Wing',      'FLYING',   'SPECIAL',   80],
-    ['Aeroblast',          'FLYING',   'SPECIAL',  100],
-    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
-    ['Hurricane',          'FLYING',   'SPECIAL',  120],
-    ['Tempest Gale',       'FLYING',   'SPECIAL',  150],
-    ['Massive Hurricane',  'FLYING',   'SPECIAL',  600],
-    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
-  ],
   563: [
     ['Lick',             'GHOST',    'SPECIAL',   30],
     ['Ominous Wind',     'GHOST',    'SPECIAL',   45],
@@ -5350,20 +5230,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Phantom Wail',     'GHOST',    'SPECIAL',  150],
     ['Mega Eclipse',     'GHOST',    'SPECIAL',  600],
     ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
-  ],
-  565: [
-    ['Rock Blast',     'ROCK',     'PHYSICAL',  25],
-    ['Rock Tomb',      'ROCK',     'PHYSICAL',  45],
-    ['Smack Down',     'ROCK',     'PHYSICAL',  50],
-    ['Stone Axe',      'ROCK',     'PHYSICAL',  65],
-    ['Rock Slide',     'ROCK',     'PHYSICAL',  75],
-    ['Dive',           'WATER',    'PHYSICAL',  80],
-    ['Diamond Storm',  'ROCK',     'PHYSICAL', 100],
-    ['Stone Edge',     'ROCK',     'PHYSICAL', 120],
-    ['Wave Crash',     'WATER',    'PHYSICAL', 120],
-    ['Head Smash',     'ROCK',     'PHYSICAL', 150],
-    ['Crumbling Rain', 'ROCK',     'PHYSICAL', 600],
-    ['Cyclonic Tide',  'WATER',    'PHYSICAL', 600],
   ],
   567: [
     ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
@@ -5603,20 +5469,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Alloy Breaker',    'STEEL',    'PHYSICAL', 600],
     ['Crossing Fissure', 'GROUND',   'PHYSICAL', 600],
   ],
-  618: [
-    ['Shock Wave',       'ELECTRIC', 'SPECIAL',   25],
-    ['Thunder Shock',    'ELECTRIC', 'SPECIAL',   40],
-    ['Electroweb',       'ELECTRIC', 'SPECIAL',   55],
-    ['Parabolic Charge', 'ELECTRIC', 'SPECIAL',   65],
-    ['Discharge',        'ELECTRIC', 'SPECIAL',   75],
-    ['Scorching Sands',  'GROUND',   'SPECIAL',   80],
-    ['Thunderbolt',      'ELECTRIC', 'SPECIAL',   90],
-    ['Earth Power',      'GROUND',   'SPECIAL',  120],
-    ['Thunder',          'ELECTRIC', 'SPECIAL',  120],
-    ['Ion Cannon',       'ELECTRIC', 'SPECIAL',  150],
-    ["Land's Wrath",     'GROUND',   'SPECIAL',  600],
-    ['Static Overload',  'ELECTRIC', 'SPECIAL',  600],
-  ],
   6628: [
     ['Stored Power',       'PSYCHIC',  'SPECIAL',   25],
     ['Twin Beam',          'PSYCHIC',  'SPECIAL',   40],
@@ -5714,34 +5566,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Comet Punch',    'NORMAL',   'PHYSICAL', 150],
     ['Giga Impact',    'NORMAL',   'PHYSICAL', 600],
     ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
-  681: [
-    ['Shadow Punch',     'GHOST',    'PHYSICAL',  25],
-    ['Shadow Sneak',     'GHOST',    'PHYSICAL',  40],
-    ['Last Respects',    'GHOST',    'PHYSICAL',  50],
-    ['Ominous Wind',     'GHOST',    'SPECIAL',   60],
-    ['Shadow Claw',      'GHOST',    'PHYSICAL',  70],
-    ['Flash Cannon',     'STEEL',    'SPECIAL',   80],
-    ['Shadow Ball',      'GHOST',    'SPECIAL',   90],
-    ['Heavy Slam',       'STEEL',    'PHYSICAL', 120],
-    ['Moongeist Beam',   'GHOST',    'SPECIAL',  120],
-    ['Phantom Wail',     'GHOST',    'SPECIAL',  150],
-    ['Alloy Breaker',    'STEEL',    'PHYSICAL', 600],
-    ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
-  ],
-  8681: [
-    ['Shadow Punch',     'GHOST',    'PHYSICAL',  25],
-    ['Shadow Sneak',     'GHOST',    'PHYSICAL',  40],
-    ['Last Respects',    'GHOST',    'PHYSICAL',  50],
-    ['Ominous Wind',     'GHOST',    'SPECIAL',   60],
-    ['Shadow Claw',      'GHOST',    'PHYSICAL',  70],
-    ['Flash Cannon',     'STEEL',    'SPECIAL',   80],
-    ['Shadow Ball',      'GHOST',    'SPECIAL',   90],
-    ['Heavy Slam',       'STEEL',    'PHYSICAL', 120],
-    ['Moongeist Beam',   'GHOST',    'SPECIAL',  120],
-    ['Phantom Wail',     'GHOST',    'SPECIAL',  150],
-    ['Alloy Breaker',    'STEEL',    'PHYSICAL', 600],
-    ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
   ],
   683: [
     ['Disarming Voice', 'FAIRY',    'SPECIAL',   25],
@@ -5953,20 +5777,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Timber Crash',   'GRASS',    'PHYSICAL', 150],
     ['Meteor Fists',   'FIGHTING', 'PHYSICAL', 600],
     ['Petal Bloom',    'GRASS',    'PHYSICAL', 600],
-  ],
-  733: [
-    ['Fury Attack',    'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',   'NORMAL',   'PHYSICAL',  40],
-    ['Flail',          'NORMAL',   'PHYSICAL',  50],
-    ['Covet',          'NORMAL',   'PHYSICAL',  60],
-    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
-    ['Drill Peck',     'FLYING',   'PHYSICAL',  80],
-    ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
-    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
-    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
-    ['Comet Punch',    'NORMAL',   'PHYSICAL', 150],
-    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
-    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
   ],
   738: [
     ['Infestation',       'BUG',      'SPECIAL',   25],
@@ -6303,20 +6113,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Riptide Slam',    'WATER',    'PHYSICAL', 150],
     ['Cyclonic Tide',   'WATER',    'PHYSICAL', 600],
     ['Psychic Fangs',   'PSYCHIC',  'PHYSICAL', 600],
-  ],
-  781: [
-    ['Bullet Seed',      'GRASS',    'PHYSICAL',  25],
-    ['Branch Poke',      'GRASS',    'PHYSICAL',  40],
-    ['Grassy Glide',     'GRASS',    'PHYSICAL',  55],
-    ['Shadow Claw',      'GHOST',    'PHYSICAL',  65],
-    ['Flower Trick',     'GRASS',    'PHYSICAL',  70],
-    ['Drum Beating',     'GRASS',    'PHYSICAL',  80],
-    ['Ivy Cudgel',       'GRASS',    'PHYSICAL', 100],
-    ['Power Whip',       'GRASS',    'PHYSICAL', 120],
-    ['Shadow Force',     'GHOST',    'PHYSICAL', 120],
-    ['Bramble Crush',    'GRASS',    'PHYSICAL', 150],
-    ['Petal Bloom',      'GRASS',    'PHYSICAL', 600],
-    ['Untold Nightmare', 'GHOST',    'PHYSICAL', 600],
   ],
   812: [
     ['Bullet Seed',    'GRASS',    'PHYSICAL',  25],
@@ -7065,20 +6861,6 @@ export const GOLPES_REWORK_2026_10_27 = {
     ['Petal Bloom',    'GRASS',    'SPECIAL',  600],
     ['Ultimate Force', 'NORMAL',   'SPECIAL',  600],
   ],
-  931: [
-    ['Fury Attack',       'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',      'NORMAL',   'PHYSICAL',  40],
-    ['Egg Bomb',          'NORMAL',   'PHYSICAL',  55],
-    ['Wing Attack',       'FLYING',   'PHYSICAL',  60],
-    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
-    ['Headbutt',          'NORMAL',   'PHYSICAL',  80],
-    ['Take Down',         'NORMAL',   'PHYSICAL',  90],
-    ['Dragon Ascent',     'FLYING',   'PHYSICAL', 120],
-    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
-    ['Comet Punch',       'NORMAL',   'PHYSICAL', 150],
-    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
-    ['Ultimate Force',    'NORMAL',   'PHYSICAL', 600],
-  ],
   934: [
     ['Rock Blast',     'ROCK',     'PHYSICAL',  25],
     ['Salt Cure',      'ROCK',     'PHYSICAL',  40],
@@ -7729,218 +7511,14 @@ export const GOLPES_REWORK_2026_10_27 = {
 
 
 
-export const GOLPES_OUTLAND_2026_10_27 = {
-  2008: [
-    ['Shock Wave',        'ELECTRIC', 'SPECIAL',   25],
-    ['Thunder Shock',     'ELECTRIC', 'SPECIAL',   40],
-    ['Electroweb',        'ELECTRIC', 'SPECIAL',   55],
-    ['Parabolic Charge',  'ELECTRIC', 'SPECIAL',   65],
-    ['Spark',             'ELECTRIC', 'PHYSICAL',  70],
-    ['Thunder Punch',     'ELECTRIC', 'PHYSICAL',  80],
-    ['Wild Charge',       'ELECTRIC', 'PHYSICAL',  90],
-    ['Double Shock',      'ELECTRIC', 'PHYSICAL', 120],
-    ['Zap Cannon',        'ELECTRIC', 'SPECIAL',  120],
-    ['Volt Breaker',      'ELECTRIC', 'PHYSICAL', 150],
-    ['Mega Thunderstorm', 'ELECTRIC', 'SPECIAL',  600],
-    ['Static Overload',   'ELECTRIC', 'PHYSICAL', 600],
-  ],
-  2013: [
-    ['Surging Strikes', 'WATER',    'PHYSICAL',  25],
-    ['Aqua Jet',        'WATER',    'PHYSICAL',  45],
-    ['Chilling Water',  'WATER',    'SPECIAL',   55],
-    ['Water Pulse',     'WATER',    'SPECIAL',   60],
-    ['Freeze-Dry',      'ICE',      'SPECIAL',   70],
-    ['Dive',            'WATER',    'PHYSICAL',  80],
-    ['Muddy Water',     'WATER',    'SPECIAL',   90],
-    ['Freeze Shock',    'ICE',      'PHYSICAL', 120],
-    ['Hydro Pump',      'WATER',    'SPECIAL',  120],
-    ['Riptide Slam',    'WATER',    'PHYSICAL', 150],
-    ['Cyclonic Tide',   'WATER',    'SPECIAL',  600],
-    ['Glacial Lance',   'ICE',      'PHYSICAL', 600],
-  ],
-  2012: [
-    ['Whirlpool',      'WATER',    'SPECIAL',   30],
-    ['Water Gun',      'WATER',    'SPECIAL',   40],
-    ['Chilling Water', 'WATER',    'SPECIAL',   55],
-    ['Razor Shell',    'WATER',    'PHYSICAL',  65],
-    ['Ice Spinner',    'ICE',      'PHYSICAL',  75],
-    ['Dive',           'WATER',    'PHYSICAL',  80],
-    ['Liquidation',    'WATER',    'PHYSICAL',  95],
-    ['Freeze Shock',   'ICE',      'PHYSICAL', 120],
-    ['Hydro Pump',     'WATER',    'SPECIAL',  120],
-    ['Tidal Surge',    'WATER',    'SPECIAL',  150],
-    ['Cyclonic Tide',  'WATER',    'SPECIAL',  600],
-    ['Glacial Lance',  'ICE',      'PHYSICAL', 600],
-  ],
-  2055: [
-    ['Absorb',             'GRASS',    'SPECIAL',   25],
-    ['Mega Drain',         'GRASS',    'SPECIAL',   40],
-    ['Leaf Tornado',       'GRASS',    'SPECIAL',   55],
-    ['Syrup Bomb',         'GRASS',    'SPECIAL',   60],
-    ['Mystical Power',     'PSYCHIC',  'SPECIAL',   70],
-    ['Giga Drain',         'GRASS',    'SPECIAL',   80],
-    ['Grass Knot',         'GRASS',    'SPECIAL',  100],
-    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
-    ['Solar Beam',         'GRASS',    'SPECIAL',  120],
-    ['Chloroblast',        'GRASS',    'SPECIAL',  150],
-    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
-    ['Petal Bloom',        'GRASS',    'SPECIAL',  600],
-  ],
-  2039: [
-    ['Surging Strikes', 'WATER',    'PHYSICAL',  25],
-    ['Aqua Jet',        'WATER',    'PHYSICAL',  45],
-    ['Yawn',            'WATER',    'PHYSICAL',  55],
-    ['Jet Punch',       'WATER',    'PHYSICAL',  60],
-    ['Aqua Cutter',     'WATER',    'PHYSICAL',  70],
-    ['Dive',            'WATER',    'PHYSICAL',  80],
-    ['Fly',             'FLYING',   'PHYSICAL',  90],
-    ['Dragon Ascent',   'FLYING',   'PHYSICAL', 120],
-    ['Wave Crash',      'WATER',    'PHYSICAL', 120],
-    ['Riptide Slam',    'WATER',    'PHYSICAL', 150],
-    ['Cyclonic Tide',   'WATER',    'PHYSICAL', 600],
-    ['Sky Attack',      'FLYING',   'PHYSICAL', 600],
-  ],
-  2045: [
-    ['Weather Ball',      'NORMAL',   'SPECIAL',   35],
-    ['Echoed Voice',      'NORMAL',   'SPECIAL',   40],
-    ['Terrain Pulse',     'NORMAL',   'SPECIAL',   50],
-    ['Tera Blast',        'NORMAL',   'SPECIAL',   65],
-    ['Air Slash',         'FLYING',   'SPECIAL',   75],
-    ['Razor Wind',        'NORMAL',   'SPECIAL',   80],
-    ['Hyper Voice',       'NORMAL',   'SPECIAL',   90],
-    ['Hurricane',         'FLYING',   'SPECIAL',  120],
-    ['Techno Blast',      'NORMAL',   'SPECIAL',  120],
-    ['Hyper Beam',        'NORMAL',   'SPECIAL',  150],
-    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
-    ['Mega Onslaught',    'NORMAL',   'SPECIAL',  600],
-  ],
-  2036: [
-    ['Stored Power',       'PSYCHIC',  'SPECIAL',   25],
-    ['Twin Beam',          'PSYCHIC',  'SPECIAL',   40],
-    ['Mirror Coat',        'PSYCHIC',  'SPECIAL',   55],
-    ['Psybeam',            'PSYCHIC',  'SPECIAL',   65],
-    ['Air Slash',          'FLYING',   'SPECIAL',   75],
-    ['Psyshock',           'PSYCHIC',  'SPECIAL',   80],
-    ['Psychic',            'PSYCHIC',  'SPECIAL',   90],
-    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
-    ['Hurricane',          'FLYING',   'SPECIAL',  120],
-    ['Psycho Boost',       'PSYCHIC',  'SPECIAL',  150],
-    ['Massive Hurricane',  'FLYING',   'SPECIAL',  600],
-    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
-  ],
-  2034: [
-    ['Metal Claw',     'STEEL',    'PHYSICAL',  35],
-    ['Bullet Punch',   'STEEL',    'PHYSICAL',  40],
-    ['Gear Grind',     'STEEL',    'PHYSICAL',  50],
-    ['Hard Press',     'STEEL',    'PHYSICAL',  60],
-    ['Steel Wing',     'STEEL',    'PHYSICAL',  70],
-    ['Metal Burst',    'STEEL',    'PHYSICAL',  80],
-    ['Thousand Waves', 'GROUND',   'PHYSICAL',  90],
-    ['Headlong Rush',  'GROUND',   'PHYSICAL', 120],
-    ['Heavy Slam',     'STEEL',    'PHYSICAL', 120],
-    ['Gigaton Hammer', 'STEEL',    'PHYSICAL', 150],
-    ["Land's Wrath",   'GROUND',   'PHYSICAL', 600],
-    ['Mega Forge',     'STEEL',    'PHYSICAL', 600],
-  ],
-  2043: [
-    ['Disarming Voice',       'FAIRY',    'PHYSICAL',  25],
-    ['Fairy Wind',            'FAIRY',    'PHYSICAL',  40],
-    ['Draining Kiss',         'FAIRY',    'PHYSICAL',  50],
-    ['Dazzling Gleam',        'FAIRY',    'PHYSICAL',  65],
-    ['Spirit Break',          'FAIRY',    'PHYSICAL',  75],
-    ['Alluring Voice',        'FAIRY',    'PHYSICAL',  80],
-    ['Play Rough',            'FAIRY',    'PHYSICAL',  90],
-    ['Fleur Cannon',          'FAIRY',    'PHYSICAL', 120],
-    ['Magical Torque',        'FAIRY',    'PHYSICAL', 120],
-    ['Fae Hammer',            'FAIRY',    'PHYSICAL', 150],
-    ["Let's Snuggle Forever", 'FAIRY',    'PHYSICAL', 600],
-    ['Starlight Charm',       'FAIRY',    'PHYSICAL', 600],
-  ],
-  2053: [
-    ['Fire Spin',        'FIRE',     'SPECIAL',   30],
-    ['Ember',            'FIRE',     'SPECIAL',   45],
-    ['Burning Jealousy', 'FIRE',     'SPECIAL',   55],
-    ['Incinerate',       'FIRE',     'SPECIAL',   60],
-    ['Ancient Power',    'ROCK',     'SPECIAL',   70],
-    ['Fire Pledge',      'FIRE',     'SPECIAL',   80],
-    ['Flamethrower',     'FIRE',     'SPECIAL',   90],
-    ['Armor Cannon',     'FIRE',     'SPECIAL',  120],
-    ['Power Gem',        'ROCK',     'SPECIAL',  120],
-    ['Eruption',         'FIRE',     'SPECIAL',  150],
-    ['Ignition Point',   'FIRE',     'SPECIAL',  600],
-    ['Meteor Beam',      'ROCK',     'SPECIAL',  600],
-  ],
-  2040: [
-    ['Whirlpool',         'WATER',    'SPECIAL',   30],
-    ['Bubble',            'WATER',    'SPECIAL',   40],
-    ['Chilling Water',    'WATER',    'SPECIAL',   55],
-    ['Water Pulse',       'WATER',    'SPECIAL',   60],
-    ['Brine',             'WATER',    'SPECIAL',   70],
-    ['Oblivion Wing',     'FLYING',   'SPECIAL',   80],
-    ['Muddy Water',       'WATER',    'SPECIAL',   90],
-    ['Hurricane',         'FLYING',   'SPECIAL',  120],
-    ['Hydro Pump',        'WATER',    'SPECIAL',  120],
-    ['Tidal Surge',       'WATER',    'SPECIAL',  150],
-    ['Hydro Cannon',      'WATER',    'SPECIAL',  600],
-    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
-  ],
-  2056: [
-    ['Lick',             'GHOST',    'SPECIAL',   30],
-    ['Ominous Wind',     'GHOST',    'SPECIAL',   45],
-    ['Night Shade',      'GHOST',    'SPECIAL',   55],
-    ['Infernal Parade',  'GHOST',    'SPECIAL',   60],
-    ['Hex',              'GHOST',    'SPECIAL',   70],
-    ['Shadow Ball',      'GHOST',    'SPECIAL',   80],
-    ['Bitter Malice',    'GHOST',    'SPECIAL',   90],
-    ['Moongeist Beam',   'GHOST',    'SPECIAL',  120],
-    ['Shadow Force',     'GHOST',    'SPECIAL',  120],
-    ['Phantom Wail',     'GHOST',    'SPECIAL',  150],
-    ['Mega Eclipse',     'GHOST',    'SPECIAL',  600],
-    ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
-  ],
-  2054: [
-    ['Arm Thrust',     'FIGHTING', 'PHYSICAL',  25],
-    ['Low Kick',       'FIGHTING', 'PHYSICAL',  45],
-    ['Seismic Toss',   'FIGHTING', 'PHYSICAL',  55],
-    ['Barb Barrage',   'POISON',   'PHYSICAL',  60],
-    ['Reversal',       'FIGHTING', 'PHYSICAL',  70],
-    ['Submission',     'FIGHTING', 'PHYSICAL',  80],
-    ['Dynamic Punch',  'FIGHTING', 'PHYSICAL', 100],
-    ['Axe Kick',       'FIGHTING', 'PHYSICAL', 120],
-    ['Gunk Shot',      'POISON',   'PHYSICAL', 120],
-    ['Focus Punch',    'FIGHTING', 'PHYSICAL', 150],
-    ['Meteor Fists',   'FIGHTING', 'PHYSICAL', 600],
-    ['Noxious Torque', 'POISON',   'PHYSICAL', 600],
-  ],
-  2052: [
-    ['Bullet Seed',     'GRASS',    'PHYSICAL',  25],
-    ['Absorb',          'GRASS',    'SPECIAL',   40],
-    ['Draining Kiss',   'FAIRY',    'SPECIAL',   50],
-    ['Needle Arm',      'GRASS',    'PHYSICAL',  60],
-    ['Giga Drain',      'GRASS',    'SPECIAL',   75],
-    ['Seed Bomb',       'GRASS',    'PHYSICAL',  80],
-    ['Petal Blizzard',  'GRASS',    'PHYSICAL',  90],
-    ['Magical Torque',  'FAIRY',    'PHYSICAL', 120],
-    ['Solar Beam',      'GRASS',    'SPECIAL',  120],
-    ['Chloroblast',     'GRASS',    'SPECIAL',  150],
-    ['Frenzy Plant',    'GRASS',    'PHYSICAL', 600],
-    ['Starlight Charm', 'FAIRY',    'SPECIAL',  600],
-  ],
-  2057: [
-    ['Powder Snow',   'ICE',      'SPECIAL',   35],
-    ['Frost Breath',  'ICE',      'SPECIAL',   45],
-    ['Icy Wind',      'ICE',      'SPECIAL',   55],
-    ['Aurora Beam',   'ICE',      'SPECIAL',   65],
-    ['Ancient Power', 'ROCK',     'SPECIAL',   70],
-    ['Freezy Frost',  'ICE',      'SPECIAL',   85],
-    ['Ice Beam',      'ICE',      'SPECIAL',   90],
-    ['Power Gem',     'ROCK',     'SPECIAL',  120],
-    ['Sheer Cold',    'ICE',      'SPECIAL',  120],
-    ['Absolute Zero', 'ICE',      'SPECIAL',  150],
-    ['Ice Burn',      'ICE',      'SPECIAL',  600],
-    ['Meteor Beam',   'ROCK',     'SPECIAL',  600],
-  ],
-};
+
+
+
+
+
+
+
+export const GOLPES_OUTLAND_2026_10_27 = {};
 
 
 
@@ -8113,6 +7691,9 @@ export const GOLPES_LENDARIOS_2026_10_27 = {
 
 
 export const GOLPES_MEGAS_2026_10_27 = {};
+
+
+
 
 
 
@@ -8497,20 +8078,6 @@ export const GOLPES_REWORK_2026_10_29 = {
     ['Blast Burn',       'FIRE',     'SPECIAL',  600],
     ['Ignition Point',   'FIRE',     'PHYSICAL', 600],
   ],
-  635: [
-    ['Twister',        'DRAGON',   'SPECIAL',   35],
-    ['Dragon Breath',  'DRAGON',   'SPECIAL',   45],
-    ['Draco Slime',    'DRAGON',   'SPECIAL',   55],
-    ['Snarl',          'DARK',     'SPECIAL',   60],
-    ['Fickle Beam',    'DRAGON',   'SPECIAL',   75],
-    ['Dragon Pulse',   'DRAGON',   'SPECIAL',   85],
-    ['Core Enforcer',  'DRAGON',   'SPECIAL',  100],
-    ['Baddy Bad',      'DARK',     'SPECIAL',  120],
-    ['Draco Deluge',   'DRAGON',   'SPECIAL',  120],
-    ['Draconic Soul',  'DRAGON',   'SPECIAL',  300],
-    ['Endless Hollow', 'DARK',     'SPECIAL',  600],
-    ['Eternal Dragon', 'DRAGON',   'SPECIAL',  600],
-  ],
   660: [
     ['Echoed Voice',    'NORMAL',   'SPECIAL',   35],
     ['Quick Attack',    'NORMAL',   'PHYSICAL',  40],
@@ -8611,20 +8178,6 @@ export const GOLPES_REWORK_2026_10_29 = {
     ['Water Spout',     'WATER',    'SPECIAL',  150],
     ['Hydro Cannon',    'WATER',    'SPECIAL',  600],
     ['Starlight Charm', 'FAIRY',    'SPECIAL',  600],
-  ],
-  784: [
-    ['Arm Thrust',     'FIGHTING', 'PHYSICAL',  25],
-    ['Vacuum Wave',    'FIGHTING', 'SPECIAL',   40],
-    ['Final Gambit',   'FIGHTING', 'SPECIAL',   55],
-    ['Draco Slime',    'DRAGON',   'SPECIAL',   65],
-    ['Aura Sphere',    'FIGHTING', 'SPECIAL',   70],
-    ['Body Press',     'FIGHTING', 'PHYSICAL',  80],
-    ['Cross Chop',     'FIGHTING', 'PHYSICAL', 100],
-    ['Close Combat',   'FIGHTING', 'PHYSICAL', 120],
-    ['Draco Deluge',   'DRAGON',   'SPECIAL',  120],
-    ['Draconic Soul',  'DRAGON',   'PHYSICAL', 300],
-    ['Eternal Dragon', 'DRAGON',   'PHYSICAL', 600],
-    ['Meteor Fists',   'FIGHTING', 'SPECIAL',  600],
   ],
   815: [
     ['Cinder Tap',     'FIRE',     'PHYSICAL',  25],
@@ -12127,6 +11680,13 @@ export const GOLPES_MEGAS_2026_10_30 = {
 
 
 
+
+
+
+
+
+
+
 export const GOLPES_REWORK_2026_11_02 = {
   24: [
     ['Poison Sting',   'POISON',   'PHYSICAL',  25],
@@ -12155,20 +11715,6 @@ export const GOLPES_REWORK_2026_11_02 = {
     ['Focus Punch',    'FIGHTING', 'PHYSICAL', 150],
     ['Meteor Assault', 'FIGHTING', 'PHYSICAL', 600],
     ['Meteor Fists',   'FIGHTING', 'PHYSICAL', 600],
-  ],
-  85: [
-    ['Double Hit',        'NORMAL',   'PHYSICAL',  35],
-    ['Quick Attack',      'NORMAL',   'PHYSICAL',  40],
-    ['Crush Grip',        'NORMAL',   'PHYSICAL',  50],
-    ['Pluck',             'FLYING',   'PHYSICAL',  60],
-    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
-    ['Body Slam',         'NORMAL',   'PHYSICAL',  85],
-    ['Hyper Drill',       'NORMAL',   'PHYSICAL', 100],
-    ['Brave Bird',        'FLYING',   'PHYSICAL', 120],
-    ['Endeavor',          'NORMAL',   'PHYSICAL', 120],
-    ['Comet Punch',       'NORMAL',   'PHYSICAL', 150],
-    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
-    ['Ultimate Force',    'NORMAL',   'PHYSICAL', 600],
   ],
   89: [
     ['Mortal Spin',    'POISON',   'PHYSICAL',  30],
@@ -12906,20 +12452,6 @@ export const GOLPES_REWORK_2026_11_02 = {
     ['Meteor Assault', 'FIGHTING', 'PHYSICAL', 600],
     ['Meteor Fists',   'FIGHTING', 'PHYSICAL', 600],
   ],
-  542: [
-    ['Bullet Seed',   'GRASS',    'PHYSICAL',  25],
-    ['Branch Poke',   'GRASS',    'PHYSICAL',  40],
-    ['Fell Stinger',  'BUG',      'PHYSICAL',  50],
-    ['Razor Leaf',    'GRASS',    'PHYSICAL',  60],
-    ['Flower Trick',  'GRASS',    'PHYSICAL',  70],
-    ['Seed Bomb',     'GRASS',    'PHYSICAL',  80],
-    ['Leaf Blade',    'GRASS',    'PHYSICAL',  90],
-    ['Attack Order',  'BUG',      'PHYSICAL', 120],
-    ['Power Whip',    'GRASS',    'PHYSICAL', 120],
-    ['Bramble Crush', 'GRASS',    'PHYSICAL', 150],
-    ['Hive Crush',    'BUG',      'PHYSICAL', 600],
-    ['Petal Bloom',   'GRASS',    'PHYSICAL', 600],
-  ],
   556: [
     ['Absorb',       'GRASS',    'SPECIAL',   25],
     ['Mega Drain',   'GRASS',    'SPECIAL',   40],
@@ -12933,20 +12465,6 @@ export const GOLPES_REWORK_2026_11_02 = {
     ['Chloroblast',  'GRASS',    'SPECIAL',  150],
     ['Frenzy Plant', 'GRASS',    'SPECIAL',  600],
     ['Petal Bloom',  'GRASS',    'SPECIAL',  600],
-  ],
-  558: [
-    ['Rock Blast',     'ROCK',     'PHYSICAL',  25],
-    ['Accelerock',     'ROCK',     'PHYSICAL',  40],
-    ['Smack Down',     'ROCK',     'PHYSICAL',  50],
-    ['Bug Bite',       'BUG',      'PHYSICAL',  60],
-    ['Rock Slide',     'ROCK',     'PHYSICAL',  75],
-    ['Mighty Cleave',  'ROCK',     'PHYSICAL',  85],
-    ['Stone Edge',     'ROCK',     'PHYSICAL', 100],
-    ['Attack Order',   'BUG',      'PHYSICAL', 120],
-    ['Boulder Rush',   'ROCK',     'PHYSICAL', 120],
-    ['Rock Wrecker',   'ROCK',     'PHYSICAL', 150],
-    ['Crumbling Rain', 'ROCK',     'PHYSICAL', 600],
-    ['Hive Crush',     'BUG',      'PHYSICAL', 600],
   ],
   569: [
     ['Mortal Spin',    'POISON',   'PHYSICAL',  30],
@@ -13367,22 +12885,10 @@ export const GOLPES_REWORK_2026_11_02 = {
 
 
 
-export const GOLPES_OUTLAND_2026_11_02 = {
-  2038: [
-    ['Stored Power',       'PSYCHIC',  'SPECIAL',   25],
-    ['Twin Beam',          'PSYCHIC',  'SPECIAL',   40],
-    ['Mirror Coat',        'PSYCHIC',  'SPECIAL',   55],
-    ['Kinetic Rush',       'PSYCHIC',  'PHYSICAL',  60],
-    ['Psyshield Bash',     'PSYCHIC',  'PHYSICAL',  70],
-    ['Psycho Cut',         'PSYCHIC',  'PHYSICAL',  80],
-    ['Glitzy Glow',        'PSYCHIC',  'SPECIAL',   90],
-    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
-    ['Psyblade',           'PSYCHIC',  'PHYSICAL', 120],
-    ['Mind Crusher',       'PSYCHIC',  'PHYSICAL', 150],
-    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
-    ['Psychic Fangs',      'PSYCHIC',  'PHYSICAL', 600],
-  ],
-};
+
+
+
+export const GOLPES_OUTLAND_2026_11_02 = {};
 
 
 
@@ -13406,6 +12912,9 @@ export const GOLPES_ARTE_NOVA_2026_11_05 = {
     ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
   ],
 };
+
+
+
 
 
 
@@ -13480,15 +12989,6 @@ export const GOLPES_PRIMEIRO_ESTAGIO_2026_11_05 = {
     ['Leech Life',   'BUG',      'PHYSICAL',  90],
     ['Toxic Ram',    'POISON',   'PHYSICAL', 100],
     ['Attack Order', 'BUG',      'PHYSICAL', 120],
-  ],
-  16: [
-    ['Quick Attack', 'NORMAL',   'PHYSICAL',  35],
-    ['Pay Day',      'NORMAL',   'PHYSICAL',  40],
-    ['Tackle',       'NORMAL',   'PHYSICAL',  50],
-    ['Wing Attack',  'FLYING',   'PHYSICAL',  70],
-    ['Raging Bull',  'NORMAL',   'PHYSICAL',  90],
-    ['Floaty Fall',  'FLYING',   'PHYSICAL', 100],
-    ['Double-Edge',  'NORMAL',   'PHYSICAL', 120],
   ],
   29: [
     ['Poison Sting', 'POISON',   'PHYSICAL',  30],
@@ -13958,15 +13458,6 @@ export const GOLPES_PRIMEIRO_ESTAGIO_2026_11_05 = {
     ['Surf',           'WATER',    'SPECIAL',  100],
     ['Hydro Pump',     'WATER',    'SPECIAL',  120],
   ],
-  396: [
-    ['Double Hit',   'NORMAL',   'PHYSICAL',  35],
-    ['Quick Attack', 'NORMAL',   'PHYSICAL',  40],
-    ['Tackle',       'NORMAL',   'PHYSICAL',  50],
-    ['Drill Peck',   'FLYING',   'PHYSICAL',  80],
-    ['Take Down',    'NORMAL',   'PHYSICAL',  90],
-    ['Floaty Fall',  'FLYING',   'PHYSICAL', 100],
-    ['Double-Edge',  'NORMAL',   'PHYSICAL', 120],
-  ],
   403: [
     ['Nuzzle',        'ELECTRIC', 'PHYSICAL',  30],
     ['Zippy Zap',     'ELECTRIC', 'PHYSICAL',  45],
@@ -14291,15 +13782,6 @@ export const GOLPES_PRIMEIRO_ESTAGIO_2026_11_05 = {
     ['Torrent Volley', 'WATER',    'SPECIAL',  100],
     ['Hydro Pump',     'WATER',    'SPECIAL',  120],
   ],
-  731: [
-    ['Double Hit',  'NORMAL',   'PHYSICAL',  35],
-    ['Pay Day',     'NORMAL',   'PHYSICAL',  40],
-    ['Crush Grip',  'NORMAL',   'PHYSICAL',  50],
-    ['Drill Peck',  'FLYING',   'PHYSICAL',  80],
-    ['Raging Bull', 'NORMAL',   'PHYSICAL',  90],
-    ['Floaty Fall', 'FLYING',   'PHYSICAL', 100],
-    ['Double-Edge', 'NORMAL',   'PHYSICAL', 120],
-  ],
   736: [
     ['Infestation',      'BUG',      'SPECIAL',   30],
     ['Struggle Bug',     'BUG',      'SPECIAL',   45],
@@ -14472,6 +13954,12 @@ export const GOLPES_PRIMEIRO_ESTAGIO_2026_11_05 = {
     ['Glaive Rush',   'DRAGON',   'PHYSICAL', 120],
   ],
 };
+
+
+
+
+
+
 
 
 
@@ -14760,17 +14248,6 @@ export const GOLPES_DUAS_FORMAS_2026_11_05 = {
     ['Close Combat', 'FIGHTING', 'PHYSICAL', 120],
     ['Meteor Fists', 'FIGHTING', 'PHYSICAL', 600],
   ],
-  84: [
-    ['Double Hit',     'NORMAL',   'PHYSICAL',  35],
-    ['Quick Attack',   'NORMAL',   'PHYSICAL',  40],
-    ['Crush Grip',     'NORMAL',   'PHYSICAL',  50],
-    ['Pluck',          'FLYING',   'PHYSICAL',  60],
-    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
-    ['Body Slam',      'NORMAL',   'PHYSICAL',  85],
-    ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
-    ['Brave Bird',     'FLYING',   'PHYSICAL', 120],
-    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
   86: [
     ['Brine Cut',      'WATER',    'PHYSICAL',  35],
     ['Aqua Jet',       'WATER',    'PHYSICAL',  40],
@@ -15012,17 +14489,6 @@ export const GOLPES_DUAS_FORMAS_2026_11_05 = {
     ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
     ['Double-Edge',    'NORMAL',   'PHYSICAL', 120],
     ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
-  163: [
-    ['Terrain Pulse',  'NORMAL',   'SPECIAL',   35],
-    ['Echoed Voice',   'NORMAL',   'SPECIAL',   40],
-    ['Weather Ball',   'NORMAL',   'SPECIAL',   50],
-    ['Hidden Power',   'NORMAL',   'SPECIAL',   60],
-    ['Relic Song',     'NORMAL',   'SPECIAL',   75],
-    ['Air Slash',      'FLYING',   'SPECIAL',   80],
-    ['Hyper Voice',    'NORMAL',   'SPECIAL',   90],
-    ['Hurricane',      'FLYING',   'SPECIAL',  120],
-    ['Ultimate Force', 'NORMAL',   'SPECIAL',  600],
   ],
   165: [
     ['Infestation',  'BUG',      'SPECIAL',   25],
@@ -15332,17 +14798,6 @@ export const GOLPES_DUAS_FORMAS_2026_11_05 = {
     ['Pursuit',        'DARK',     'PHYSICAL', 120],
     ['Endless Hollow', 'DARK',     'PHYSICAL', 600],
   ],
-  276: [
-    ['Double Slap',    'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',   'NORMAL',   'PHYSICAL',  40],
-    ['Flail',          'NORMAL',   'PHYSICAL',  50],
-    ['Covet',          'NORMAL',   'PHYSICAL',  60],
-    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
-    ['Drill Peck',     'FLYING',   'PHYSICAL',  80],
-    ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
-    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
-    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
   278: [
     ['Gust',              'FLYING',   'SPECIAL',   35],
     ['Air Cutter',        'FLYING',   'SPECIAL',   45],
@@ -15507,17 +14962,6 @@ export const GOLPES_DUAS_FORMAS_2026_11_05 = {
     ['Energy Ball',  'GRASS',    'SPECIAL',   90],
     ['Power Whip',   'GRASS',    'PHYSICAL', 120],
     ['Petal Bloom',  'GRASS',    'SPECIAL',  600],
-  ],
-  333: [
-    ['Barrage',        'NORMAL',   'PHYSICAL',  25],
-    ['Pay Day',        'NORMAL',   'PHYSICAL',  40],
-    ['Aerial Ace',     'FLYING',   'PHYSICAL',  55],
-    ['Round',          'NORMAL',   'SPECIAL',   60],
-    ['Relic Song',     'NORMAL',   'SPECIAL',   75],
-    ['Body Slam',      'NORMAL',   'PHYSICAL',  85],
-    ['Hyper Voice',    'NORMAL',   'SPECIAL',   90],
-    ['Brave Bird',     'FLYING',   'PHYSICAL', 120],
-    ['Ultimate Force', 'NORMAL',   'SPECIAL',  600],
   ],
   339: [
     ['Water Shuriken',   'WATER',    'SPECIAL',   25],
@@ -17103,21 +16547,10 @@ export const GOLPES_DUAS_FORMAS_2026_11_05 = {
 
 
 
+
+
+
 export const GOLPES_SEM_EVOLUCAO_2026_11_05 = {
-  83: [
-    ['Double Slap',    'NORMAL',   'PHYSICAL',  25],
-    ['Pay Day',        'NORMAL',   'PHYSICAL',  40],
-    ['Acrobatics',     'FLYING',   'PHYSICAL',  55],
-    ['Covet',          'NORMAL',   'PHYSICAL',  60],
-    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
-    ['Mega Punch',     'NORMAL',   'PHYSICAL',  80],
-    ['Hyper Drill',    'NORMAL',   'PHYSICAL', 100],
-    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
-    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
-    ['Comet Punch',    'NORMAL',   'PHYSICAL', 150],
-    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
-    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
-  ],
   211: [
     ['Brine Cut',     'WATER',    'PHYSICAL',  35],
     ['Aqua Jet',      'WATER',    'PHYSICAL',  40],
@@ -17159,30 +16592,11 @@ export const GOLPES_SEM_EVOLUCAO_2026_11_05 = {
 
 
 
-export const GOLPES_OUTLAND_2026_11_05 = {
-  2006: [
-    ['Pin Missile',   'BUG',      'PHYSICAL',  25],
-    ['Fury Cutter',   'BUG',      'PHYSICAL',  40],
-    ['Fell Stinger',  'BUG',      'PHYSICAL',  50],
-    ['Bug Bite',      'BUG',      'PHYSICAL',  60],
-    ['Skitter Smack', 'BUG',      'PHYSICAL',  70],
-    ['Leech Life',    'BUG',      'PHYSICAL',  80],
-    ['Fly',           'FLYING',   'PHYSICAL',  90],
-    ['Brave Bird',    'FLYING',   'PHYSICAL', 120],
-    ['Mega Swarm',    'BUG',      'PHYSICAL', 600],
-  ],
-  2007: [
-    ['Double Slap',    'NORMAL',   'PHYSICAL',  25],
-    ['Quick Attack',   'NORMAL',   'PHYSICAL',  40],
-    ['Mirror Coat',    'PSYCHIC',  'SPECIAL',   55],
-    ['Covet',          'NORMAL',   'PHYSICAL',  60],
-    ['Relic Song',     'NORMAL',   'SPECIAL',   75],
-    ['Razor Wind',     'NORMAL',   'SPECIAL',   80],
-    ['Hyper Voice',    'NORMAL',   'SPECIAL',   90],
-    ['Psyblade',       'PSYCHIC',  'PHYSICAL', 120],
-    ['Ultimate Force', 'NORMAL',   'SPECIAL',  600],
-  ],
-};
+
+
+
+
+export const GOLPES_OUTLAND_2026_11_05 = {};
 
 
 
@@ -17310,6 +16724,453 @@ export const GOLPES_ARTE_NOVA_2026_11_22 = {
   ],
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GOLPES_REWORK_2026_11_26 = {
+  214: [
+    ['Pin Missile',      'BUG',      'PHYSICAL',  25],
+    ['Fury Cutter',      'BUG',      'PHYSICAL',  40],
+    ['Pounce',           'BUG',      'PHYSICAL',  50],
+    ['Steamroller',      'BUG',      'PHYSICAL',  65],
+    ['Brick Break',      'FIGHTING', 'PHYSICAL',  75],
+    ['Lunge',            'BUG',      'PHYSICAL',  80],
+    ['First Impression', 'BUG',      'PHYSICAL',  90],
+    ['Close Combat',     'FIGHTING', 'PHYSICAL', 120],
+    ['Megahorn',         'BUG',      'PHYSICAL', 120],
+    ['Bee Swarm',        'BUG',      'PHYSICAL', 150],
+    ['Hive Crush',       'BUG',      'PHYSICAL', 600],
+    ['Meteor Fists',     'FIGHTING', 'PHYSICAL', 600],
+  ],
+  542: [
+    ['Pin Missile',    'BUG',      'PHYSICAL',  25],
+    ['Fury Cutter',    'BUG',      'PHYSICAL',  40],
+    ['Fell Stinger',   'BUG',      'PHYSICAL',  50],
+    ['Bug Bite',       'BUG',      'PHYSICAL',  60],
+    ['Flower Trick',   'GRASS',    'PHYSICAL',  70],
+    ['Leech Life',     'BUG',      'PHYSICAL',  80],
+    ['Lunge',          'BUG',      'PHYSICAL',  90],
+    ['Attack Order',   'BUG',      'PHYSICAL', 120],
+    ['Power Whip',     'GRASS',    'PHYSICAL', 120],
+    ['Chitin Crusher', 'BUG',      'PHYSICAL', 150],
+    ['Hive Crush',     'BUG',      'PHYSICAL', 600],
+    ['Petal Bloom',    'GRASS',    'PHYSICAL', 600],
+  ],
+  558: [
+    ['Pin Missile',    'BUG',      'PHYSICAL',  25],
+    ['Fury Cutter',    'BUG',      'PHYSICAL',  40],
+    ['Fell Stinger',   'BUG',      'PHYSICAL',  50],
+    ['Bug Bite',       'BUG',      'PHYSICAL',  60],
+    ['Rock Slide',     'ROCK',     'PHYSICAL',  75],
+    ['Leech Life',     'BUG',      'PHYSICAL',  80],
+    ['Lunge',          'BUG',      'PHYSICAL',  90],
+    ['Attack Order',   'BUG',      'PHYSICAL', 120],
+    ['Boulder Rush',   'ROCK',     'PHYSICAL', 120],
+    ['Chitin Crusher', 'BUG',      'PHYSICAL', 150],
+    ['Crumbling Rain', 'ROCK',     'PHYSICAL', 600],
+    ['Hive Crush',     'BUG',      'PHYSICAL', 600],
+  ],
+  565: [
+    ['Brine Cut',      'WATER',    'PHYSICAL',  35],
+    ['Aqua Jet',       'WATER',    'PHYSICAL',  45],
+    ['Yawn',           'WATER',    'PHYSICAL',  55],
+    ['Flip Turn',      'WATER',    'PHYSICAL',  60],
+    ['Rock Slide',     'ROCK',     'PHYSICAL',  75],
+    ['Dive',           'WATER',    'PHYSICAL',  80],
+    ['Aqua Tail',      'WATER',    'PHYSICAL',  90],
+    ['Stone Edge',     'ROCK',     'PHYSICAL', 120],
+    ['Wave Crash',     'WATER',    'PHYSICAL', 120],
+    ['Riptide Slam',   'WATER',    'PHYSICAL', 150],
+    ['Crumbling Rain', 'ROCK',     'PHYSICAL', 600],
+    ['Cyclonic Tide',  'WATER',    'PHYSICAL', 600],
+  ],
+  618: [
+    ['Mud-Slap',        'GROUND',   'SPECIAL',   25],
+    ['Sand Burst',      'GROUND',   'SPECIAL',   40],
+    ['Mud Shot',        'GROUND',   'SPECIAL',   55],
+    ['Mud Bomb',        'GROUND',   'SPECIAL',   65],
+    ['Discharge',       'ELECTRIC', 'SPECIAL',   75],
+    ['Scorching Sands', 'GROUND',   'SPECIAL',   80],
+    ['Tremor Wave',     'GROUND',   'SPECIAL',   90],
+    ['Earth Power',     'GROUND',   'SPECIAL',  120],
+    ['Thunder',         'ELECTRIC', 'SPECIAL',  120],
+    ['Seismic Blast',   'GROUND',   'SPECIAL',  150],
+    ["Land's Wrath",    'GROUND',   'SPECIAL',  600],
+    ['Static Overload', 'ELECTRIC', 'SPECIAL',  600],
+  ],
+  635: [
+    ['Dusk Needle',    'DARK',     'SPECIAL',   30],
+    ['Gloom Pulse',    'DARK',     'SPECIAL',   40],
+    ['Umbral Wave',    'DARK',     'SPECIAL',   50],
+    ['Snarl',          'DARK',     'SPECIAL',   60],
+    ['Fickle Beam',    'DRAGON',   'SPECIAL',   75],
+    ['Dark Pulse',     'DARK',     'SPECIAL',   80],
+    ['Fiery Wrath',    'DARK',     'SPECIAL',   90],
+    ['Baddy Bad',      'DARK',     'SPECIAL',  120],
+    ['Draco Deluge',   'DRAGON',   'SPECIAL',  120],
+    ['Draconic Soul',  'DRAGON',   'SPECIAL',  300],
+    ['Endless Hollow', 'DARK',     'SPECIAL',  600],
+    ['Eternal Dragon', 'DRAGON',   'SPECIAL',  600],
+  ],
+  681: [
+    ['Bullet Punch',     'STEEL',    'PHYSICAL',  35],
+    ['Alloy Spark',      'STEEL',    'SPECIAL',   40],
+    ['Gear Grind',       'STEEL',    'PHYSICAL',  50],
+    ['Mirror Shot',      'STEEL',    'SPECIAL',   65],
+    ['Shadow Claw',      'GHOST',    'PHYSICAL',  70],
+    ['Flash Cannon',     'STEEL',    'SPECIAL',   80],
+    ['Chrome Beam',      'STEEL',    'SPECIAL',  100],
+    ['Heavy Slam',       'STEEL',    'PHYSICAL', 120],
+    ['Moongeist Beam',   'GHOST',    'SPECIAL',  120],
+    ['Ironclad Crash',   'STEEL',    'PHYSICAL', 150],
+    ['Alloy Breaker',    'STEEL',    'PHYSICAL', 600],
+    ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
+  ],
+  8681: [
+    ['Bullet Punch',     'STEEL',    'PHYSICAL',  35],
+    ['Alloy Spark',      'STEEL',    'SPECIAL',   40],
+    ['Gear Grind',       'STEEL',    'PHYSICAL',  50],
+    ['Mirror Shot',      'STEEL',    'SPECIAL',   65],
+    ['Shadow Claw',      'GHOST',    'PHYSICAL',  70],
+    ['Flash Cannon',     'STEEL',    'SPECIAL',   80],
+    ['Chrome Beam',      'STEEL',    'SPECIAL',  100],
+    ['Heavy Slam',       'STEEL',    'PHYSICAL', 120],
+    ['Moongeist Beam',   'GHOST',    'SPECIAL',  120],
+    ['Ironclad Crash',   'STEEL',    'PHYSICAL', 150],
+    ['Alloy Breaker',    'STEEL',    'PHYSICAL', 600],
+    ['Untold Nightmare', 'GHOST',    'SPECIAL',  600],
+  ],
+  781: [
+    ['Astonish',         'GHOST',    'PHYSICAL',  30],
+    ['Shadow Sneak',     'GHOST',    'PHYSICAL',  40],
+    ['Last Respects',    'GHOST',    'PHYSICAL',  50],
+    ['Shadow Claw',      'GHOST',    'PHYSICAL',  65],
+    ['Flower Trick',     'GRASS',    'PHYSICAL',  70],
+    ['Shadow Bone',      'GHOST',    'PHYSICAL',  85],
+    ['Phantom Force',    'GHOST',    'PHYSICAL',  90],
+    ['Power Whip',       'GRASS',    'PHYSICAL', 120],
+    ['Shadow Force',     'GHOST',    'PHYSICAL', 120],
+    ['Grim Rend',        'GHOST',    'PHYSICAL', 150],
+    ['Petal Bloom',      'GRASS',    'PHYSICAL', 600],
+    ['Untold Nightmare', 'GHOST',    'PHYSICAL', 600],
+  ],
+  784: [
+    ['Scale Shot',     'DRAGON',   'PHYSICAL',  25],
+    ['Twister',        'DRAGON',   'SPECIAL',   40],
+    ['Dragon Darts',   'DRAGON',   'PHYSICAL',  50],
+    ['Draco Slime',    'DRAGON',   'SPECIAL',   65],
+    ['Aura Sphere',    'FIGHTING', 'SPECIAL',   70],
+    ['Dragon Claw',    'DRAGON',   'PHYSICAL',  80],
+    ['Core Enforcer',  'DRAGON',   'SPECIAL',  100],
+    ['Close Combat',   'FIGHTING', 'PHYSICAL', 120],
+    ['Draco Deluge',   'DRAGON',   'SPECIAL',  120],
+    ['Draconic Soul',  'DRAGON',   'PHYSICAL', 300],
+    ['Eternal Dragon', 'DRAGON',   'PHYSICAL', 600],
+    ['Meteor Fists',   'FIGHTING', 'SPECIAL',  600],
+  ],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GOLPES_REWORK_2026_11_27 = {
+  83: [
+    ['Aerial Ace',     'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',  'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',     'FLYING',   'PHYSICAL',  55],
+    ['Pluck',          'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',         'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',    'FLYING',   'PHYSICAL',  90],
+    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
+    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
+    ['Skyfall Dive',   'FLYING',   'PHYSICAL', 150],
+    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
+    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
+  ],
+  85: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Brave Bird',        'FLYING',   'PHYSICAL', 120],
+    ['Endeavor',          'NORMAL',   'PHYSICAL', 120],
+    ['Skyfall Dive',      'FLYING',   'PHYSICAL', 150],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+    ['Ultimate Force',    'NORMAL',   'PHYSICAL', 600],
+  ],
+  164: [
+    ['Gust',              'FLYING',   'SPECIAL',   35],
+    ['Air Cutter',        'FLYING',   'SPECIAL',   45],
+    ['Chatter',           'FLYING',   'SPECIAL',   55],
+    ['Round',             'NORMAL',   'SPECIAL',   60],
+    ['Air Slash',         'FLYING',   'SPECIAL',   75],
+    ['Oblivion Wing',     'FLYING',   'SPECIAL',   80],
+    ['Aeroblast',         'FLYING',   'SPECIAL',  100],
+    ['Hurricane',         'FLYING',   'SPECIAL',  120],
+    ['Techno Blast',      'NORMAL',   'SPECIAL',  120],
+    ['Cyclone Burst',     'FLYING',   'SPECIAL',  150],
+    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
+    ['Mega Onslaught',    'NORMAL',   'SPECIAL',  600],
+  ],
+  521: [
+    ['Aerial Ace',     'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',  'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',     'FLYING',   'PHYSICAL',  55],
+    ['Covet',          'NORMAL',   'PHYSICAL',  60],
+    ['Fly',            'FLYING',   'PHYSICAL',  75],
+    ['Bounce',         'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',    'FLYING',   'PHYSICAL',  90],
+    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
+    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
+    ['Skyfall Dive',   'FLYING',   'PHYSICAL', 150],
+    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
+    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
+  ],
+  561: [
+    ['Stored Power',       'PSYCHIC',  'SPECIAL',   25],
+    ['Twin Beam',          'PSYCHIC',  'SPECIAL',   40],
+    ['Confusion',          'PSYCHIC',  'SPECIAL',   50],
+    ['Psybeam',            'PSYCHIC',  'SPECIAL',   65],
+    ['Air Slash',          'FLYING',   'SPECIAL',   75],
+    ['Eerie Spell',        'PSYCHIC',  'SPECIAL',   80],
+    ['Freezing Glare',     'PSYCHIC',  'SPECIAL',   90],
+    ['Future Sight',       'PSYCHIC',  'SPECIAL',  120],
+    ['Hurricane',          'FLYING',   'SPECIAL',  120],
+    ['Psionic Nova',       'PSYCHIC',  'SPECIAL',  150],
+    ['Massive Hurricane',  'FLYING',   'SPECIAL',  600],
+    ['Mental Singularity', 'PSYCHIC',  'SPECIAL',  600],
+  ],
+  733: [
+    ['Aerial Ace',     'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',  'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',     'FLYING',   'PHYSICAL',  55],
+    ['Pluck',          'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',      'NORMAL',   'PHYSICAL',  70],
+    ['Drill Peck',     'FLYING',   'PHYSICAL',  80],
+    ['Floaty Fall',    'FLYING',   'PHYSICAL',  90],
+    ['Dragon Ascent',  'FLYING',   'PHYSICAL', 120],
+    ['Thrash',         'NORMAL',   'PHYSICAL', 120],
+    ['Skyfall Dive',   'FLYING',   'PHYSICAL', 150],
+    ['Sky Attack',     'FLYING',   'PHYSICAL', 600],
+    ['Ultimate Force', 'NORMAL',   'PHYSICAL', 600],
+  ],
+  931: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Wing Attack',       'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Dragon Ascent',     'FLYING',   'PHYSICAL', 120],
+    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
+    ['Skyfall Dive',      'FLYING',   'PHYSICAL', 150],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+    ['Ultimate Force',    'NORMAL',   'PHYSICAL', 600],
+  ],
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const GOLPES_PRE_EVOLUCOES_2026_11_27 = {
+  16: [
+    ['Peck',          'FLYING',   'PHYSICAL',  35],
+    ['Dual Wingbeat', 'FLYING',   'PHYSICAL',  40],
+    ['Tackle',        'NORMAL',   'PHYSICAL',  50],
+    ['Wing Attack',   'FLYING',   'PHYSICAL',  70],
+    ['Fly',           'FLYING',   'PHYSICAL',  90],
+    ['Hyper Drill',   'NORMAL',   'PHYSICAL', 100],
+    ['Brave Bird',    'FLYING',   'PHYSICAL', 120],
+  ],
+  17: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+  84: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Double-Edge',       'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+  163: [
+    ['Gust',              'FLYING',   'SPECIAL',   35],
+    ['Air Cutter',        'FLYING',   'SPECIAL',   45],
+    ['Chatter',           'FLYING',   'SPECIAL',   55],
+    ['Oblivion Wing',     'FLYING',   'SPECIAL',   65],
+    ['Relic Song',        'NORMAL',   'SPECIAL',   75],
+    ['Air Slash',         'FLYING',   'SPECIAL',   80],
+    ['Aeroblast',         'FLYING',   'SPECIAL',  100],
+    ['Hyper Roar',        'NORMAL',   'SPECIAL',  120],
+    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
+  ],
+  276: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Drill Peck',        'FLYING',   'PHYSICAL',  80],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Double-Edge',       'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+  333: [
+    ['Peck',              'FLYING',   'PHYSICAL',  35],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  55],
+    ['Air Cutter',        'FLYING',   'SPECIAL',   60],
+    ['Relic Song',        'NORMAL',   'SPECIAL',   75],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Aeroblast',         'FLYING',   'SPECIAL',  100],
+    ['Double-Edge',       'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'SPECIAL',  600],
+  ],
+  396: [
+    ['Peck',          'FLYING',   'PHYSICAL',  35],
+    ['Dual Wingbeat', 'FLYING',   'PHYSICAL',  40],
+    ['Tackle',        'NORMAL',   'PHYSICAL',  50],
+    ['Drill Peck',    'FLYING',   'PHYSICAL',  80],
+    ['Fly',           'FLYING',   'PHYSICAL',  90],
+    ['Hyper Drill',   'NORMAL',   'PHYSICAL', 100],
+    ['Brave Bird',    'FLYING',   'PHYSICAL', 120],
+  ],
+  397: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Fly',               'FLYING',   'PHYSICAL',  90],
+    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+  520: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Pluck',             'FLYING',   'PHYSICAL',  60],
+    ['Chip Away',         'NORMAL',   'PHYSICAL',  70],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Fly',               'FLYING',   'PHYSICAL',  90],
+    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+  731: [
+    ['Peck',          'FLYING',   'PHYSICAL',  35],
+    ['Dual Wingbeat', 'FLYING',   'PHYSICAL',  40],
+    ['Crush Grip',    'NORMAL',   'PHYSICAL',  50],
+    ['Drill Peck',    'FLYING',   'PHYSICAL',  80],
+    ['Fly',           'FLYING',   'PHYSICAL',  90],
+    ['Hyper Drill',   'NORMAL',   'PHYSICAL', 100],
+    ['Brave Bird',    'FLYING',   'PHYSICAL', 120],
+  ],
+  732: [
+    ['Aerial Ace',        'FLYING',   'PHYSICAL',  25],
+    ['Dual Wingbeat',     'FLYING',   'PHYSICAL',  40],
+    ['Acrobatics',        'FLYING',   'PHYSICAL',  55],
+    ['Covet',             'NORMAL',   'PHYSICAL',  60],
+    ['Drill Peck',        'FLYING',   'PHYSICAL',  75],
+    ['Bounce',            'FLYING',   'PHYSICAL',  85],
+    ['Floaty Fall',       'FLYING',   'PHYSICAL',  90],
+    ['Thrash',            'NORMAL',   'PHYSICAL', 120],
+    ['Massive Hurricane', 'FLYING',   'PHYSICAL', 600],
+  ],
+};
+
 const TABELAS = [
   GOLPES_INICIAIS,
   GOLPES_PSEUDO_LENDARIOS,
@@ -17340,7 +17201,11 @@ const TABELAS = [
   GOLPES_ARTE_NOVA_2026_11_15,
   GOLPES_ARTE_NOVA_2026_11_21,
   GOLPES_ARTE_NOVA_2026_11_22,
+  GOLPES_REWORK_2026_11_26,
+  GOLPES_REWORK_2026_11_27,
+  GOLPES_PRE_EVOLUCOES_2026_11_27,
 ];
+
 
 
 
@@ -17354,6 +17219,7 @@ const TABELAS_FECHADAS = new Set([
   GOLPES_CONTRATO_2026_10_16,
   GOLPES_PRIMEIRO_ESTAGIO_2026_11_05,
   GOLPES_DUAS_FORMAS_2026_11_05,
+  GOLPES_PRE_EVOLUCOES_2026_11_27,
 ]);
 
 
