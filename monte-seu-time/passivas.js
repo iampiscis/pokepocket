@@ -93,7 +93,7 @@ function el(tag, attrs = {}, filhos = []) {
 }
 function imgSprite(looktype, speciesId) {
   const img = el('img', { alt: '', decoding: 'async', draggable: 'false' })
-  const tentativas = [...new Set([looktype, 60000 + Number(speciesId)].filter(ehNum).map(Number))].map((l) => `${SPRITES}${l}.png`)
+  const tentativas = [...new Set([].concat(looktype, 60000 + Number(speciesId)).filter(ehNum).map(Number))].map((l) => `${SPRITES}${l}.png`)
   const proxima = () => {
     const url = tentativas.shift()
     if (url) img.src = url
@@ -102,6 +102,13 @@ function imgSprite(looktype, speciesId) {
   img.onerror = proxima
   proxima()
   return img
+}
+const temShiny = (e) => e?.lookShiny != null && e.lookShiny !== e.looktype
+const lookDe = (e, sh) => (sh && temShiny(e) ? [e.lookShiny, e.looktype] : e?.looktype)
+const ICO_SHINY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 2.5c.7 5 2.9 7.3 7.9 8-5 .7-7.2 2.9-7.9 7.9-.7-5-2.9-7.2-7.9-7.9 5-.7 7.2-3 7.9-8z"/><path d="M18.5 13.5c.4 2.6 1.5 3.7 4 4-2.5.4-3.6 1.5-4 4-.4-2.5-1.5-3.6-4-4 2.5-.3 3.6-1.4 4-4z"/></svg>'
+function caixaShiny(e, sh, attrs) {
+  const ok = temShiny(e), on = ok && !!sh
+  return el('button', { type: 'button', class: `pt-shiny${on ? ' on' : ''}`, role: 'checkbox', 'aria-checked': String(on), 'aria-label': `Shiny${e?.nome ? ` (${e.nome})` : ''}`, title: ok ? (on ? 'Shiny marcado' : 'Marcar shiny') : 'Sem sprite shiny', disabled: !ok, html: ICO_SHINY, ...attrs })
 }
 
 const LISTA = P.ORDEM_PASSIVAS.map((id) => {
@@ -142,8 +149,8 @@ const TIME_MAX = 5
 const INI_PADRAO = [[132, 3, 0], [132, 6, 1], [132, 0, 1], [132, 4, 2], [132, 3, 4]]
 const TIME_EXEMPLO = [[210, 3, 0], [184, 4, 0], [12, 2, 1], [621, 5, 1], [3149, 3, 1]]
 
-const codigoTime = (l) => l.map((m) => `${Number(m.sp).toString(36)}${m.col}${m.f}`).join('-')
-const lerCodigo = (txt) => (txt ? txt.split('-').map((t) => [parseInt(t.slice(0, -2), 36), Number(t.at(-2)), Number(t.at(-1))]).filter((v) => v.every(Number.isFinite) && valida(v[1], v[2])) : null)
+const codigoTime = (l) => l.map((m) => `${Number(m.sp).toString(36)}${m.col}${m.f}${m.sh ? 's' : ''}`).join('-')
+const lerCodigo = (txt) => (txt ? txt.split('-').map((t) => { const sh = t.endsWith('s'); if (sh) t = t.slice(0, -1); return [parseInt(t.slice(0, -2), 36), Number(t.at(-2)), Number(t.at(-1)), sh] }).filter((v) => v.slice(0, 3).every(Number.isFinite) && valida(v[1], v[2])) : null)
 function lerHash() {
   const h = decodeURIComponent(location.hash.slice(1))
   if (h === 'time' || h.startsWith('time=') || h.startsWith('t=')) {
@@ -152,8 +159,8 @@ function lerHash() {
     const velho = (txt) => (txt == null ? null : txt.split(',').filter(Boolean).map((t) => t.split('.').map(Number)).filter((v) => v.length === 3 && v.every(Number.isFinite) && valida(v[1], v[2])))
     const nos = partes.t != null ? lerCodigo(partes.t) : velho(partes.time)
     const ini = partes.i != null ? lerCodigo(partes.i) : velho(partes.ini)
-    estado.time = (nos ?? TIME_EXEMPLO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
-    estado.ini = (ini ?? INI_PADRAO).slice(0, TIME_MAX).map(([sp, col, f]) => ({ sp, col, f }))
+    estado.time = (nos ?? TIME_EXEMPLO).slice(0, TIME_MAX).map(([sp, col, f, sh]) => ({ sp, col, f, sh: !!sh }))
+    estado.ini = (ini ?? INI_PADRAO).slice(0, TIME_MAX).map(([sp, col, f, sh]) => ({ sp, col, f, sh: !!sh }))
     return
   }
   if (PORID.has(h)) { estado.modo = 'passivas'; estado.sel = h; return }
@@ -1044,7 +1051,8 @@ function chipPassiva(m) {
 }
 function linhaMembro(m) {
   return el('div', { class: `pt-membro${estado.timeSel === m.k ? ' sel' : ''}`, 'data-k': m.k }, [
-    el('span', { class: 'pas-pk-img' }, [imgSprite(m.e?.looktype, m.sp)]),
+    el('span', { class: 'pas-pk-img' }, [imgSprite(lookDe(m.e, m.sh), m.sp)]),
+    caixaShiny(m.e, m.sh, { 'data-shiny': m.k }),
     el('span', { class: 'pt-membro-txt' }, [el('b', { text: m.e?.nome || `#${m.sp}` }), el('small', { text: m.bst ? `BST ${m.bst} · alcance ${alcanceDe(m.e)}` : '' })]),
     chipPassiva(m),
     el('button', { type: 'button', class: 'pt-tirar', 'data-tirar': m.k, 'aria-label': `Tirar ${m.e?.nome || 'pokémon'}`, title: 'Tirar', html: ICO_X })
@@ -1077,7 +1085,7 @@ function montarTimeInfo() {
   const N = membros('nos'), I = membros('ini')
   const T = estado.lado === 'ini' ? I : N
   const itens = T.map((m) => el('li', { class: 'pt-linha' }, [
-    el('span', { class: 'pt-linha-ic sprite' }, [imgSprite(m.e?.looktype, m.sp)]),
+    el('span', { class: 'pt-linha-ic sprite' }, [imgSprite(lookDe(m.e, m.sh), m.sp)]),
     el('span', {}, [el('b', { text: m.e?.nome || '' }), ' ', el('span', { class: 'pt-info-pas', text: m.x ? `${m.x.nome}: ${m.x.curto}` : 'Sem passiva: luta só com os golpes.' })])
   ]))
   $('pas-time-info').replaceChildren(
@@ -1087,16 +1095,28 @@ function montarTimeInfo() {
     T.length ? el('ul', { class: 'pt-info' }, itens) : el('p', { class: 'pt-ok', text: 'Sem pokémon.' })
   )
 }
-function adicionarAoTime(sp) {
+function adicionarAoTime(sp, sh = false) {
   const lista = listaDe(estado.lado)
   if (lista.length >= TIME_MAX) return
   const livre = ORDEM_CASAS.find((c) => !lista.some((m) => m.col === c.col && m.f === c.f))
   if (!livre) return
-  lista.push({ sp, ...livre })
+  lista.push({ sp, ...livre, sh: sh && temShiny(especie(sp)) })
   som('clique', { forca: 0.6 })
   atualizarTime(true)
 }
 const parteK = (k) => { const [lado, i] = k.split(':'); return { lado, i: Number(i) } }
+function alternarShiny(k) {
+  const { lado, i } = parteK(k)
+  const m = listaDe(lado)[i]
+  if (!m) return
+  const e = especie(m.sp)
+  if (!temShiny(e)) return
+  m.sh = !m.sh
+  som('clique', { forca: 0.6 })
+  montarTimeLado()
+  montarTimeInfo()
+  document.querySelectorAll(`.pas-peca[data-k="${k}"] .pas-peca-img`).forEach((s) => s.replaceChildren(imgSprite(lookDe(e, m.sh), m.sp)))
+}
 function moverMembro(k, col, f) {
   const { lado, i } = parteK(k)
   const lista = listaDe(lado)
@@ -1120,14 +1140,16 @@ function ligarTime() {
   document.querySelectorAll('[data-lado]').forEach((b) => b.addEventListener('click', () => trocarLado(b.dataset.lado)))
   $('pt-lista').addEventListener('click', (e) => {
     if (e.target.closest('[data-vaga]')) { $('pt-busca').focus(); return }
+    const s = e.target.closest('[data-shiny]')
+    if (s) { if (!s.disabled) alternarShiny(s.dataset.shiny); return }
     const t = e.target.closest('[data-tirar]')
     if (t) { const { lado, i } = parteK(t.dataset.tirar); listaDe(lado).splice(i, 1); estado.timeSel = null; return atualizarTime(true) }
     const m = e.target.closest('.pt-membro[data-k]')
     if (m) { estado.timeSel = estado.timeSel === m.dataset.k ? null : m.dataset.k; montarTimeLado(); marcarSel() }
   })
   $('pt-exemplo').addEventListener('click', () => {
-    if (estado.lado === 'ini') estado.ini = INI_PADRAO.map(([sp, col, f]) => ({ sp, col, f }))
-    else estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f }))
+    if (estado.lado === 'ini') estado.ini = INI_PADRAO.map(([sp, col, f]) => ({ sp, col, f, sh: false }))
+    else estado.time = TIME_EXEMPLO.map(([sp, col, f]) => ({ sp, col, f, sh: false }))
     estado.timeSel = null
     atualizarTime(true)
   })
@@ -1152,6 +1174,7 @@ function ligarTime() {
     if (moverMembro(k, col, f)) { som('passo', { forca: 0.7 }); atualizarTime(true) } else { montarTimeLado(); marcarSel() }
   })
   const campo = $('pt-busca'), caixa = $('pt-achados')
+  const shinyBusca = new Set()
   const fechar = () => { caixa.hidden = true; caixa.replaceChildren() }
   const pintar = () => {
     const q = campo.value
@@ -1161,8 +1184,11 @@ function ligarTime() {
     caixa.replaceChildren(...(achados.length ? achados.map((a) => {
       const pas = P.passivaDaEspecie(a.speciesId)
       const x = pas ? PORID.get(pas.id) : null
-      return el('button', { type: 'button', class: 'pas-achado', 'data-sp': String(a.speciesId), style: x ? `--t:${COR_TIPO[x.tipo]}` : null }, [
-        el('span', { class: 'pas-pk-img' }, [imgSprite(a.looktype, a.speciesId)]),
+      const e = especie(a.speciesId)
+      const sh = shinyBusca.has(a.speciesId) && temShiny(e)
+      return el('div', { class: 'pas-achado', role: 'option', 'data-sp': String(a.speciesId), style: x ? `--t:${COR_TIPO[x.tipo]}` : null }, [
+        el('span', { class: 'pas-pk-img' }, [imgSprite(e ? lookDe(e, sh) : a.looktype, a.speciesId)]),
+        caixaShiny(e, sh, { 'data-shiny-busca': String(a.speciesId) }),
         el('span', { class: 'pas-achado-txt' }, [el('b', { text: a.nome }), el('small', { text: `BST ${bstDe(especie(a.speciesId)) ?? '?'} · alcance ${alcanceDe(especie(a.speciesId))}` })]),
         x ? el('span', { class: 'pas-achado-pas' }, [comIcone(el('span', { class: 'pas-achado-ic', 'aria-hidden': 'true' }), x.id), x.nome]) : el('span', { class: 'pas-achado-pas nada', text: 'Sem passiva' })
       ])
@@ -1173,10 +1199,20 @@ function ligarTime() {
   campo.addEventListener('focus', pintar)
   campo.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') fechar()
-    if (e.key === 'Enter') { const b = caixa.querySelector('[data-sp]'); if (b) { e.preventDefault(); adicionarAoTime(Number(b.dataset.sp)); campo.value = ''; fechar() } }
+    if (e.key === 'Enter') { const b = caixa.querySelector('[data-sp]'); if (b) { e.preventDefault(); adicionar(Number(b.dataset.sp)); fechar() } }
   })
+  const adicionar = (sp) => { adicionarAoTime(sp, shinyBusca.has(sp)); shinyBusca.clear(); campo.value = '' }
   caixa.addEventListener('mousedown', (e) => e.preventDefault())
-  caixa.addEventListener('click', (e) => { const b = e.target.closest('[data-sp]'); if (b) { adicionarAoTime(Number(b.dataset.sp)); campo.value = ''; fechar(); campo.focus() } })
+  caixa.addEventListener('click', (e) => {
+    const s = e.target.closest('[data-shiny-busca]')
+    if (s) {
+      const sp = Number(s.dataset.shinyBusca)
+      if (!s.disabled) { if (shinyBusca.has(sp)) shinyBusca.delete(sp); else shinyBusca.add(sp); som('clique', { forca: 0.5 }); pintar() }
+      return
+    }
+    const b = e.target.closest('[data-sp]')
+    if (b) { adicionar(Number(b.dataset.sp)); fechar(); campo.focus() }
+  })
   campo.addEventListener('blur', () => setTimeout(fechar, 120))
 }
 
@@ -1184,7 +1220,7 @@ function desenharFormacao(c) {
   const unidades = []
   for (const lado of ['nos', 'ini']) for (const m of membros(lado)) {
     const papel = lado === 'nos' ? (m.p ? 'dono' : 'aliado sem-passiva') : (m.p ? 'teste com-passiva' : 'teste')
-    const pc = c.peca(lado, m.col, m.f, { sp: m.sp, lt: m.e?.looktype, papel })
+    const pc = c.peca(lado, m.col, m.f, { sp: m.sp, lt: lookDe(m.e, m.sh), papel })
     pc.n.dataset.k = m.k
     if (m.x) pc.n.style.setProperty('--t', COR_TIPO[m.x.tipo])
     unidades.push({ pc, m })
