@@ -45,7 +45,8 @@ function ico(nome) {
 }
 function sprite(p) {
   const img = el('img', { alt: '', loading: 'lazy', decoding: 'async' })
-  const tentativas = [...new Set([p.looktype, 60000 + Number(p.speciesId)].filter(ehNum).map(Number))].map((l) => `${SPRITES}${l}.png`)
+  const t = looksTier.get(Number(p.speciesId))
+  const tentativas = [...new Set([p.looktype, p.shiny ? t?.shiny : null, t?.normal, 60000 + Number(p.speciesId)].filter(ehNum).map(Number))].map((l) => `${SPRITES}${l}.png`)
   const proxima = () => {
     const url = tentativas.shift()
     if (url) img.src = url
@@ -63,13 +64,18 @@ function indicador(icone, texto, titulo) {
 
 let dados = null
 let tiers = new Map()
+let looksTier = new Map()
 const COR_TIER = { 'S+': '#ff6fae', S: '#ff7676', 'S-': '#b495ff', 'A+': '#f5b13d', A: '#ffa25a', 'A-': '#ffd95e', 'B+': '#8c93f0', B: '#5f9ad6', 'B-': '#3fd4c6', C: '#9aa0aa', D: '#e4e7ec' }
 
 async function lerTiers() {
   try {
     const r = await fetch('../tier/tier.json', { cache: 'no-cache' })
     if (!r.ok) return
-    const j = (await r.json())?.janelas?.dia
+    const todo = await r.json()
+    const j = todo?.janelas?.dia
+    const looks = new Map()
+    for (const jan of Object.values(todo?.janelas || {})) for (const x of [...(jan?.tiers || []).flatMap((g) => g.itens || []), ...(jan?.foraDoMeta || [])]) if (x && !looks.has(Number(x.speciesId))) looks.set(Number(x.speciesId), { shiny: x.looktype, normal: x.lookNormal })
+    looksTier = looks
     const m = new Map()
     for (const g of j?.tiers || []) for (const x of g.itens || []) m.set(Number(x.speciesId), g.tier)
     for (const x of j?.foraDoMeta || []) if (!m.has(Number(x.speciesId)) && COR_TIER[x.tier]) m.set(Number(x.speciesId), x.tier)
