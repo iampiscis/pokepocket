@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
   const cor = iso && document.querySelector('.topo .acoes-topo .coracao')
   if (cor && !cor.querySelector('.coracao-pika')) {
     cor.classList.add('coracao-pilula')
-    cor.insertAdjacentHTML('afterbegin', `<span class="coracao-pika" aria-hidden="true" style="--gg:url('${fonte}assets/itens/gengar-tchau.png')"><span class="pk-portal"></span><span class="pk-luz"><span class="pk-eco"></span><span class="pk-gg"></span></span></span><span class="coracao-txt">Apoie</span>`)
+    cor.insertAdjacentHTML('afterbegin', `<span class="pk-raio" aria-hidden="true"></span><span class="coracao-pika" aria-hidden="true" style="--gg:url('${fonte}assets/itens/gengar-tchau.png')"><span class="pk-portal"></span><span class="pk-luz"><span class="pk-eco"></span><span class="pk-gg"></span></span><span class="pk-mega-wrap"><span class="pk-mega" style="--mg:url('${fonte}assets/itens/gengar-mega.png')"><span class="pk-mega-corpo"></span><span class="pk-mega-mao"></span></span></span></span><span class="coracao-txt">Apoie</span>`)
   }
   if (iso && location.hash === '#apoie') abrir()
 })()
