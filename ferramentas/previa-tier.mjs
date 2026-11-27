@@ -74,8 +74,8 @@ async function atualizarPagina() {
   const nomes = (topo?.itens || []).slice(0, 3).map((p) => p.nome)
   const resto = (topo?.itens?.length || 0) > nomes.length ? '…' : ''
   const descricao = nomes.length
-    ? `${topo.tier} hoje: ${nomes.join(', ')}${resto} · atualizado todo dia ao meio-dia`
-    : 'Os shiny mais fortes do ranqueado do Pokéidle, atualizados todo dia ao meio-dia.'
+    ? `${topo.tier} hoje: ${nomes.join(', ')}${resto} · atualizado à 0h e às 12h`
+    : 'Os shiny mais fortes do ranqueado do Pokéidle, atualizados duas vezes por dia.'
   let html = await readFile(PAGINA, 'utf8')
   html = trocarMeta(html, 'property', 'og:image', `${URL_IMAGEM}?d=${carimbo}`)
   html = trocarMeta(html, 'name', 'twitter:image', `${URL_IMAGEM}?d=${carimbo}`)

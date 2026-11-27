@@ -2,13 +2,14 @@ name: Atualizar meta PvP e tier
 
 on:
   schedule:
+    - cron: '7 2 * * *'
+    - cron: '37 3 * * *'
     - cron: '7 14 * * *'
     - cron: '37 15 * * *'
-    - cron: '17 17 * * *'
   workflow_dispatch:
     inputs:
       so_se_faltar:
-        description: Pular se o tier de hoje já saiu
+        description: Pular se o tier deste turno (00h ou 12h) já saiu
         type: boolean
         default: false
 
@@ -27,18 +28,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ver se o tier de hoje já saiu
+      - name: Ver se o tier deste turno já saiu
         id: hoje
         run: |
+          turno() { local h; h=$(TZ=America/Sao_Paulo date -d "@$1" +%H); echo "$(TZ=America/Sao_Paulo date -d "@$1" +%F)-$(( 10#$h / 12 ))"; }
+          agora=$(date -u +%s)
+          alvo=$agora
+          for b in "$(date -u +%F) 03:00" "$(date -u +%F) 15:00" "$(date -u -d tomorrow +%F) 03:00"; do
+            t=$(date -u -d "$b" +%s)
+            if [ "$t" -gt "$agora" ] && [ $(( t - agora )) -le 5400 ]; then alvo=$t; break; fi
+          done
           feito=nao
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.so_se_faltar }}" = "true" ]; then
             gerado=$(jq -r '.geradoEm // empty' tier/tier.json 2>/dev/null || true)
-            if [ -n "$gerado" ] && [ "$(TZ=America/Sao_Paulo date -d "$gerado" +%F)" = "$(TZ=America/Sao_Paulo date +%F)" ]; then
+            if [ -n "$gerado" ] && [ "$(turno $(( $(date -u -d "$gerado" +%s) + 5400 )))" = "$(turno "$alvo")" ]; then
               feito=sim
-              echo "o tier de hoje já saiu ($gerado); nada a fazer"
+              echo "o tier deste turno já saiu ($gerado); nada a fazer"
             fi
           fi
           echo "feito=$feito" >> "$GITHUB_OUTPUT"
+          echo "alvo=$alvo" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
         if: steps.hoje.outputs.feito != 'sim'
@@ -77,14 +86,12 @@ jobs:
         continue-on-error: true
         run: node ferramentas/previa-tier.mjs
 
-      - name: Esperar até 12h de Brasília
-        if: github.event_name == 'schedule' && steps.hoje.outputs.feito != 'sim'
+      - name: Esperar o horário do turno (00h ou 12h de Brasília)
+        if: steps.hoje.outputs.feito != 'sim' && (github.event_name == 'schedule' || inputs.so_se_faltar)
         run: |
-          alvo=$(date -u -d "$(date -u +%Y-%m-%d) 15:00:00" +%s)
-          agora=$(date -u +%s)
-          espera=$(( alvo - agora - 45 ))
+          espera=$(( ${{ steps.hoje.outputs.alvo }} - $(date -u +%s) - 45 ))
           if [ "$espera" -gt 0 ]; then
-            echo "publicando às 12h em $(( espera / 60 )) min"
+            echo "publicando em $(( espera / 60 )) min"
             sleep "$espera"
           fi
 

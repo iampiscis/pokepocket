@@ -513,7 +513,7 @@ function pintarCabecalho() {
     el('div', { class: 'ex-grade' }, [
       bloco('⚔', 'Partidas reais', 'Lutas ranqueadas do dia, do Mestre ao Challenger. Sem lendários e míticos.'),
       bloco('★', 'Força + uso', 'Quanto o pokémon bate e aguenta, somado a quanto o top escolhe ele.'),
-      bloco('↻', 'Todo dia', 'Renova ao meio-dia com as lutas novas.')
+      bloco('↻', '2x por dia', 'Renova à 0h e às 12h com as lutas novas.')
     ]),
     ...(versao ? [el('small', { class: 'ex-pe', text: versao })] : [])
   )

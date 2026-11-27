@@ -25,14 +25,18 @@ jobs:
         run: |
           fim=$(( $(date +%s) + 5*3600 + 30*60 ))
           ultima_coleta=0
+          ultimo_jogo=0
           while [ "$(date +%s)" -lt "$fim" ]; do
             agora=$(date +%s)
             if [ $(( agora - ultima_coleta )) -ge 3600 ]; then
               gh workflow run coletar-pvp.yml --repo "$REPO" && ultima_coleta=$agora && echo "coleta disparada $(date -u +%H:%M)"
             fi
-            hora=$(date -u +%H)
-            if [ "$hora" -ge 14 ] && [ "$hora" -le 20 ]; then
+            hora=$((10#$(date -u +%H)))
+            if { [ "$hora" -ge 3 ] && [ "$hora" -le 8 ]; } || { [ "$hora" -ge 15 ] && [ "$hora" -le 20 ]; }; then
               gh workflow run atualizar-meta.yml --repo "$REPO" -f so_se_faltar=true && echo "tier disparado (só se faltar) $(date -u +%H:%M)"
+              if [ $(( agora - ultimo_jogo )) -ge 21600 ]; then
+                gh workflow run atualizar-jogo.yml --repo "$REPO" && ultimo_jogo=$agora && echo "dados do jogo disparados $(date -u +%H:%M)"
+              fi
             fi
             sleep 1800
           done

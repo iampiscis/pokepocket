@@ -3,6 +3,7 @@ name: Atualizar dados do jogo
 on:
   schedule:
     - cron: '17 9 * * *'
+    - cron: '17 21 * * *'
   workflow_dispatch:
 
 permissions:
