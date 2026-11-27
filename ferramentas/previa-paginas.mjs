@@ -12,7 +12,8 @@ const PREVIAS = [
   { html: 'ferramentas/previas/site.html', png: 'previa-site.png', paginas: ['index.html'] },
   { html: 'ferramentas/previas/nivel.html', png: 'previa-nivel.png', paginas: ['nivel/index.html'] },
   { html: 'ferramentas/previas/passivas.html', png: 'previa-passivas.png', paginas: ['passivas/index.html'] },
-  { html: 'ferramentas/previas/posicionamento.html', png: 'previa-posicionamento.png', paginas: ['posicionamento/index.html'] }
+  { html: 'ferramentas/previas/posicionamento.html', png: 'previa-posicionamento.png', paginas: ['posicionamento/index.html'] },
+  { html: 'ferramentas/previas/ferramentas.html', png: 'previa-ferramentas.png', paginas: ['ferramentas/inicio.html'] }
 ]
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.webp': 'image/webp' }
 const CHROMES = [process.env.CHROME_BIN, 'google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].filter(Boolean)
