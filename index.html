@@ -308,6 +308,17 @@
     .passos-doar { list-style: none; display: grid; gap: 12px; margin-top: 18px; }
     .passos-doar li { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 17px; }
     .passos-doar li span.doar-txt { all: unset; }
+    .doar-forma { margin-top: 14px; padding: 14px; border-radius: 16px; background: rgba(0, 0, 0, 0.22); box-shadow: inset 0 0 0 1px rgba(244, 114, 182, 0.18); }
+    .doar-forma-cab { display: flex; align-items: center; gap: 12px; }
+    .doar-forma-cab img { flex: none; width: 34px; height: 34px; }
+    .doar-forma-cab div { display: grid; gap: 1px; }
+    .doar-forma-cab b { font-size: 19px; font-weight: 900; color: #fff6ef; }
+    .doar-forma-cab small { font-size: 13px; font-weight: 800; color: #f9a8d4; opacity: .85; }
+    .doar-forma-txt { margin-top: 8px; font-size: 15px; font-weight: 700; }
+    .doar-forma .carteira { margin-top: 12px; }
+    .doar-ou { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 246, 239, 0.55); }
+    .doar-ou::before, .doar-ou::after { content: ''; flex: 1; height: 1px; background: rgba(244, 114, 182, 0.25); }
+    .doar-ou + .doar-forma { margin-top: 14px; }
     .passos-doar li span img { width: 20px; height: 20px; }
     .doar-sub { margin-top: 8px; font-size: 15px; font-weight: 700; opacity: .85; }
     .doar-nick { color: #f9a8d4; }
@@ -685,13 +696,18 @@
           <div class="cartao-doar revela">
             <h3><span class="gema"></span>Apoie o projeto</h3>
             <p class="doar-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
-            <ul class="passos-doar">
-              <li><span><img src="assets/coin.svg" alt="" /></span><span class="doar-txt"><b>Coins:</b> mande direto no jogo para o jogador <b class="doar-nick">Piscis</b>.</span></li>
-              <li><span><img src="assets/gema.svg" alt="" /></span><span class="doar-txt"><b>Gemas:</b> envie USDT pela rede Solana (SPL) para o endereço abaixo.</span></li>
-            </ul>
-            <code class="carteira" id="carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
-            <button type="button" class="botao copiar" id="copiar">Copiar endereço</button>
-            <p class="alerta-rede">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
+            <div class="doar-forma">
+              <div class="doar-forma-cab"><img src="assets/coin.svg" alt="" /><div><b>Coins</b><small>direto no jogo</small></div></div>
+              <p class="doar-forma-txt">Mande para o jogador <b class="doar-nick">Piscis</b>.</p>
+            </div>
+            <div class="doar-ou" aria-hidden="true"><span>ou</span></div>
+            <div class="doar-forma">
+              <div class="doar-forma-cab"><img src="assets/gema.svg" alt="" /><div><b>Gemas</b><small>USDT na rede Solana (SPL)</small></div></div>
+              <p class="doar-forma-txt">Envie para o endereço abaixo.</p>
+              <code class="carteira" id="carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
+              <button type="button" class="botao copiar" id="copiar">Copiar endereço</button>
+              <p class="alerta-rede">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
+            </div>
           </div>
         </div>
       </div>
