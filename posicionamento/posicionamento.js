@@ -22,7 +22,8 @@ const ICO = {
   pontos: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   vitorias: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
   frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>',
-  busca: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>'
+  busca: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+  link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/>'
 }
 
 function el(tag, attrs = {}, filhos = []) {
@@ -146,6 +147,44 @@ function pintar() {
   const secao = outrosSecao(outros)
   const busca = buscaCampo(grade, secao)
   corpo.replaceChildren(linha, resumo(dados.resumo || [], n), busca.campo, busca.vazio, grade, secao)
+  abrirDoLink()
+}
+
+const linkDe = (nick) => `${location.origin}${location.pathname}${location.search}#j=${encodeURIComponent(nick)}`
+function nickDoLink() {
+  const m = /^#j=(.+)$/.exec(location.hash)
+  if (!m) return null
+  try { return decodeURIComponent(m[1]).trim() } catch { return null }
+}
+function abrirDoLink() {
+  const nick = nickDoLink()
+  document.querySelector('.pos-aviso-link')?.remove()
+  if (!nick || !dados) return
+  const k = normalizar(nick)
+  const top = (dados.jogadores || []).find((j) => normalizar(j.nick) === k)
+  if (top) {
+    const card = [...document.querySelectorAll('.pos-grade .pos-card')].find((c) => c.dataset.nick === k)
+    if (card) {
+      card.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+      card.classList.remove('destacado'); void card.offsetWidth; card.classList.add('destacado')
+    }
+    return
+  }
+  const outro = (dados.outros || []).find((j) => normalizar(j.nick) === k)
+  if (outro) return abrirPop(outro)
+  const aviso = el('div', { class: 'pos-aviso-link', role: 'status' }, [
+    el('b', { text: `A formação de ${nick} não está mais disponível.` }),
+    el('span', { text: 'O jogador saiu do top 200 ou a formação foi trocada. Veja as atuais abaixo.' })
+  ])
+  const fechar = el('button', { type: 'button', class: 'pos-aviso-fechar', 'aria-label': 'Fechar aviso', text: '×' })
+  fechar.onclick = () => { aviso.remove(); history.replaceState(null, '', location.pathname + location.search) }
+  aviso.append(fechar)
+  $('pos-corpo').prepend(aviso)
+}
+addEventListener('hashchange', abrirDoLink)
+function botaoLink(j) {
+  const b = el('button', { type: 'button', class: 'pos-link', 'data-copiar': linkDe(j.nick), title: 'Copiar link desta formação', 'aria-label': `Copiar link da formação de ${j.nick}` }, [ico('link')])
+  return b
 }
 
 function outrosSecao(lista) {
@@ -350,7 +389,7 @@ function cartao(j) {
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const podio = j.pos <= 3 ? ` p${j.pos}` : ''
-  return el('article', { class: `pos-card${podio}`, 'data-busca': textoBusca(j) }, [
+  return el('article', { class: `pos-card${podio}`, 'data-busca': textoBusca(j), 'data-nick': normalizar(j.nick) }, [
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
       el('strong', { class: 'pos-nick', title: j.guild?.nome ? `${j.nick} · ${j.guild.nome}` : j.nick }, [el('span', { text: j.nick })]),
@@ -359,7 +398,8 @@ function cartao(j) {
       el('li', { title: 'Pontos no mês' }, [ico('pontos'), el('span', { text: `${fmt.format(j.pontos || 0)} pts` })]),
       wr != null ? el('li', { title: `${fmt.format(j.vitorias)} vitórias e ${fmt.format(j.derrotas)} derrotas no mês` }, [ico('vitorias'), el('span', { text: `${wr}%` })]) : null,
       usadoEm(j.usadoEm),
-      faltam > 0 ? el('li', { class: 'pos-menos', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { text: `${j.pks.length} pokémon` })]) : null
+      faltam > 0 ? el('li', { class: 'pos-menos', title: 'Esse jogador entra com menos de 5 pokémon' }, [el('span', { text: `${j.pks.length} pokémon` })]) : null,
+      el('li', { class: 'pos-link-li' }, [botaoLink(j)])
       ])
     ]),
     tab,
