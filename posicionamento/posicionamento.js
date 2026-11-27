@@ -21,7 +21,8 @@ const ICO = {
   usados: '<path d="M5 20v-6M12 20V5M19 20v-9"/>',
   pontos: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   vitorias: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
-  frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>'
+  frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>',
+  busca: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>'
 }
 
 function el(tag, attrs = {}, filhos = []) {
@@ -108,21 +109,21 @@ function pintar() {
   const js = Array.isArray(dados?.jogadores) ? dados.jogadores : []
   if (!js.length) { corpo.replaceChildren(el('p', { class: 'vazio', text: 'As formações da semana ainda não saíram.' })); return }
   const n = js.length
+  const total = n + (Array.isArray(dados.outros) ? dados.outros.length : 0)
   const g = new Date(dados.geradoEm)
-  const s = new Date(`${dados.semana}T12:00:00`)
+  const mes = /^\d{4}-\d{2}$/.test(String(dados.mes || '')) ? new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(`${dados.mes}-15T12:00:00`)) : null
   const inds = [
-    Number.isNaN(s.getTime()) ? null : indicador('semana', `Semana de ${fmtDia.format(s)}`, 'Renova toda segunda'),
-    indicador('topo', 'Top do PvP mensal'),
-    indicador('formacoes', `${n} formações`),
-    Number.isNaN(g.getTime()) ? null : indicador('hora', `${fmtDia.format(g)} às ${fmtHora.format(g)}`, 'Última atualização')
+    indicador('topo', mes ? `Top 200 de ${mes}` : 'Top 200 do mensal', 'Ranking do PvP mensal'),
+    indicador('formacoes', `${total} formações`, total > n ? `${n} em destaque e ${total - n} na lista` : null),
+    Number.isNaN(g.getTime()) ? null : indicador('hora', `Atualizado ${fmtDia.format(g)} às ${fmtHora.format(g)}`, 'Atualiza sozinho quando aparece jogador novo')
   ].filter(Boolean)
   const explica = el('div', { id: 'pos-explica', class: 'explica explica-pop', role: 'dialog', 'aria-label': 'Como as formações são escolhidas', hidden: true }, [
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como as formações são escolhidas' })]),
     el('div', { class: 'ex-grade' }, [
-      bloco('⚔', 'Formação real', 'Casas tiradas de partidas ranqueadas da semana'),
-      bloco('★', 'Ranking', 'Os 10 mais bem colocados do top mensal'),
-      bloco('↑', 'Tabuleiro', 'Adversário em cima; toque num pokémon para ver as casas que ele alcança'),
-      bloco('➶', 'Alcance', 'Espada é corpo a corpo, arco ataca de longe; o número é quantas casas ele alcança')
+      bloco('⚔', 'Formação real', 'Tirada de partidas ranqueadas recentes.'),
+      bloco('★', 'Ranking', 'Os 10 melhores do mensal; abaixo, o resto do top 200.'),
+      bloco('↑', 'Tabuleiro', 'Adversário em cima. Toque num pokémon para ver o alcance.'),
+      bloco('➶', 'Alcance', 'Espada luta colado, arco ataca de longe.')
     ])
   ])
   const info = el('button', { type: 'button', class: 'info', 'aria-expanded': 'false', 'aria-controls': 'pos-explica', 'aria-label': 'Como as formações são escolhidas', text: 'i' })
@@ -135,7 +136,10 @@ function pintar() {
   document.addEventListener('click', (e) => { if (!explica.hidden && !explica.contains(e.target)) { explica.hidden = true; info.setAttribute('aria-expanded', 'false') } })
   const linha = el('div', { class: 'info-linha' }, [el('ul', { class: 'indicadores', 'aria-label': 'Resumo' }, inds), info, explica])
   const outros = Array.isArray(dados.outros) ? dados.outros : []
-  corpo.replaceChildren(linha, resumo(dados.resumo || [], n), el('div', { class: 'pos-grade' }, js.map(cartao)), outrosSecao(outros))
+  const grade = el('div', { class: 'pos-grade' }, js.map(cartao))
+  const secao = outrosSecao(outros)
+  const busca = buscaCampo(grade, secao)
+  corpo.replaceChildren(linha, resumo(dados.resumo || [], n), busca.campo, busca.vazio, grade, secao)
 }
 
 function outrosSecao(lista) {
@@ -152,11 +156,11 @@ function outro(j) {
   const d = /^\d{4}-\d{2}-\d{2}$/.test(String(j.usadoEm || '')) ? fmtDia.format(new Date(`${j.usadoEm}T12:00:00`)) : null
   const pks = [...j.pks].sort((a, b) => (CASAS[a.casa]?.fileira ?? 0) - (CASAS[b.casa]?.fileira ?? 0) || a.casa - b.casa)
   const corpo = el('div', { class: 'pos-outro-corpo' })
-  const item = el('details', { class: 'pos-outro' }, [
+  const item = el('details', { class: 'pos-outro', 'data-busca': textoBusca(j) }, [
     el('summary', { title: `Ver a formação de ${j.nick}` }, [
       el('span', { class: 'pos-lugar', text: `${j.pos}º` }),
       el('span', { class: 'pos-outro-quem' }, [
-        el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]),
+        el('span', { class: 'pos-outro-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
         el('span', { class: 'pos-outro-meta' }, [
           el('span', { text: `${fmt.format(j.pontos || 0)} pts` }),
           wr != null ? el('span', { text: `${wr}%` }) : null,
@@ -200,11 +204,38 @@ function resumo(lista, n) {
   ])
 }
 
+const ESCUDO = '<path d="M12 3.2 19 6v5.2c0 4.4-3 7.9-7 9.6-4-1.7-7-5.2-7-9.6V6z"/>'
 function guildTag(g) {
-  const tag = String(g?.tag || '').trim().slice(0, 8)
+  const tag = String(g?.tag || '').trim().replace(/^\[|\]$/g, '').slice(0, 8)
   if (!tag) return null
   const cor = /^#[0-9a-f]{3,8}$/i.test(String(g.cor || '')) ? g.cor : '#c9b8a8'
-  return el('span', { class: 'pos-guild', style: `--g:${cor}`, title: g.nome ? `Guild ${g.nome}` : 'Guild' }, [`[${tag}]`])
+  const esc = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  esc.setAttribute('viewBox', '0 0 24 24'); esc.setAttribute('aria-hidden', 'true'); esc.innerHTML = ESCUDO
+  return el('span', { class: 'pos-guild', style: `--g:${cor}`, title: g.nome ? `Guild ${g.nome}` : `Guild ${tag}` }, [esc, el('b', { text: tag })])
+}
+const textoBusca = (j) => normalizar(`${j.nick} ${j.guild?.tag || ''} ${j.guild?.nome || ''}`)
+const normalizar = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+
+function buscaCampo(grade, secao) {
+  const input = el('input', { id: 'pos-busca', class: 'campo', type: 'search', autocomplete: 'off', spellcheck: 'false', placeholder: 'Buscar jogador ou guild', 'aria-label': 'Buscar jogador ou guild' })
+  const vazio = el('p', { class: 'vazio pos-busca-vazio', hidden: true, text: 'Nenhum jogador ou guild com esse nome.' })
+  input.addEventListener('input', () => {
+    const q = normalizar(input.value)
+    let achou = 0
+    for (const sel of [grade, secao]) {
+      if (!sel) continue
+      let n = 0
+      for (const it of sel.querySelectorAll('[data-busca]')) {
+        const ok = !q || it.dataset.busca.includes(q)
+        it.hidden = !ok
+        if (ok) n++
+      }
+      sel.hidden = !n
+      achou += n
+    }
+    vazio.hidden = !!achou
+  })
+  return { campo: el('label', { class: 'busca pos-busca' }, [el('span', { class: 'busca-ico', 'aria-hidden': 'true' }, [ico('busca')]), input]), vazio }
 }
 
 function usadoEm(dia) {
@@ -307,7 +338,7 @@ function cartao(j) {
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const podio = j.pos <= 3 ? ` p${j.pos}` : ''
-  return el('article', { class: `pos-card${podio}` }, [
+  return el('article', { class: `pos-card${podio}`, 'data-busca': textoBusca(j) }, [
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
       el('strong', { class: 'pos-nick', title: j.guild?.nome ? `${j.nick} · ${j.guild.nome}` : j.nick }, [el('span', { text: j.nick })]),

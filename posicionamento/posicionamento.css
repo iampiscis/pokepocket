@@ -21,7 +21,9 @@
 .pos-lugar { flex: none; min-width: 40px; padding: 2px 8px; border-radius: 999px; text-align: center; font-family: var(--display); font-size: 16px; line-height: 1.35; color: #2a1a12; background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 55%, #fff), var(--cor)); font-variant-numeric: tabular-nums; }
 .pos-nick { display: inline-flex; align-items: center; gap: 5px; min-width: 0; color: #fff; text-decoration: none; font-size: 16px; font-weight: 900; }
 .pos-nick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pos-guild { flex: none; padding: 1px 7px; border-radius: 6px; font-size: 12px; font-weight: 900; letter-spacing: 0.02em; line-height: 1.5; color: var(--g); background: color-mix(in srgb, var(--g) 14%, rgba(8, 4, 6, 0.6)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--g) 35%, transparent); white-space: nowrap; }
+.pos-guild { --g: #c9b8a8; flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px 0 7px; border-radius: 999px; font-family: var(--display); font-size: 13px; font-weight: 400; line-height: 1; letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb, var(--g) 70%, #fff3df); background: linear-gradient(180deg, color-mix(in srgb, var(--g) 22%, #1d1016), color-mix(in srgb, var(--g) 10%, #120a0e)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--g) 50%, transparent), 0 2px 6px rgba(0, 0, 0, 0.35); white-space: nowrap; }
+.pos-guild svg { width: 13px; height: 13px; fill: var(--g); stroke: color-mix(in srgb, var(--g) 60%, #000); stroke-width: 1.2; }
+.pos-guild b { font-weight: 400; }
 .pos-stats { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; list-style: none; }
 .pos-stats li { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 6px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #fff3df; white-space: nowrap; background: rgba(8, 4, 6, 0.5); border: 1px solid rgba(255, 233, 163, 0.12); font-variant-numeric: tabular-nums; }
 .pos-stats svg { width: 14px; height: 14px; color: var(--ouro); }
@@ -125,3 +127,15 @@ html.embed .pos-corpo { margin-top: 0; }
   .pos-outro-pks { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
 }
 html.embed .pos-outros { display: none; }
+.pos-outro-nome { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pos-outro-nome .pos-guild { height: 19px; padding: 0 6px 0 5px; font-size: 11px; }
+.pos-outro-nome .pos-guild svg { width: 11px; height: 11px; }
+.pos-busca { max-width: 340px; }
+.pos-busca-vazio { margin: 4px 0; }
+[data-busca][hidden], .pos-grade[hidden], .pos-outros[hidden] { display: none !important; }
+html.embed .pos-busca { display: none; }
+#pos-explica { width: min(460px, calc(100vw - 32px)); }
+#pos-explica .ex-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#pos-explica .ex-bloco { grid-template-columns: 30px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+#pos-explica .ex-bloco .ex-ico { grid-row: span 2; }
+@media (max-width: 560px) { #pos-explica .ex-grade { grid-template-columns: minmax(0, 1fr); } }
