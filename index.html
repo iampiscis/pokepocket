@@ -693,22 +693,7 @@
               <b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Equipe PokePocket</b>
             </div>
           </div>
-          <div class="cartao-doar revela">
-            <h3><span class="gema"></span>Apoie o projeto</h3>
-            <p class="doar-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
-            <div class="doar-forma">
-              <div class="doar-forma-cab"><img src="assets/coin.svg" alt="" /><div><b>Coins</b><small>direto no jogo</small></div></div>
-              <p class="doar-forma-txt">Mande para o jogador <b class="doar-nick">Piscis</b>.</p>
-            </div>
-            <div class="doar-ou" aria-hidden="true"><span>ou</span></div>
-            <div class="doar-forma">
-              <div class="doar-forma-cab"><img src="assets/gema.svg" alt="" /><div><b>Gemas</b><small>USDT na rede Solana (SPL)</small></div></div>
-              <p class="doar-forma-txt">Envie para o endereço abaixo.</p>
-              <code class="carteira" id="carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
-              <button type="button" class="botao copiar" id="copiar">Copiar endereço</button>
-              <p class="alerta-rede">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
-            </div>
-          </div>
+          <div class="cartao-doar apoie-doar revela" data-apoio=""></div>
         </div>
       </div>
     </section>
@@ -779,13 +764,6 @@
     })();
     const obs =new IntersectionObserver((itens) => itens.forEach((i) => { if (i.isIntersecting) { i.target.classList.add('ok'); obs.unobserve(i.target) } }), { threshold: 0.12 });
     document.querySelectorAll('.revela').forEach((e) => obs.observe(e));
-    const copiar = document.getElementById('copiar');
-    copiar.addEventListener('click', async () => {
-      const txt = document.getElementById('carteira').textContent.trim();
-      try { await navigator.clipboard.writeText(txt); } catch { const r = document.createRange(); r.selectNodeContents(document.getElementById('carteira')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges(); }
-      copiar.textContent = 'Endereço copiado ✓'; copiar.classList.add('ok');
-      setTimeout(() => { copiar.textContent = 'Copiar endereço'; copiar.classList.remove('ok'); }, 2500);
-    });
     (async () => {
       try {
         const r = await fetch('https://api.github.com/repos/iampiscis/pokepocket/releases?per_page=100', { headers: { Accept: 'application/vnd.github+json' } });

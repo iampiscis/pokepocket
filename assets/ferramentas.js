@@ -1,3 +1,33 @@
+const APOIO_COPIAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>'
+const apoioHTML = (fonte) => `
+  <h3 class="apoie-tit"><span class="apoie-gema" style="background-image:url('${fonte}assets/gema.svg')"></span>Apoie o projeto</h3>
+  <p class="apoie-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
+  <div class="apoie-opcoes">
+    <section class="apoie-op coins" aria-label="Apoiar com coins">
+      <div class="apoie-op-cab"><span class="apoie-medalha"><img src="${fonte}assets/coin.svg" alt="" /></span><div><b>Coins</b><small>Direto no jogo</small></div></div>
+      <span class="apoie-rot2">Envie para o jogador</span>
+      <div class="apoie-campo"><code class="apoie-nick">Piscis</code><button type="button" data-copiar="Piscis" data-rotulo="Copiar" aria-label="Copiar o nick Piscis">${APOIO_COPIAR}<span>Copiar</span></button></div>
+    </section>
+    <span class="apoie-ou" aria-hidden="true">ou</span>
+    <section class="apoie-op gemas" aria-label="Apoiar com gemas">
+      <div class="apoie-op-cab"><span class="apoie-medalha"><img src="${fonte}assets/gema.svg" alt="" /></span><div><b>Gemas</b><small>USDT · rede Solana (SPL)</small></div></div>
+      <span class="apoie-rot2">Endereço da carteira</span>
+      <div class="apoie-campo"><code class="apoie-end">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code><button type="button" data-copiar="J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx" data-rotulo="Copiar" aria-label="Copiar o endereço da carteira">${APOIO_COPIAR}<span>Copiar</span></button></div>
+      <p class="apoie-alerta">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
+    </section>
+  </div>`
+
+document.addEventListener('click', async (e) => {
+  const bt = e.target.closest?.('[data-copiar]')
+  if (!bt) return
+  const txt = bt.dataset.copiar
+  try { await navigator.clipboard.writeText(txt) } catch { const t = document.createElement('textarea'); t.value = txt; t.style.cssText = 'position:fixed;opacity:0'; document.body.append(t); t.select(); document.execCommand('copy'); t.remove() }
+  const sp = bt.querySelector('span')
+  bt.classList.add('ok'); if (sp) sp.textContent = 'Copiado'
+  clearTimeout(bt._t); bt._t = setTimeout(() => { bt.classList.remove('ok'); if (sp) sp.textContent = bt.dataset.rotulo || 'Copiar' }, 2200)
+});
+document.addEventListener('DOMContentLoaded', () => { for (const c of document.querySelectorAll('[data-apoio]')) c.innerHTML = apoioHTML(c.dataset.apoio || '') });
+
 (() => {
   for (const raiz of document.querySelectorAll('[data-ferramentas]')) {
     const botao = raiz.querySelector('.ferr-botao')
@@ -112,35 +142,12 @@
           </div>
           <div class="apoie-nome"><small>Feito com carinho pela</small><b><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34L8 10l14 12L32 4l10 18 14-12 4 24z" fill="#ffd34d" stroke="#7d5313" stroke-width="3" stroke-linejoin="round"/></svg>Equipe PokePocket</b></div>
         </div>
-        <div class="apoie-doar">
-          <h3><span class="apoie-gema" style="background-image:url('${fonte}assets/gema.svg')"></span>Apoie o projeto</h3>
-          <p class="apoie-sub">Sua doação mantém as melhorias e o PokePocket sempre gratuito.</p>
-          <div class="apoie-forma">
-              <div class="apoie-forma-cab"><img src="${fonte}assets/coin.svg" alt="" /><div><b>Coins</b><small>direto no jogo</small></div></div>
-              <p class="apoie-forma-txt">Mande para o jogador <b class="apoie-nick">Piscis</b>.</p>
-            </div>
-            <div class="apoie-ou" aria-hidden="true"><span>ou</span></div>
-            <div class="apoie-forma">
-              <div class="apoie-forma-cab"><img src="${fonte}assets/gema.svg" alt="" /><div><b>Gemas</b><small>USDT na rede Solana (SPL)</small></div></div>
-              <p class="apoie-forma-txt">Envie para o endereço abaixo.</p>
-              <code class="apoie-carteira">J3NgpD4WkWBsxgEUgibU59AoBHVUJse9YuLu6wJ78wMx</code>
-              <button type="button" class="apoie-copiar">Copiar endereço</button>
-              <p class="apoie-alerta">⚠ Só USDT na rede Solana. Outra moeda ou rede pode ser perdida.</p>
-            </div>
+        <div class="apoie-doar">${apoioHTML(fonte)}
         </div>
       </div>`
     document.body.append(pop)
     pop.querySelector('.apoie-fechar').addEventListener('click', () => pop.close())
     pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
-    const bt = pop.querySelector('.apoie-copiar')
-    bt.addEventListener('click', async () => {
-      const cod = pop.querySelector('.apoie-carteira')
-      const txt = cod.textContent.trim()
-      try { await navigator.clipboard.writeText(txt) } catch { const r = document.createRange(); r.selectNodeContents(cod); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges() }
-      bt.textContent = 'Endereço copiado ✓'
-      bt.classList.add('ok')
-      setTimeout(() => { bt.textContent = 'Copiar endereço'; bt.classList.remove('ok') }, 2500)
-    })
   }
   const abrir = () => { if (!pop) montar(); if (!pop.open) pop.showModal() }
   document.addEventListener('click', (e) => {
