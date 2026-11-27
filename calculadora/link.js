@@ -104,6 +104,14 @@ export function codificarCompacto({ hoje, sim }, resumo = null) {
   return paraBase64(b)
 }
 
+export const MARCA_ISOLADO = 'Ferramnt'
+
+export function marcarIsolado(token) {
+  const b = deBase64(token)
+  while (b.length % 3) b.push(0)
+  return paraBase64(b) + MARCA_ISOLADO
+}
+
 export function decodificarCompacto(token) {
   const txt = String(token || '').trim()
   if (!txt || txt.length > 200) throw new Error('link inválido')

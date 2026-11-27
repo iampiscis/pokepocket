@@ -50,7 +50,7 @@ function gravarHash() {
   if (estado.ordem !== 'score') p.set('o', estado.ordem)
   if (estado.ficha != null) p.set('p', String(estado.ficha))
   const h = p.toString().replace(/%2C/g, ',')
-  history.replaceState(null, '', h ? `#${h}` : location.pathname + location.search)
+  history.replaceState(null, '', location.pathname + location.search + (h ? `#${h}` : ''))
 }
 
 function janelasDe(j) {

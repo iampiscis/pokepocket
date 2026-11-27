@@ -1,5 +1,5 @@
 import * as motor from './motor.js'
-import { codificarCompacto, decodificarCompacto } from './link.js'
+import { codificarCompacto, decodificarCompacto, marcarIsolado } from './link.js'
 
 const STATS = [['hp', 'HP'], ['atk', 'ATK'], ['def', 'DEF'], ['spAtk', 'SP.ATK'], ['spDef', 'SP.DEF'], ['speed', 'VEL']]
 const TIPOS = ['NORMAL', 'FIRE', 'WATER', 'GRASS', 'ELECTRIC', 'ICE', 'FIGHTING', 'POISON', 'GROUND', 'FLYING', 'PSYCHIC', 'BUG', 'ROCK', 'GHOST', 'DRAGON', 'DARK', 'STEEL', 'FAIRY']
@@ -274,7 +274,7 @@ function gravarEstado() {
   if (!st.hoje) return
   const cod = `k=${codificarCompacto({ hoje: st.hoje, sim: st.sim })}`
   st.ultimoHash = cod
-  try { history.replaceState(null, '', `#${cod}`) } catch {}
+  try { history.replaceState(null, '', `${location.pathname}${location.search}#${cod}`) } catch {}
 }
 
 function aplicarCodigo(txt) {
@@ -1237,7 +1237,8 @@ async function imagemPrevia(s, resumo) {
 }
 
 async function linkCurto(s, resumo) {
-  const token = codificarCompacto({ hoje: st.hoje, sim: st.sim }, resumo)
+  const cru = codificarCompacto({ hoje: st.hoje, sim: st.sim }, resumo)
+  const token = document.documentElement.dataset.isolado ? marcarIsolado(cru) : cru
   if (linksFeitos.has(token)) return linksFeitos.get(token)
   const longo = `${PREVIA}/p/${token}`
   const tarefa = (async () => {
