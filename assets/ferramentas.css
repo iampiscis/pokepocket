@@ -110,3 +110,20 @@
 .apoie-forma .apoie-carteira { margin-top: 10px; }
 .apoie-ou { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 246, 239, 0.55); }
 .apoie-ou::before, .apoie-ou::after { content: ''; flex: 1; height: 1px; background: rgba(244, 114, 182, 0.25); }
+
+.so-ferr .topo .secoes[data-ferr] { margin: 0 auto; height: 50px; padding: 5px; gap: 2px; box-sizing: border-box; }
+.so-ferr .topo .secoes[data-ferr] a { height: 38px; box-sizing: border-box; padding: 0 15px 0 13px; gap: 8px; font-size: 14px; line-height: 1; }
+.so-ferr .topo .secoes[data-ferr] .ic, .so-ferr .topo .secoes[data-ferr] .ic svg { width: 17px; height: 17px; }
+.so-ferr .topo .secoes[data-ferr] .ic svg, .so-ferr .topo .secoes[data-ferr] .ic svg * { stroke-width: 2px; }
+.so-ferr .topo .secoes[data-ferr] a:not(.ativo) .ic { color: color-mix(in srgb, var(--suave) 75%, transparent); }
+@media (min-width: 900px) {
+  .so-ferr .topo .acoes-topo .coracao { width: 50px; height: 50px; margin-left: 0; border-radius: 50%; place-items: center; background: rgba(21, 11, 16, 0.62); border: 1px solid rgba(255, 233, 163, 0.14); box-shadow: inset 0 1px 0 rgba(255, 233, 163, 0.06); color: #f472b6; transition: background-color .2s, border-color .2s; }
+  .so-ferr .topo .acoes-topo .coracao:hover { background: rgba(244, 114, 182, 0.12); border-color: rgba(244, 114, 182, 0.4); }
+  .so-ferr .topo .acoes-topo .coracao svg { width: 19px; height: 19px; }
+}
+@media (min-width: 900px) and (max-width: 1180px) {
+  .so-ferr .topo .secoes[data-ferr] a { padding: 0 11px 0 9px; gap: 6px; font-size: 13.5px; }
+}
+@media (min-width: 900px) and (max-width: 1020px) {
+  .so-ferr .topo .marca-ferr { display: none; }
+}
