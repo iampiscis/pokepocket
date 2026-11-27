@@ -120,7 +120,7 @@ function pintar() {
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como as formações são escolhidas' })]),
     el('div', { class: 'ex-grade' }, [
       bloco('⚔', 'Formação real', 'Casas tiradas de partidas ranqueadas da semana'),
-      bloco('★', 'Variedade', 'Times e posições diferentes entre si'),
+      bloco('★', 'Ranking', 'Os 10 mais bem colocados do top mensal'),
       bloco('↑', 'Tabuleiro', 'Adversário em cima; toque num pokémon para ver as casas que ele alcança'),
       bloco('➶', 'Alcance', 'Espada é corpo a corpo, arco ataca de longe; o número é quantas casas ele alcança')
     ])
