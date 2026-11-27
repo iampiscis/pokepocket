@@ -283,3 +283,5 @@
   html:not(.so-ferr) .topo .acoes-topo .ferr-botao .selo-novo { position: absolute; }
 }
 .topo .acoes-topo a.estrela, .topo .acoes-topo .baixar { display: none !important; }
+.painel-menu > .apoio { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 11px 14px; border-radius: 14px; border: 1px solid rgba(244, 114, 182, 0.3); background: rgba(236, 72, 153, 0.08); color: #fce7f3; font-weight: 800; font-size: 16px; text-decoration: none; }
+.painel-menu > .apoio svg { flex: none; width: 20px; height: 20px; color: #f9a8d4; }
