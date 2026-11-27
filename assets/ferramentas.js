@@ -180,11 +180,12 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
     b.innerHTML = CORACAO
     acoes.prepend(b)
   }
-  const cor = iso && document.querySelector('.topo .acoes-topo .coracao')
+  const cor = document.querySelector('.topo .acoes-topo .coracao')
   if (cor && !cor.querySelector('.coracao-pika')) {
     cor.classList.add('coracao-pilula')
     cor.insertAdjacentHTML('afterbegin', `<span class="pk-raio" aria-hidden="true"><i></i></span><span class="coracao-pika" aria-hidden="true" style="--gg:url('${fonte}assets/itens/gengar-tchau.png')"><span class="pk-portal"></span><span class="pk-luz"><span class="pk-eco"></span><span class="pk-gg"></span></span><span class="pk-mega-wrap"><span class="pk-mega" style="--mg:url('${fonte}assets/itens/gengar-mega.png')"><span class="pk-mega-olhos" style="background-image:url('${fonte}assets/itens/gengar-mega-olhos.png')"></span></span></span></span><span class="coracao-txt">Apoie</span>`)
   }
+  if (cor && !iso) cor.addEventListener('click', (e) => { if (matchMedia('(min-width: 1181px)').matches) { e.preventDefault(); abrir() } })
   const gg = cor && cor.querySelector('.pk-gg')
   if (gg) {
     let dentro = false, espera = null
