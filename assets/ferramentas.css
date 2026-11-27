@@ -192,3 +192,9 @@
   .apoie-pop .apoie-campo code.apoie-end { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .apoie-pop .apoie-luz, .apoie-pop .apoie-nota, .apoie-pop .apoie-dancam img { animation: none; } }
+.apoie-pop .apoie-luz, .apoie-pop .apoie-palco::before { content: ''; position: absolute; left: 0; top: -8px; width: 100%; height: calc(100% + 8px); margin: 0; clip-path: none; pointer-events: none; background: conic-gradient(from 154deg at var(--x) 0, transparent 0deg, rgba(255, 246, 214, 0.05) 8deg, rgba(255, 246, 214, 0.16) 17deg, rgba(255, 246, 214, 0.24) 26deg, rgba(255, 246, 214, 0.16) 35deg, rgba(255, 246, 214, 0.05) 44deg, transparent 52deg); -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.9) 60%, rgba(0, 0, 0, 0.4) 88%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.9) 60%, rgba(0, 0, 0, 0.4) 88%, transparent 100%); transform-origin: var(--x) 0; }
+.apoie-pop .apoie-luz { --x: 28%; animation: apoie-varre-a 4.2s ease-in-out infinite alternate; }
+.apoie-pop .apoie-palco::before { --x: 72%; animation: apoie-varre-b 4.2s ease-in-out infinite alternate; }
+@keyframes apoie-varre-a { from { transform: rotate(-6deg); } to { transform: rotate(14deg); } }
+@keyframes apoie-varre-b { from { transform: rotate(6deg); } to { transform: rotate(-14deg); } }
+@media (prefers-reduced-motion: reduce) { .apoie-pop .apoie-palco::before { animation: none; } }
