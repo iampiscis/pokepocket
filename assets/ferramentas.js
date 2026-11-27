@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
   const cor = iso && document.querySelector('.topo .acoes-topo .coracao')
   if (cor && !cor.querySelector('.coracao-pika')) {
     cor.classList.add('coracao-pilula')
-    cor.insertAdjacentHTML('afterbegin', `<span class="coracao-pika" aria-hidden="true"><span class="pk-gengar"><img class="pk-corpo" src="${fonte}assets/itens/gengar-corpo.png" alt="" /><span class="pk-braco" style="background-image:url('${fonte}assets/itens/gengar-braco.png')"></span></span></span><span class="coracao-txt">Apoie</span>`)
+    cor.insertAdjacentHTML('afterbegin', `<span class="coracao-pika" aria-hidden="true" style="--gg:url('${fonte}assets/itens/gengar-tchau.png')"><span class="pk-portal"></span><span class="pk-luz"><span class="pk-eco"></span><span class="pk-gg"></span></span></span><span class="coracao-txt">Apoie</span>`)
   }
   if (iso && location.hash === '#apoie') abrir()
 })()
