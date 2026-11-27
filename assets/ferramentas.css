@@ -134,3 +134,61 @@
   .apoie-campo button { min-width: 0; width: 44px; height: 44px; padding: 0; align-self: center; }
   .apoie-campo button span { display: none; }
 }
+
+.apoie-pop { width: min(900px, calc(100vw - 24px)); padding: 16px 18px 18px; }
+.apoie-pop .apoie-fechar { top: 12px; right: 12px; width: 32px; height: 32px; }
+.apoie-pop .apoie-cab { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 12px; padding: 0 40px; }
+.apoie-pop .apoie-cab h2 { margin: 0; font-size: 28px; line-height: 1.1; }
+.apoie-pop .apoie-cab p { flex-basis: 100%; font-size: 14px; }
+.apoie-pop .apoie-grade { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); gap: 14px; margin-top: 12px; }
+.apoie-pop .apoie-autor { border-width: 1.5px; box-shadow: 0 0 0 3px rgba(192, 138, 62, 0.12); }
+.apoie-pop .apoie-palco { position: relative; min-height: 0; overflow: hidden; display: grid; align-items: end; background: radial-gradient(75% 45% at 50% 100%, rgba(255, 211, 77, 0.2), transparent 72%), linear-gradient(180deg, #2b2126, #141013); }
+.apoie-pop .apoie-palco::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 10px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 233, 163, 0.32), transparent); pointer-events: none; }
+.apoie-pop .apoie-luz { top: -30px; width: 220px; height: 100%; margin-left: -110px; transform-origin: 50% 0; animation: apoie-varre 3.6s ease-in-out infinite alternate; }
+@keyframes apoie-varre { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+.apoie-pop .apoie-nota { font-size: 20px; animation: apoie-sobe 3s ease-in infinite; }
+@keyframes apoie-sobe { 0% { opacity: 0; transform: translateY(14px); } 25% { opacity: .75; } 100% { opacity: 0; transform: translateY(-36px) rotate(-10deg); } }
+.apoie-pop .apoie-dancam { z-index: 1; gap: 8px; padding: 0 10px 16px; }
+.apoie-pop .apoie-dancam img { width: auto !important; height: 60px; animation: apoie-pula 1.1s cubic-bezier(.3, 0, .3, 1) infinite; }
+.apoie-pop .apoie-dancam img:nth-child(1) { animation-delay: 0s !important; }
+.apoie-pop .apoie-dancam img:nth-child(2) { animation-delay: .14s !important; }
+.apoie-pop .apoie-dancam img:nth-child(3) { animation-delay: .28s !important; }
+.apoie-pop .apoie-dancam img:nth-child(4) { animation-delay: .42s !important; height: 66px; }
+@keyframes apoie-pula { 0%, 60%, 100% { transform: translateY(0) scale(1, 1); } 12% { transform: translateY(0) scale(1.08, .9); } 30% { transform: translateY(-16px) scale(.96, 1.05); } 48% { transform: translateY(0) scale(1.06, .93); } }
+.apoie-pop .apoie-nome { padding: 10px 12px 12px; }
+.apoie-pop .apoie-nome small { font-size: 11px; }
+.apoie-pop .apoie-nome b { font-size: 25px; }
+.apoie-pop .apoie-nome b svg { left: -13px; top: -9px; width: 22px; }
+.apoie-pop .apoie-doar { padding: 14px 16px 16px; border-width: 1.5px; box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1); }
+.apoie-pop .apoie-tit, .apoie-tit { font-size: 21px; }
+.apoie-pop .apoie-gema { width: 22px; height: 22px; }
+.apoie-pop .apoie-sub, .apoie-sub { margin-top: 3px; font-size: 13px; }
+.apoie-pop .apoie-opcoes { gap: 6px; margin-top: 12px; }
+.apoie-pop .apoie-op { padding: 10px 12px 12px; border-radius: 15px; }
+.apoie-pop .apoie-medalha { width: 38px; height: 38px; }
+.apoie-pop .apoie-medalha img { width: 24px; height: 24px; }
+.apoie-pop .apoie-op-cab { gap: 10px; }
+.apoie-pop .apoie-op-cab b { font-size: 19px; }
+.apoie-pop .apoie-op-cab small { font-size: 12px; }
+.apoie-pop .apoie-rot2 { margin: 8px 0 5px; font-size: 10px; }
+.apoie-pop .apoie-campo code { min-height: 38px; padding: 6px 10px; font-size: 12.5px; }
+.apoie-pop .apoie-campo code.apoie-nick { font-size: 19px; }
+.apoie-pop .apoie-campo button { min-width: 92px; font-size: 13.5px; }
+.apoie-pop .apoie-op .apoie-alerta { margin-top: 7px; font-size: 11.5px; }
+.apoie-pop .apoie-ou { padding: 2px 12px; font-size: 10px; }
+.apoie-pop .apoie-campo code.apoie-end { font-size: 11.5px; letter-spacing: -0.01em; }
+@media (max-width: 760px) {
+  .apoie-pop .apoie-grade { grid-template-columns: 1fr; }
+  .apoie-pop .apoie-palco { min-height: 92px; }
+  .apoie-pop .apoie-dancam { padding-bottom: 8px; }
+  .apoie-pop .apoie-dancam img { height: 44px; }
+  .apoie-pop .apoie-dancam img:nth-child(4) { height: 48px; }
+  .apoie-pop .apoie-nome { padding: 7px 10px 9px; }
+  .apoie-pop .apoie-nome small { font-size: 10px; }
+  .apoie-pop .apoie-nome b { font-size: 20px; }
+}
+@media (max-width: 420px) {
+  .apoie-pop .apoie-campo button, .apoie-campo button { min-width: 0; width: 44px; height: 44px; padding: 0; align-self: center; }
+  .apoie-pop .apoie-campo code.apoie-end { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .apoie-pop .apoie-luz, .apoie-pop .apoie-nota, .apoie-pop .apoie-dancam img { animation: none; } }
