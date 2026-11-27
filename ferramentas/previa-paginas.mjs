@@ -11,7 +11,7 @@ const LIMITE = 400 * 1024
 const PREVIAS = [
   { html: 'ferramentas/previas/site.html', png: 'previa-site.png', paginas: ['index.html'] },
   { html: 'ferramentas/previas/nivel.html', png: 'previa-nivel.png', paginas: ['nivel/index.html'] },
-  { html: 'ferramentas/previas/passivas.html', png: 'previa-passivas.png', paginas: ['passivas/index.html'] },
+  { html: 'ferramentas/previas/monte-seu-time.html', png: 'previa-monte-seu-time.png', paginas: ['monte-seu-time/index.html'] },
   { html: 'ferramentas/previas/posicionamento.html', png: 'previa-posicionamento.png', paginas: ['posicionamento/index.html'] },
   { html: 'ferramentas/previas/ferramentas.html', png: 'previa-ferramentas.png', paginas: ['ferramentas/inicio.html'] }
 ]

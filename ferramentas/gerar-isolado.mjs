@@ -6,7 +6,7 @@ if (!origem || !destino) {
   console.error('uso: node gerar-isolado.mjs <pasta do pokepocket> <pasta do pokepocketferramentas>')
   process.exit(2)
 }
-const PAGINAS = ['calculadora', 'nivel', 'tier', 'posicionamento', 'passivas']
+const PAGINAS = ['calculadora', 'nivel', 'tier', 'posicionamento', 'monte-seu-time']
 const SITE = 'https://iampiscis.github.io'
 const FONTE = '/pokepocket/'
 const ISOLADO = '/pokepocketferramentas/'
@@ -27,9 +27,9 @@ for (const pagina of PAGINAS) {
     .replace(`content="${SITE}${FONTE}${pagina}/"`, `content="${SITE}${ISOLADO}${caminho(pagina)}"`)
     .replace(/class="marca" href="\.\.\/"/g, `class="marca" href="${ISOLADO}"`)
     .replace(/ · <a href="\.\.\/">Página inicial<\/a>/g, '')
-    .replace(/href="\.\.\/(calculadora|nivel|tier|posicionamento|passivas)\/"/g, (_, p) => `href="${ISOLADO}${caminho(p)}"`)
+    .replace(/href="\.\.\/(calculadora|nivel|tier|posicionamento|monte-seu-time)\/"/g, (_, p) => `href="${ISOLADO}${caminho(p)}"`)
     .replace(/href="\.\/"/g, `href="${ISOLADO}${caminho(pagina)}"`)
-  const sobra = html.match(/Setup\.exe|github\.com\/iampiscis|href="\.\.\/"|href="\.\.\/#|href="\.\.\/(calculadora|nivel|tier|posicionamento|passivas)\/"/)
+  const sobra = html.match(/Setup\.exe|github\.com\/iampiscis|href="\.\.\/"|href="\.\.\/#|href="\.\.\/(calculadora|nivel|tier|posicionamento|monte-seu-time)\/"/)
   if (sobra) { falhou.push(`${pagina} (sobrou ${sobra[0]})`); continue }
   const pasta = resolve(destino, caminho(pagina))
   mkdirSync(pasta, { recursive: true })
