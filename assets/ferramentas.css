@@ -278,6 +278,8 @@
   html:not(.so-ferr) .topo .acoes-topo .baixar { height: 46px; padding-top: 0; padding-bottom: 0; display: inline-flex; align-items: center; }
 }
 @media (min-width: 1181px) and (max-width: 1359px) {
-  html:not(.so-ferr) .topo .acoes-topo .ferr-botao { width: 46px; padding: 0; justify-content: center; }
+  html:not(.so-ferr) .topo .acoes-topo .ferr-botao { width: auto; padding: 0 16px; }
+  html:not(.so-ferr) .topo .acoes-topo .ferr-botao .rot { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+  html:not(.so-ferr) .topo .acoes-topo .ferr-botao .selo-novo { position: absolute; }
 }
-.topo .acoes-topo a.estrela { display: none !important; }
+.topo .acoes-topo a.estrela, .topo .acoes-topo .baixar { display: none !important; }
