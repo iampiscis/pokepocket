@@ -278,8 +278,6 @@
   html:not(.so-ferr) .topo .acoes-topo .baixar { height: 46px; padding-top: 0; padding-bottom: 0; display: inline-flex; align-items: center; }
 }
 @media (min-width: 1181px) and (max-width: 1359px) {
-  html:not(.so-ferr) .topo .acoes-topo .coracao.coracao-pilula { padding-right: 12px; gap: 2px; }
-  html:not(.so-ferr) .topo .acoes-topo .coracao-pilula .coracao-txt { display: none; }
-  html:not(.so-ferr) .topo .acoes-topo a.estrela { width: 46px; }
   html:not(.so-ferr) .topo .acoes-topo .ferr-botao { width: 46px; padding: 0; justify-content: center; }
 }
+.topo .acoes-topo a.estrela { display: none !important; }
