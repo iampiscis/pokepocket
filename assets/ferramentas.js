@@ -1,3 +1,4 @@
+const RAIZ_PP = (() => { try { return new URL('../', document.currentScript.src).pathname } catch { return '/pokepocket/' } })()
 const APOIO_COPIAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>'
 const apoioHTML = (fonte) => `
   <h3 class="apoie-tit"><span class="apoie-gema" style="background-image:url('${fonte}assets/gema.svg')"></span>Apoie o projeto</h3>
@@ -121,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
 })()
 
 ;(() => {
-  if (!document.documentElement.dataset.isolado) return
-  const fonte = new URL('../', document.baseURI).pathname
+  const iso = !!document.documentElement.dataset.isolado
+  const fonte = RAIZ_PP
   const CORACAO = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>'
   let pop = null
   const montar = () => {
@@ -149,14 +150,27 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
     pop.querySelector('.apoie-fechar').addEventListener('click', () => pop.close())
     pop.addEventListener('click', (e) => { if (e.target === pop) pop.close() })
   }
-  const abrir = () => { if (!pop) montar(); if (!pop.open) pop.showModal() }
-  document.addEventListener('click', (e) => {
+  const hoje = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` }
+  const ler = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null') } catch { return null } }
+  const gravar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }
+  const abrir = () => { if (!pop) montar(); if (!pop.open) pop.showModal(); gravar('pp-apoio-visto', hoje()) }
+  const USO_ATE_MOSTRAR = 3 * 60000
+  const PASSO = 5000
+  setInterval(() => {
+    if (document.hidden || ler('pp-apoio-visto') === hoje()) return
+    const u = ler('pp-uso')
+    const ms = (u?.dia === hoje() ? u.ms : 0) + PASSO
+    gravar('pp-uso', { dia: hoje(), ms })
+    if (ms < USO_ATE_MOSTRAR || document.querySelector('dialog[open]')) return
+    abrir()
+  }, PASSO)
+  if (iso) document.addEventListener('click', (e) => {
     const a = e.target.closest?.('.coracao, .apoio, a[href$="#apoie"]')
     if (!a) return
     e.preventDefault()
     abrir()
   }, true)
-  const acoes = document.querySelector('.topo .acoes-topo')
+  const acoes = iso && document.querySelector('.topo .acoes-topo')
   if (acoes && !acoes.querySelector('.coracao')) {
     const b = document.createElement('a')
     b.className = 'coracao'
@@ -166,5 +180,10 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
     b.innerHTML = CORACAO
     acoes.prepend(b)
   }
-  if (location.hash === '#apoie') abrir()
+  const cor = iso && document.querySelector('.topo .acoes-topo .coracao')
+  if (cor && !cor.querySelector('.coracao-pika')) {
+    cor.classList.add('coracao-pilula')
+    cor.insertAdjacentHTML('afterbegin', `<img class="coracao-pika" src="${fonte}assets/itens/pikachu.png" alt="" width="29" height="31" /><span class="coracao-txt">Apoie</span>`)
+  }
+  if (iso && location.hash === '#apoie') abrir()
 })()

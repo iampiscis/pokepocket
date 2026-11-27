@@ -198,3 +198,15 @@
 @keyframes apoie-varre-a { from { transform: rotate(-6deg); } to { transform: rotate(14deg); } }
 @keyframes apoie-varre-b { from { transform: rotate(6deg); } to { transform: rotate(-14deg); } }
 @media (prefers-reduced-motion: reduce) { .apoie-pop .apoie-palco::before { animation: none; } }
+.coracao-pika, .coracao-txt { display: none; }
+@media (min-width: 900px) {
+  .so-ferr .topo .acoes-topo .coracao.coracao-pilula { display: inline-flex !important; align-items: center; gap: 8px; width: auto; height: 50px; padding: 0 18px 0 10px; border-radius: 999px; color: #fbcfe8; font-size: 14px; font-weight: 900; text-decoration: none; background: linear-gradient(180deg, rgba(236, 72, 153, 0.22), rgba(21, 11, 16, 0.72)); border: 1px solid rgba(244, 114, 182, 0.5); box-shadow: 0 0 18px rgba(236, 72, 153, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06); transition: box-shadow .2s, border-color .2s, transform .2s; }
+  .so-ferr .topo .acoes-topo .coracao.coracao-pilula:hover { border-color: rgba(244, 114, 182, 0.85); box-shadow: 0 0 26px rgba(236, 72, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
+  .coracao-pilula .coracao-pika { display: block; width: 29px; height: 31px; margin-top: -6px; image-rendering: pixelated; transform-origin: 50% 100%; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45)); animation: pika-tchau 5s ease-in-out infinite; }
+  .coracao-pilula .coracao-txt { display: inline; }
+  .coracao-pilula svg { width: 16px !important; height: 16px !important; color: #f472b6; animation: coracao-bate 5s ease-in-out infinite; }
+  .coracao-pilula:hover .coracao-pika { animation-duration: 1.2s; }
+}
+@keyframes pika-tchau { 0%, 58%, 100% { transform: rotate(0) translateY(0); } 62% { transform: rotate(-14deg) translateY(-3px); } 67% { transform: rotate(12deg) translateY(-3px); } 72% { transform: rotate(-12deg) translateY(-2px); } 77% { transform: rotate(10deg) translateY(-1px); } 82% { transform: rotate(0) translateY(0); } }
+@keyframes coracao-bate { 0%, 84%, 100% { transform: scale(1); } 87% { transform: scale(1.25); } 90% { transform: scale(1); } 93% { transform: scale(1.2); } 96% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .coracao-pilula .coracao-pika, .coracao-pilula svg { animation: none !important; } }
