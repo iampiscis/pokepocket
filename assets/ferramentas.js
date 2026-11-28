@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => { for (const c of document.q
     { p: 'posicionamento/', n: 'Posicionamento', ic: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 12h17"/><circle cx="12" cy="12" r="3"/><path d="M8 7.5h.01M16 7.5h.01M8 16.5h.01M12 16.5h.01M16 16.5h.01"/>') },
     { p: 'monte-seu-time/', n: 'Monte seu time', ic: svg('<path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>') },
     { p: 'farm/', n: 'Top farm', ic: svg('<path d="M4 19.5h16"/><path d="M7 16v-4M12 16V7M17 16v-7"/><path d="M14.5 4.5 17 3l1.5 2.5"/>') },
+    { p: 'shinies/', n: 'Shinies 24h', ic: svg('<path d="M12 2.5c.9 4.6 2.9 6.6 7.5 7.5-4.6.9-6.6 2.9-7.5 7.5-.9-4.6-2.9-6.6-7.5-7.5 4.6-.9 6.6-2.9 7.5-7.5z"/><path d="M19 16v4.5M16.75 18.25h4.5"/>') },
   ]
   const atual = location.pathname.slice(isolado.length).replace(/index\.html$/, '')
   const montar = (alvo, comTexto) => {
