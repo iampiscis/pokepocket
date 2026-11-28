@@ -50,12 +50,35 @@
   .farm-num.abates { grid-area: abates; }
   .farm-hunt { grid-area: hunt; }
 }
+.farm-curto { display: none; }
 @media (max-width: 700px) {
-  .farm-linha { grid-template-areas: "pos quem quem quem" "pk pk pk pk" "xp xp coins coins" "abates abates hunt hunt"; gap: 10px 12px; padding: 10px 12px; }
-  .farm-linha > .pos-lugar { align-self: center; }
-  .farm-num, .farm-hunt { padding: 8px 10px; border-radius: 10px; background: rgba(255, 233, 163, 0.04); }
-  .farm-num b { font-size: 18px; }
-  .farm-hunt b { font-size: 15px; }
+  .farm-longo { display: none; }
+  .farm-curto { display: inline; }
+  .farm-lista { gap: 5px; }
+  .farm-linha { grid-template-columns: 38px repeat(5, minmax(0, 1fr)); grid-template-areas: "pos quem quem quem xp xp" "pk pk pk pk pk pk" "coins coins abates abates hunt hunt"; gap: 5px 8px; min-height: 0; padding: 7px 10px 8px 7px; border-radius: 12px; }
+  .farm-linha > .pos-lugar { align-self: center; min-width: 0; padding: 1px 5px; font-size: 12.5px; }
+  .farm-nome { gap: 4px; }
+  .farm-nome .pos-nick { font-size: 14px; }
+  .farm-nome .pos-guild { height: 16px; padding: 0 5px 0 4px; font-size: 9.5px; }
+  .farm-nome .pos-guild svg { width: 9px; height: 9px; }
+  .farm-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; }
+  .farm-num.xp { justify-items: end; text-align: right; }
+  .farm-num.xp b { font-size: 19px; }
+  .farm-num.xp .farm-barra { justify-self: stretch; }
+  .farm-pk { grid-template-columns: 24px minmax(0, 1fr); gap: 6px; padding: 3px 6px 3px 3px; border-radius: 8px; background: rgba(255, 233, 163, 0.04); }
+  .farm-pk-img { width: 24px; height: 24px; border-radius: 6px; background: none; }
+  .farm-pk-img img { inset: 0; width: 24px; height: 24px; }
+  .farm-pk-img img.bola { inset: 5px; width: 14px; height: 14px; }
+  .farm-shiny { top: -4px; right: -4px; font-size: 8px; }
+  .farm-pk-txt { display: flex; align-items: baseline; gap: 6px; }
+  .farm-pk-txt b { font-size: 12px; }
+  .farm-pk-txt small { flex: none; font-size: 10.5px; }
+  .farm-num, .farm-hunt { gap: 0; padding: 0; background: none; }
+  .farm-num small, .farm-hunt small { font-size: 9px; letter-spacing: 0.04em; }
+  .farm-num b { font-size: 14.5px; }
+  .farm-hunt b { font-size: 13px; line-height: 1.15; white-space: nowrap; }
+  .farm-hunt em { display: none; }
+  .farm-barra { height: 2px; margin-top: 2px; }
   .farm-ordem { width: 100%; justify-content: space-between; }
-  .farm-chip { flex: 1; justify-content: center; padding: 0 8px; }
+  .farm-chip { flex: 1; justify-content: center; height: 30px; padding: 0 6px; font-size: 12.5px; }
 }

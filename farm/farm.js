@@ -94,7 +94,7 @@ function linha(j, i, maxXp) {
     el('span', { class: 'pos-lugar', text: `${i + 1}º` }),
     el('span', { class: 'farm-quem' }, [
       el('span', { class: 'farm-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
-      el('small', { class: 'farm-sub', text: ehNum(j.nivel) ? `Treinador Nv ${fmt.format(j.nivel)}` : '' })
+      el('small', { class: 'farm-sub' }, ehNum(j.nivel) ? [el('span', { class: 'farm-longo', text: 'Treinador ' }), `Nv ${fmt.format(j.nivel)}`] : [])
     ]),
     el('span', { class: 'farm-pk', title: pk ? '' : 'O pokémon que está farmando não está na vitrine do perfil' }, [
       el('span', { class: 'farm-pk-img' }, [pk ? sprite(pk) : el('img', { class: 'bola', src: BOLA, alt: '' }), pk?.shiny ? el('i', { class: 'farm-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
@@ -103,7 +103,7 @@ function linha(j, i, maxXp) {
     el('span', { class: `farm-num xp${ordem === 'xph' ? ' ativo' : ''}`, title: `${fmt.format(Math.round(j.xph))} XP por hora (medido)` }, [el('small', { text: 'XP/h' }), el('b', { text: curto(j.xph) }), el('i', { class: 'farm-barra', style: `--p:${Math.max(0.04, j.xph / maxXp)}` })]),
     el('span', { class: `farm-num coins${ordem === 'coinsh' ? ' ativo' : ''}`, title: ehNum(j.coinsh) ? `${fmt.format(Math.round(j.coinsh))} coins por hora (estimado pela hunt)` : 'Sem estimativa' }, [el('small', { text: 'Coins/h' }), el('b', { text: ehNum(j.coinsh) ? `≈${curto(j.coinsh)}` : '—' })]),
     el('span', { class: `farm-num abates${ordem === 'kph' ? ' ativo' : ''}`, title: `${fmt.format(Math.round(j.kph))} pokémon derrotados por hora (medido)` }, [el('small', { text: 'Abates/h' }), el('b', { text: fmt.format(Math.round(j.kph)) })]),
-    el('span', { class: 'farm-hunt', title: ex ? `Hunts de ${hunt}: ${ex}` : '' }, [el('small', { text: 'Hunt provável' }), el('b', { text: hunt }), el('em', { text: ex })])
+    el('span', { class: 'farm-hunt', title: ex ? `Hunt provável, ${hunt}: ${ex}` : 'Hunt provável' }, [el('small', {}, [el('span', { class: 'farm-longo', text: 'Hunt provável' }), el('span', { class: 'farm-curto', text: 'Hunt' })]), el('b', { text: hunt }), el('em', { text: ex })])
   ])
   return item
 }
