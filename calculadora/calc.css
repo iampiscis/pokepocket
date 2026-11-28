@@ -199,6 +199,8 @@ h1 { margin-top: 6px; font-family: var(--display); font-weight: 400; font-size: 
 .esc-f i { position: relative; display: block; height: 100%; border-radius: 3px; background: var(--c); transition: width 0.35s ease; }
 .esc-marca { position: absolute; top: 50%; z-index: 1; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px rgba(10, 5, 8, 0.85), 0 0 6px var(--c); transform: translate(-50%, -50%); }
 .v-cel .delta { padding: 0 7px; font-size: 11.5px; }
+.v-poder.v-coin { gap: 4px; color: #fde68a; }
+.v-coin .coin-ico { width: 13px; height: 13px; }
 .visor-acoes { grid-area: copiar; display: flex; align-items: center; gap: 8px; }
 .visor-copiar { width: 44px; height: 44px; padding: 0; border-radius: 12px; }
 .visor-novo { height: 44px; padding: 0 14px; border-radius: 12px; font-size: 13px; }

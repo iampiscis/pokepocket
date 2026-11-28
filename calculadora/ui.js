@@ -404,7 +404,7 @@ function pintarIdentidade() {
       dado('Qual', fmt3.format(h.quality), null, { style: `--vc:${corQual(h.quality)}`, class: 'cor-cel' }),
       (st.ui.notaHojeCel = dado('Nota', '', st.ui.notaHoje, { class: 'cor-cel' }))
     ]),
-    el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}${h.tmElemental ? ` · Z-\u2060Move ${nomeTipo(h.tmElemental)}${h.tmAoe ? ' em área' : ''}` : ''}` })]),
+    el('div', { class: 'id-sub' }, [el('span', { text: 'IVs' }), el('span', { text: `${fmt.format(somaIvs(h.ivs))}/192${ref ? ` · refino +${fmt.format(ref)}` : ''}${h.tmElemental ? ` · Z-\u2060Move ${nomeTipo(h.tmElemental)}` : ''}${h.tmAoe ? ' · AoE' : ''}` })]),
     el('div', { class: 'id-ivs' }, STATS.map(([k, rot]) => dado(rot, fmt.format(h.ivs[k]), null, { class: `cor-cel${h.ivs[k] >= 27 ? ' brilho' : ''}`, style: `--vc:${corIv(h.ivs[k])}` })))
   )
   pintarNotaHoje()
@@ -462,7 +462,8 @@ function montarSimulacao() {
 
   const tipoSel = el('select', { 'aria-label': 'Tipo do Z-Move' }, TIPOS.map((t) => el('option', { value: t, text: nomeTipo(t) })))
   const cat = seg([['e', 'Especial'], ['f', 'Físico']], s.tmFisico ? 'f' : 'e', (k) => { s.tmFisico = k === 'f'; mudou() }, 'Categoria do Z-Move')
-  const aoe = alternar('Em área', 'area', s.tmAoe, (v) => { s.tmAoe = v; mudou() })
+  const aoe = alternar('AoE', 'area', s.tmAoe, (v) => { s.tmAoe = v; mudou() }, 'chip-aoe')
+  aoe.title = 'Golpe em área (TM AoE)'
   const detalhe = el('div', { class: 'z-detalhe' }, [tipoSel, cat])
   tipoSel.value = s.tmElemental || 'NORMAL'
   tipoSel.addEventListener('change', () => { s.tmElemental = tipoSel.value; mudou() })
@@ -474,11 +475,9 @@ function montarSimulacao() {
       tipoSel.value = s.tmElemental
     } else s.tmElemental = null
     detalhe.hidden = !s.tmElemental
-    aoe.hidden = !s.tmElemental
     mudou()
   }, 'Z-Move')
-  aoe.hidden = !s.tmElemental
-  ui.z = bloco('zmove', 'Z-Move', [el('div', { class: 'z-topo' }, [z, aoe]), detalhe])
+  ui.z = bloco('zmove', 'Z-Move e AoE', [el('div', { class: 'z-topo' }, [z, aoe]), detalhe])
 
   const refino = STATS.map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
   ui.refino = bloco('refino', 'Refino', [el('div', { class: 'grade6' }, refino)])
@@ -501,7 +500,7 @@ function resumos() {
   else nasc.push(`P${s.potencia}`)
   if (s.shiny) nasc.push('shiny')
   ui.nasc.resumo.textContent = nasc.join(' · ')
-  ui.z.resumo.textContent = s.tmElemental ? `${nomeTipo(s.tmElemental)} · ${s.tmFisico ? 'físico' : 'especial'}${s.tmAoe ? ' · área' : ''}` : 'nenhum'
+  ui.z.resumo.textContent = s.tmElemental ? `${nomeTipo(s.tmElemental)} · ${s.tmFisico ? 'físico' : 'especial'}${s.tmAoe ? ' · AoE' : ''}` : s.tmAoe ? 'só AoE' : 'nenhum'
   const ref = somaRefino(s.refino)
   ui.refino.resumo.textContent = ref ? `+${fmt.format(ref)}` : 'nenhum'
 }
@@ -669,14 +668,29 @@ function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra 
   })
 }
 
-function celPreco(valor, p = null, dica = '') {
+function escalaConfianca(c) {
+  if (!ehNum(c)) return null
+  const v = Math.max(0, Math.min(100, Number(c)))
+  const segs = [[0, 40, '#f87171'], [40, 70, '#fbbf24'], [70, 100, '#4ade80']].map(([de, ate, cor]) => {
+    const cheio = Math.max(0, Math.min(1, (v - de) / (ate - de)))
+    const aqui = v >= de && (v < ate || ate === 100)
+    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}` }, [
+      el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
+      aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
+    ])
+  })
+  return el('span', { class: 'escala', 'aria-hidden': 'true' }, segs)
+}
+
+function celPreco(valor, p = null, dica = '', coins = null, conf = null) {
   return vCel({
     id: 'v-preco',
     classe: 'preco-v',
     icone: 'gema',
     rotulo: ['Preço', 'justo'],
     valor: el('b', { class: 'v-val rosa' }, [valor, valor !== '—' && valor !== '…' ? el('span', { class: 'gema-ico', 'aria-hidden': 'true' }) : null]),
-    pe: [p === undefined || p === null ? el('span', { class: 'delta igual', text: valor === '…' ? 'calculando' : '—' }) : pilula(p)],
+    barra: escalaConfianca(conf),
+    pe: [coins != null ? el('span', { class: 'v-poder v-coin' }, [el('span', { class: 'coin-ico', 'aria-hidden': 'true' }), coins]) : null, p === undefined || p === null ? el('span', { class: 'delta igual', text: valor === '…' ? 'calculando' : '—' }) : pilula(p)],
     dica
   })
 }
@@ -846,7 +860,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   if (!pronto) box.replaceChildren(cabPreco(el('span', { class: 'resumo', text: 'calculando…' })), el('div', { class: 'precos3' }, [el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' })]))
   const [ds, dh] = await Promise.all([pS, pH])
   if (seq !== st.seq) return
-  const trocaPreco = (valor, p = null, dica = '') => $('v-preco')?.replaceWith(celPreco(valor, p, dica))
+  const trocaPreco = (valor, p = null, dica = '', coins = null, conf = null) => $('v-preco')?.replaceWith(celPreco(valor, p, dica, coins, conf))
   if (!ds || ds.erro) {
     trocaPreco('—', null, 'Preço indisponível')
     box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: ds?.erro || 'Não consegui estimar o preço agora.' }))
@@ -860,7 +874,8 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   }
   const hojeJusto = dh && !dh.erro && ehNum(dh.gemas?.justo) ? Number(dh.gemas.justo) : null
   const p = hojeJusto ? variacao(hojeJusto, g.justo) : null
-  trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas`)
+  const coinsTopo = !pkS.shiny && ehNum(ds.coins?.justo) ? Number(ds.coins.justo) : null
+  trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas${coinsTopo != null ? ` ou ${grande(coinsTopo)} coins` : ''}${ehNum(ds.confianca) ? ` · confiança ${Math.round(ds.confianca)}%` : ''}`, coinsTopo != null ? grande(coinsTopo) : null, ds.confianca)
   const pontos = [['rapido', 'Rápido', g.rapido], ['justo', 'Justo', g.justo], ['esperar', 'Esperar', g.esperar]].filter(([, , v]) => ehNum(v))
   const valores = pontos.map(([, , v]) => Number(v))
   const min = Math.min(...valores)
