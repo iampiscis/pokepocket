@@ -96,9 +96,9 @@ function linha(j, i, maxXp) {
       el('span', { class: 'farm-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
       el('small', { class: 'farm-sub' }, ehNum(j.nivel) ? [el('span', { class: 'farm-longo', text: 'Treinador ' }), `Nv ${fmt.format(j.nivel)}`] : [])
     ]),
-    el('span', { class: 'farm-pk', title: pk ? '' : 'O pokémon que está farmando não está na vitrine do perfil' }, [
+    el('span', { class: 'farm-pk', title: pk ? '' : 'O pokémon que está farmando não aparece na vitrine nem no time de PvP do perfil' }, [
       el('span', { class: 'farm-pk-img' }, [pk ? sprite(pk) : el('img', { class: 'bola', src: BOLA, alt: '' }), pk?.shiny ? el('i', { class: 'farm-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
-      el('span', { class: 'farm-pk-txt' }, [el('b', { text: pk ? `${pk.shiny ? 'Shiny ' : ''}${pk.nome}` : 'Fora da vitrine' }), el('small', { text: pk && ehNum(pk.nivel) ? `Nv ${fmt.format(pk.nivel)}` : 'não aparece no perfil' })])
+      el('span', { class: 'farm-pk-txt' }, [el('b', { text: pk ? `${pk.shiny ? 'Shiny ' : ''}${pk.nome}` : 'Não exposto' }), el('small', { text: pk && ehNum(pk.nivel) ? `Nv ${fmt.format(pk.nivel)}` : 'não aparece no perfil' })])
     ]),
     el('span', { class: `farm-num xp${ordem === 'xph' ? ' ativo' : ''}`, title: `${fmt.format(Math.round(j.xph))} XP por hora (medido)` }, [el('small', { text: 'XP/h' }), el('b', { text: curto(j.xph) }), el('i', { class: 'farm-barra', style: `--p:${Math.max(0.04, j.xph / maxXp)}` })]),
     el('span', { class: `farm-num coins${ordem === 'coinsh' ? ' ativo' : ''}`, title: ehNum(j.coinsh) ? `${fmt.format(Math.round(j.coinsh))} coins por hora (estimado pela hunt)` : 'Sem estimativa' }, [el('small', { text: 'Coins/h' }), el('b', { text: ehNum(j.coinsh) ? `≈${curto(j.coinsh)}` : '—' })]),
@@ -119,7 +119,7 @@ function podio(ord) {
       el('span', { class: 'pod-lugar', text: `${i + 1}º` }),
       el('span', { class: 'pod-pk' }, [el('i', { class: 'pod-luz', 'aria-hidden': 'true' }), pk ? sprite(pk) : el('img', { class: 'bola', src: BOLA, alt: '' }), pk?.shiny ? el('i', { class: 'farm-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
       el('span', { class: 'pod-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
-      el('small', { class: 'pod-pkn', text: pk ? `${pk.shiny ? 'Shiny ' : ''}${pk.nome}` : 'Pokémon fora da vitrine' }),
+      el('small', { class: 'pod-pkn', text: pk ? `${pk.shiny ? 'Shiny ' : ''}${pk.nome}` : 'Pokémon não exposto' }),
       el('b', { class: 'pod-valor' }, [valor(j), el('small', { text: rot })]),
       el('span', { class: 'pod-mini' }, mini.map((t) => el('span', { text: t }))),
       el('span', { class: 'pod-hunt', text: ehNum(j.hunt) ? `Hunt Nv ${fmt.format(j.hunt)}` : '' })
@@ -143,7 +143,7 @@ function pintar() {
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como o top farm é medido' })]),
     el('div', { class: 'ex-grade' }, [
       bloco('⚡', 'XP e abates por hora', 'Medidos: diferença entre duas leituras do perfil público.'),
-      bloco('◎', 'Pokémon', 'O da vitrine que ganhou XP no intervalo.'),
+      bloco('◎', 'Pokémon', 'O da vitrine ou do time de PvP que ganhou XP no intervalo.'),
       bloco('⌖', 'Hunt provável', 'Faixa de nível pelo XP de cada abate; o jogo não mostra a hunt.'),
       bloco('$', 'Coins por hora', 'Estimadas pela faixa da hunt e pelos abates por hora.')
     ])
