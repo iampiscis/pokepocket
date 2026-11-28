@@ -185,6 +185,6 @@ function pintar() {
   corpo.replaceChildren(topo, pod, barra, vazio, lista)
   desenhar()
 }
-const bloco = (sim, tit, txt) => el('div', { class: 'ex-bloco' }, [el('span', { class: 'ex-sim', 'aria-hidden': 'true', text: sim }), el('b', { text: tit }), el('p', { text: txt })])
+const bloco = (sim, tit, txt) => el('div', { class: 'ex-bloco' }, [el('span', { class: 'ex-ico', 'aria-hidden': 'true', text: sim }), el('b', { text: tit }), el('span', { text: txt })])
 
 carregar()
