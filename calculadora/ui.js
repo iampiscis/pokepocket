@@ -460,23 +460,19 @@ function montarSimulacao() {
   }, 'shiny')
   ui.nasc = bloco('nascimento', 'Potência', [el('div', { class: 'linha' }, [el('div', { style: 'flex:1 1 200px;min-width:0' }, [pot]), shiny])])
 
-  const tipoSel = el('select', { 'aria-label': 'Tipo do Z-Move' }, TIPOS.map((t) => el('option', { value: t, text: nomeTipo(t) })))
-  const cat = seg([['e', 'Especial'], ['f', 'Físico']], s.tmFisico ? 'f' : 'e', (k) => { s.tmFisico = k === 'f'; mudou() }, 'Categoria do Z-Move')
   const aoe = seg([['sem', 'Sem AoE'], ['com', 'Com AoE']], s.tmAoe ? 'com' : 'sem', (k) => { s.tmAoe = k === 'com'; mudou() }, 'AoE')
-  const detalhe = el('div', { class: 'z-detalhe' }, [tipoSel, cat])
-  tipoSel.value = s.tmElemental || 'NORMAL'
-  tipoSel.addEventListener('change', () => { s.tmElemental = tipoSel.value; mudou() })
-  detalhe.hidden = !s.tmElemental
   const z = seg([['sem', 'Sem Z-Move'], ['com', 'Com Z-Move']], s.tmElemental ? 'com' : 'sem', (k) => {
     if (k === 'com') {
       const tipos = st.res?.s?.tipos || formaSim()?.tipos || []
-      s.tmElemental = s.tmElemental || (TIPOS.includes(String(tipos[0]).toUpperCase()) ? String(tipos[0]).toUpperCase() : 'NORMAL')
-      tipoSel.value = s.tmElemental
+      if (!s.tmElemental) {
+        s.tmElemental = TIPOS.includes(String(tipos[0]).toUpperCase()) ? String(tipos[0]).toUpperCase() : 'NORMAL'
+        const at = st.res?.s?.stats
+        s.tmFisico = !!at && Number(at.atk) > Number(at.spAtk)
+      }
     } else s.tmElemental = null
-    detalhe.hidden = !s.tmElemental
     mudou()
   }, 'Z-Move')
-  ui.z = bloco('zmove', 'Z-Move', [z, detalhe])
+  ui.z = bloco('zmove', 'Z-Move', [z])
   ui.aoe = bloco('area', 'AoE', [aoe])
 
   const refino = STATS.map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
