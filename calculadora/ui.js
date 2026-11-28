@@ -72,7 +72,7 @@ function normal(x = {}) {
   const refino = {}
   for (const [k] of STATS) {
     ivs[k] = inteiro(x.ivs?.[k], 0, 32)
-    refino[k] = inteiro(x.refino?.[k], 0, 999)
+    refino[k] = k === 'speed' ? 0 : inteiro(x.refino?.[k], 0, 999)
   }
   const q = Number(x.quality)
   const tm = String(x.tmElemental || '').toUpperCase()
@@ -475,8 +475,8 @@ function montarSimulacao() {
   ui.z = bloco('zmove', 'Z-Move', [z])
   ui.aoe = bloco('area', 'AoE', [aoe])
 
-  const refino = STATS.map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
-  ui.refino = bloco('refino', 'Refino', [el('div', { class: 'grade6' }, refino)])
+  const refino = STATS.filter(([k]) => k !== 'speed').map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
+  ui.refino = bloco('refino', 'Refino', [el('div', { class: 'grade6 grade-refino' }, refino)])
   ui.refino.classList.add('larga')
   if (secForma) secForma.classList.add('larga')
 

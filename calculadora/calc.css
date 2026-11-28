@@ -351,6 +351,7 @@ select option { background: #1c1016; color: var(--tinta); }
 
 .grade6 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .larga .grade6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.larga .grade-refino { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .celula { display: grid; gap: 3px; min-width: 0; }
 .celula > span { font-size: 11px; font-weight: 900; letter-spacing: 0.05em; color: var(--suave); white-space: nowrap; }
 .duas-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: end; }
@@ -706,4 +707,7 @@ details[open] .det-seta { transform: rotate(180deg); }
   .v-cel.preco-v .v-precos { grid-area: val; justify-self: end; justify-items: end; row-gap: 6px; }
   .v-cel .v-precos .v-val { grid-area: auto; font-size: 20px; }
   .v-cel.preco-v:has(.v-precos) .v-pe { justify-content: flex-end; }
+}
+@media (max-width: 560px) {
+  .grade-refino > :last-child { grid-column: 1 / -1; }
 }
