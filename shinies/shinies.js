@@ -17,6 +17,10 @@ const CURVA = 1.8
 const ORDENS = [['recentes', 'Captura recente'], ['favoritos', 'Mais favoritados'], ['nota', 'Maior nota'], ['pvp', 'Maior Score PvP'], ['pvpJogo', 'Maior Score PvE'], ['preco', 'Menor preço']]
 const LADOS = [['todos', 'Todos'], ['venda', 'À venda'], ['fora', 'Fora']]
 const POR_PAGINA = 30
+const GIST = 'https://api.github.com/gists/963037f07afd92147bc65b48170645d2'
+const A_CADA = 60000
+const NOVO_POR = 10 * 60000
+const DIA = 24 * 3600000
 
 const ICO = {
   busca: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
@@ -168,11 +172,11 @@ function cartao(l) {
   const notaFinal = Number.isFinite(nf) && l.nf != null && !(Number(l.nota) >= nf - 0.0005) ? el('div', { class: 'sh-nf' }, [el('strong', { style: `color:${faixaNota(nf)?.[2] || 'inherit'}`, text: `Nota final ${fmtNota.format(nf)}` }), el('span', { text: 'se evoluir' })]) : null
   const fav = Number(l.an?.fav) || 0
   const meta = [el('span', { class: 'sh-dono', text: `de ${l.dono || '?'}` }), fav > 0 ? el('span', { class: 'sh-fav', title: `${fmt.format(fav)} ${fav === 1 ? 'jogador favoritou' : 'jogadores favoritaram'} este anúncio` }, [ico('coracao', true), el('span', { text: fmt.format(fav) })]) : null, ehNum(l.em) ? el('span', { class: 'sh-ha', title: `Capturado em ${fmtDia.format(new Date(l.em))} às ${fmtHora.format(new Date(l.em))}`, text: fmtHa(Date.now() - l.em) }) : null].filter(Boolean)
-  return el('article', { class: 'sh-cartao' }, [
+  return el('article', { class: `sh-cartao${ehNovo(l) ? ' sh-recente' : ''}${acabouDeChegar(l) ? ' sh-chegou' : ''}` }, [
     el('div', { class: 'sh-topo' }, [
       el('span', { class: 'sh-arte' }, [sprite(l), el('i', { class: 'sh-brilho', 'aria-hidden': 'true', text: '✦' })]),
       el('div', { class: 'sh-id' }, [
-        el('div', { class: 'sh-nome' }, [el('b', { text: l.nome || 'Pokémon' }), ehNum(l.nv) ? el('span', { class: 'sh-nv', text: `Nv ${fmt.format(l.nv)}` }) : null]),
+        el('div', { class: 'sh-nome' }, [el('b', { text: l.nome || 'Pokémon' }), ehNum(l.nv) ? el('span', { class: 'sh-nv', text: `Nv ${fmt.format(l.nv)}` }) : null, ehNovo(l) ? el('span', { class: 'sh-novo', text: 'novo' }) : null]),
         el('div', { class: 'sh-linha2' }, [
           el('span', { class: 'sh-selo', style: fx ? `--n:${fx[2]}` : null, title: fx ? `Nota ${fmtNota.format(nota)} · ${fx[1]}` : 'Sem nota' }, [ico('estrela', true), el('span', { text: nota != null ? fmtNota.format(nota) : 'shiny' })]),
           ...tipos.map((t) => el('span', { class: 'chip-tipo sh-tipo', style: `--c:${COR_TIPO[t]}`, text: NOME_TIPO[t] }))
@@ -197,20 +201,75 @@ let dados = null
 let limite = POR_PAGINA
 let aberto = false
 
+async function lerGist() {
+  const r = await fetch(GIST, { cache: 'no-cache' })
+  if (!r.ok) throw new Error(`HTTP ${r.status}`)
+  const f = (await r.json())?.files?.['shinies.json']
+  if (!f) throw new Error('sem arquivo')
+  if (!f.truncated) return JSON.parse(f.content)
+  const raw = await fetch(f.raw_url, { cache: 'no-cache' })
+  if (!raw.ok) throw new Error(`HTTP ${raw.status}`)
+  return raw.json()
+}
+async function lerEstatico() {
+  const r = await fetch(`shinies.json?t=${Math.floor(Date.now() / 300000)}`, { cache: 'no-cache' })
+  if (!r.ok) throw new Error(`HTTP ${r.status}`)
+  return r.json()
+}
+const vistos = new Map()
+let pausaGistAte = 0
+function receber(d) {
+  const corte = Date.now() - DIA
+  d.linhas = (d.linhas || []).filter((l) => !ehNum(l.em) || Number(l.em) >= corte)
+  const primeira = !dados
+  const agora = Date.now()
+  for (const l of d.linhas) if (!vistos.has(l.id)) vistos.set(l.id, primeira ? 0 : agora)
+  dados = d
+}
+const ehNovo = (l) => (vistos.get(l.id) || 0) > Date.now() - NOVO_POR
+const acabouDeChegar = (l) => (vistos.get(l.id) || 0) > Date.now() - A_CADA + 5000
+async function buscar() {
+  if (Date.now() >= pausaGistAte) {
+    try { return { d: await lerGist(), vivo: true } } catch { pausaGistAte = Date.now() + 5 * 60000 }
+  }
+  return { d: await lerEstatico(), vivo: false }
+}
 async function carregar() {
   const corpo = $('sh-corpo')
   corpo.replaceChildren(el('div', { class: 'carga vao' }, [el('img', { class: 'carga-bola', src: BOLA, alt: '' }), el('b', { text: 'Carregando os shinies' })]))
   try {
-    const r = await fetch(`shinies.json?t=${Math.floor(Date.now() / 300000)}`, { cache: 'no-cache' })
-    if (!r.ok) throw new Error(`HTTP ${r.status}`)
-    dados = await r.json()
+    const { d, vivo } = await buscar()
+    receber(d)
+    dados.vivo = vivo
     montar()
+    if (!document.documentElement.classList.contains('embed')) agendada = setTimeout(atualizar, A_CADA)
   } catch {
     const tentar = el('button', { type: 'button', class: 'botao pequeno', text: 'Tentar de novo' })
     tentar.onclick = carregar
     corpo.replaceChildren(el('div', { class: 'carga vao falhou' }, [el('b', { text: 'Não deu para carregar os shinies agora.' }), tentar]))
   }
 }
+let ultimaBusca = Date.now()
+let agendada = null
+async function atualizar() {
+  clearTimeout(agendada)
+  if (document.hidden) return
+  ultimaBusca = Date.now()
+  try {
+    const { d, vivo } = await buscar()
+    const antes = dados?.lidoEm
+    if (d.lidoEm !== antes || vivo !== dados?.vivo) {
+      receber(d)
+      dados.vivo = vivo
+      pintarInds()
+      const digitando = topo.contains(document.activeElement)
+      if (aberto || digitando) pintarLista()
+      else pintar()
+    } else pintarInds()
+  } catch {}
+  agendada = setTimeout(atualizar, A_CADA)
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && dados && Date.now() - ultimaBusca > A_CADA) atualizar() })
 
 const topo = el('div', { class: 'sh-filtros' })
 const contagem = el('p', { class: 'sh-contagem' })
@@ -324,6 +383,21 @@ function pintar() {
   pintarLista()
 }
 
+const infoUl = el('ul', { class: 'indicadores', 'aria-label': 'Resumo' })
+function pintarInds() {
+  const ls = dados.linhas || []
+  const jogadores = new Set(ls.map((l) => String(l.dono || '').toLowerCase())).size
+  const g = new Date(dados.lidoEm || dados.geradoEm)
+  const ind = (icone, texto, titulo, classe = '') => el('li', { class: `ind ind-${icone}${classe}`, title: titulo || null }, [ico(icone), el('span', { text: texto })])
+  const vivo = dados.vivo && !Number.isNaN(g.getTime()) && Date.now() - g.getTime() < 15 * 60000
+  infoUl.replaceChildren(...[
+    vivo ? el('li', { class: 'ind sh-vivo', title: 'A lista se atualiza sozinha a cada minuto' }, [el('i', { class: 'sh-vivo-ponto', 'aria-hidden': 'true' }), el('span', { text: 'Ao vivo' })]) : null,
+    ind('shiny', `${fmt.format(ls.length)} ${ls.length === 1 ? 'shiny' : 'shinies'}`, 'Capturados nas últimas 24 h'),
+    ind('jogadores', `${fmt.format(jogadores)} ${jogadores === 1 ? 'jogador' : 'jogadores'}`),
+    ind('venda', `${fmt.format(ls.filter((l) => l.an).length)} à venda`),
+    Number.isNaN(g.getTime()) ? null : ind('hora', `${vivo ? 'Atualizado' : 'Lido'} ${fmtDia.format(g)} às ${fmtHora.format(g)}`, 'Hora da última leitura da lista de shinies do jogo')
+  ].filter(Boolean))
+}
 function montar() {
   const corpo = $('sh-corpo')
   const ls = dados.linhas || []
@@ -332,17 +406,8 @@ function montar() {
     corpo.replaceChildren(el('div', { class: 'sh-lista' }, top.map(cartao)))
     return
   }
-  const jogadores = new Set(ls.map((l) => String(l.dono || '').toLowerCase())).size
-  const g = new Date(dados.lidoEm || dados.geradoEm)
-  const ind = (icone, texto, titulo) => el('li', { class: `ind ind-${icone}`, title: titulo || null }, [ico(icone), el('span', { text: texto })])
-  const inds = [
-    ind('shiny', `${fmt.format(ls.length)} ${ls.length === 1 ? 'shiny' : 'shinies'}`, 'Capturados nas últimas 24 h da leitura'),
-    ind('jogadores', `${fmt.format(jogadores)} ${jogadores === 1 ? 'jogador' : 'jogadores'}`),
-    ind('venda', `${fmt.format(ls.filter((l) => l.an).length)} à venda`),
-    Number.isNaN(g.getTime()) ? null : ind('hora', `Lido ${fmtDia.format(g)} às ${fmtHora.format(g)}`, 'Hora da leitura da lista de shinies do jogo')
-  ].filter(Boolean)
-  contagem.replaceChildren()
-  corpo.replaceChildren(el('div', { class: 'info-linha' }, [el('ul', { class: 'indicadores', 'aria-label': 'Resumo' }, inds)]), topo, lista, mais)
+  pintarInds()
+  corpo.replaceChildren(el('div', { class: 'info-linha' }, [infoUl]), topo, lista, mais)
   pintar()
 }
 
