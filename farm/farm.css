@@ -41,16 +41,21 @@
 .farm-hunt em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--apagado); }
 
 @media (max-width: 1100px) {
-  .farm-linha { grid-template-columns: 42px minmax(0, 1fr) minmax(0, 1fr); row-gap: 8px; }
-  .farm-num, .farm-hunt { grid-row: 2; }
-  .farm-linha > .farm-num.xp { grid-column: 2; }
-  .farm-linha > .farm-num.coins { grid-column: 3; }
-  .farm-linha > .farm-num.abates { grid-column: 2; grid-row: 3; }
-  .farm-linha > .farm-hunt { grid-column: 3; grid-row: 3; }
+  .farm-linha { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "pos quem pk pk" "xp coins abates hunt"; row-gap: 10px; }
+  .farm-linha > .pos-lugar { grid-area: pos; justify-self: start; }
+  .farm-quem { grid-area: quem; }
+  .farm-pk { grid-area: pk; }
+  .farm-num.xp { grid-area: xp; }
+  .farm-num.coins { grid-area: coins; }
+  .farm-num.abates { grid-area: abates; }
+  .farm-hunt { grid-area: hunt; }
 }
-@media (max-width: 560px) {
-  .farm-linha { grid-template-columns: 40px minmax(0, 1fr); }
-  .farm-pk { grid-column: 1 / -1; }
-  .farm-linha > .farm-num.xp, .farm-linha > .farm-num.coins, .farm-linha > .farm-num.abates, .farm-linha > .farm-hunt { grid-column: auto; grid-row: auto; }
+@media (max-width: 700px) {
+  .farm-linha { grid-template-areas: "pos quem quem quem" "pk pk pk pk" "xp xp coins coins" "abates abates hunt hunt"; gap: 10px 12px; padding: 10px 12px; }
+  .farm-linha > .pos-lugar { align-self: center; }
+  .farm-num, .farm-hunt { padding: 8px 10px; border-radius: 10px; background: rgba(255, 233, 163, 0.04); }
+  .farm-num b { font-size: 18px; }
+  .farm-hunt b { font-size: 15px; }
   .farm-ordem { width: 100%; justify-content: space-between; }
+  .farm-chip { flex: 1; justify-content: center; padding: 0 8px; }
 }
