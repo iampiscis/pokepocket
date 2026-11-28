@@ -302,7 +302,7 @@ select option { background: #1c1016; color: var(--tinta); }
 .tipo { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11.5px; font-weight: 900; line-height: 1.55; color: #fff; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45); background: var(--c, #777); white-space: nowrap; }
 .etiqueta { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11.5px; font-weight: 900; line-height: 1.55; color: #2a1a12; background: linear-gradient(180deg, #e9d5ff, #a78bfa); white-space: nowrap; }
 
-.identidade { display: grid; gap: 10px; padding: 12px; border-radius: 14px; background: var(--vao); box-shadow: inset 0 0 0 3px #480e1e, 0 3px 0 #e7a86d; }
+.identidade { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 12px; border-radius: 14px; background: var(--vao); box-shadow: inset 0 0 0 3px #480e1e, 0 3px 0 #e7a86d; }
 .id-topo { display: grid; grid-template-columns: 60px minmax(0, 1fr); align-items: center; gap: 10px; }
 .id-topo .sprite { width: 60px; height: 60px; border-radius: 12px; background-color: #1a0d13; }
 .id-nome { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
@@ -314,7 +314,8 @@ select option { background: #1c1016; color: var(--tinta); }
 .id-dados b, .id-ivs b { font-weight: 900; font-size: 15px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .id-ivs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
 .id-sub { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; color: var(--suave); }
-.id-sub span:last-child { color: var(--apagado); white-space: nowrap; }
+.id-sub span:first-child { flex: none; }
+.id-sub span:last-child { min-width: 0; color: var(--apagado); text-align: right; text-wrap: balance; }
 .estrela { color: var(--ouro); }
 .estrela svg { fill: currentColor; }
 
