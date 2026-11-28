@@ -1262,7 +1262,7 @@ async function imagemPrevia(s, resumo) {
     poderPve: ehNum(s.pve) ? s.pve : null,
     justo: resumo.justo,
     vendas: resumo.vendas ?? null,
-    sprite: png ? { url: new URL(png.url, location.href).href, x: 0, y: 0, w: png.w, h: png.h } : null
+    sprite: png ? { url: new URL(png.url, document.baseURI).href, x: 0, y: 0, w: png.w, h: png.h } : null
   })
 }
 
