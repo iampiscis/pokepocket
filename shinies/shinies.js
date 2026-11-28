@@ -17,7 +17,7 @@ const CURVA = 1.8
 const ORDENS = [['recentes', 'Captura recente'], ['favoritos', 'Mais favoritados'], ['nota', 'Maior nota'], ['pvp', 'Maior Score PvP'], ['pvpJogo', 'Maior Score PvE'], ['preco', 'Menor preço']]
 const LADOS = [['todos', 'Todos'], ['venda', 'À venda'], ['fora', 'Fora']]
 const POR_PAGINA = 30
-const GIST = 'https://api.github.com/gists/963037f07afd92147bc65b48170645d2'
+const AO_VIVO = 'https://api.github.com/repos/iampiscis/pokepocket/contents/shinies.json?ref=shinies'
 const A_CADA = 60000
 const NOVO_POR = 10 * 60000
 const DIA = 24 * 3600000
@@ -207,15 +207,10 @@ let dados = null
 let limite = POR_PAGINA
 let aberto = false
 
-async function lerGist() {
-  const r = await fetch(GIST, { cache: 'no-cache' })
+async function lerAoVivo() {
+  const r = await fetch(AO_VIVO, { cache: 'no-cache', headers: { accept: 'application/vnd.github.raw' } })
   if (!r.ok) throw new Error(`HTTP ${r.status}`)
-  const f = (await r.json())?.files?.['shinies.json']
-  if (!f) throw new Error('sem arquivo')
-  if (!f.truncated) return JSON.parse(f.content)
-  const raw = await fetch(f.raw_url, { cache: 'no-cache' })
-  if (!raw.ok) throw new Error(`HTTP ${raw.status}`)
-  return raw.json()
+  return r.json()
 }
 async function lerEstatico() {
   const r = await fetch(`shinies.json?t=${Math.floor(Date.now() / 300000)}`, { cache: 'no-cache' })
@@ -223,7 +218,7 @@ async function lerEstatico() {
   return r.json()
 }
 const vistos = new Map()
-let pausaGistAte = 0
+let pausaAoVivoAte = 0
 function receber(d) {
   const corte = Date.now() - DIA
   d.linhas = (d.linhas || []).filter((l) => !ehNum(l.em) || Number(l.em) >= corte)
@@ -235,8 +230,8 @@ function receber(d) {
 const ehNovo = (l) => (vistos.get(l.id) || 0) > Date.now() - NOVO_POR
 const acabouDeChegar = (l) => (vistos.get(l.id) || 0) > Date.now() - A_CADA + 5000
 async function buscar() {
-  if (Date.now() >= pausaGistAte) {
-    try { return { d: await lerGist(), vivo: true } } catch { pausaGistAte = Date.now() + 5 * 60000 }
+  if (Date.now() >= pausaAoVivoAte) {
+    try { return { d: await lerAoVivo(), vivo: true } } catch { pausaAoVivoAte = Date.now() + 5 * 60000 }
   }
   return { d: await lerEstatico(), vivo: false }
 }
