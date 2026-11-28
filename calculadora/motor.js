@@ -395,6 +395,19 @@ async function carregarModeloPreco() {
   return pub
 }
 
+const CAMBIO_RAMO = 'https://raw.githubusercontent.com/iampiscis/pokepocket/cambio/cambio.json'
+let cambioCache = null
+async function cambioMercado() {
+  if (!cambioCache || Date.now() - cambioCache.lido > 10 * 60000) {
+    const lido = Date.now()
+    cambioCache = { lido, p: fetch(CAMBIO_RAMO, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null) }
+  }
+  const c = await cambioCache.p
+  const taxa = Number(c?.taxa)
+  const em = Number(c?.em)
+  return taxa > 0 && em > 0 && Date.now() - em < 36 * 3600000 ? taxa : null
+}
+
 let conferidoPrecoEm = 0
 export async function atualizarModeloPreco() {
   if (!modeloPreco) return false
@@ -429,6 +442,7 @@ export async function preco(pk) {
       confianca: g?.confianca ?? null,
       vendas: g?.grupo ?? 0,
       adicionais: [],
+      cambio: await cambioMercado(),
       atualizadoEm: pub.dadosAte,
       versaoModelo: pub.versaoModelo ?? null
     }

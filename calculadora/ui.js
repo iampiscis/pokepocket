@@ -232,8 +232,8 @@ function codificar() {
   if (h.tmElemental) {
     p.set('hz', h.tmElemental.toLowerCase())
     if (h.tmFisico) p.set('hzf', '1')
-    if (h.tmAoe) p.set('hza', '1')
   }
+  if (h.tmAoe) p.set('hza', '1')
   if (s.speciesId !== h.speciesId) p.set('f', s.speciesId)
   p.set('sn', s.level)
   if (s.potencia !== h.potencia) p.set('sp', s.potencia)
@@ -242,8 +242,8 @@ function codificar() {
   if (s.tmElemental) {
     p.set('z', s.tmElemental.toLowerCase())
     if (s.tmFisico) p.set('zf', '1')
-    if (s.tmAoe) p.set('za', '1')
   }
+  if (s.tmAoe) p.set('za', '1')
   return p.toString()
 }
 
@@ -631,7 +631,7 @@ function vCel({ id = null, classe = '', icone, rotulo, valor, barra = null, pe =
   ])
 }
 
-const pilula = (p) => el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) })
+const pilula = (p) => (p == null || p === 0 ? null : el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) }))
 
 const COR_TIER = { 'S+': '#ff7ec8', S: '#ffc02e', 'S-': '#ffd34d', 'A+': '#4ade80', A: '#42c97a', 'A-': '#3a9a5c', 'B+': '#7dd3fc', B: '#1fa5f5', 'B-': '#5b8fd6', C: '#b9aeb3', D: '#8a8086' }
 function tierDoScore(v) {
@@ -663,20 +663,48 @@ function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra 
     rotulo,
     valor: el('b', { class: 'v-val' }, [v != null ? fmt.format(v) : '—', d ? el('small', { class: `v-dif ${classeDelta(d)}`, text: `${d > 0 ? '+' : '−'}${fmt.format(Math.abs(d))}` }) : null]),
     barra: escalaScore(v ?? NaN),
-    pe: [el('span', { class: 'v-poder' }, [ico(iconePoder, 12, 'ico-v'), grande(pod)]), pilula(variacao(podHoje, pod)), icone === 'pvp' && tierDoScore(v) ? el('a', { class: 'v-tier', href: '../tier/', style: `--ct:${COR_TIER[tierDoScore(v)] || '#ffd34d'}`, text: `Tier ${tierDoScore(v)}` }) : null],
+    pe: [el('span', { class: 'v-poder' }, [ico(iconePoder, 12, 'ico-v'), grande(pod)]), pilula(variacao(podHoje, pod))],
     dica: [faixa ? `Score ${rotulo} ${fmt.format(v)} de 1000 (${faixa[1]})` : '', icone === 'pvp' && tierDoScore(v) ? `Tier ${tierDoScore(v)} no meta de hoje` : '', `Poder ${rotulo} ${grande(pod)}`, dicaExtra].filter(Boolean).join(' · ')
   })
 }
 
-function celPreco(valor, p = null, dica = '', coins = null, conf = null) {
+const TAXA_FAIXAS_ORB = [[500, 1300], [5000, 1000], [Infinity, 750]]
+function liquidoVenda(total, moeda) {
+  const t = Math.floor(Number(total) || 0)
+  if (t <= 0) return 0
+  if (moeda === 'gold') return Math.floor((t * 8500) / 10000)
+  let piso = 0
+  let bp = 0
+  for (const [ate, bpFaixa] of TAXA_FAIXAS_ORB) {
+    const teto = Math.min(t, ate)
+    if (teto <= piso) break
+    bp += (teto - piso) * bpFaixa
+    piso = teto
+  }
+  return t - Math.min(t, Math.ceil(bp / 10000))
+}
+function melhorMoeda(gemasJusto, coinsJusto, cambio) {
+  if (!ehNum(gemasJusto) || !ehNum(coinsJusto) || !(cambio > 0)) return null
+  const viaGemas = liquidoVenda(gemasJusto, 'orb') * cambio
+  const viaCoins = liquidoVenda(coinsJusto, 'gold')
+  if (!(viaGemas > 0) || !(viaCoins > 0)) return null
+  const r = viaGemas / viaCoins
+  if (Math.abs(r - 1) < 0.05) return null
+  return { moeda: r > 1 ? 'orb' : 'gold', ganho: Math.round((Math.max(r, 1 / r) - 1) * 100), viaGemas, viaCoins }
+}
+
+function celPreco(valor, p = null, dica = '', coins = null, conf = null, melhor = null) {
   return vCel({
     id: 'v-preco',
     classe: 'preco-v',
     icone: 'gema',
     rotulo: ['Preço', 'justo'],
-    valor: el('b', { class: 'v-val rosa' }, [valor, valor !== '—' && valor !== '…' ? el('span', { class: 'gema-ico', 'aria-hidden': 'true' }) : null]),
-    barra: coins != null ? el('span', { class: 'escala v-divisor', 'aria-hidden': 'true' }) : null,
-    pe: [coins != null ? el('span', { class: 'v-poder v-coin' }, [el('span', { class: 'coin-ico', 'aria-hidden': 'true' }), coins]) : null, p === undefined || p === null ? el('span', { class: 'delta igual', text: valor === '…' ? 'calculando' : '—' }) : pilula(p)],
+    valor: (() => {
+      const selo = (m) => (melhor?.moeda === m ? el('span', { class: 'v-melhor', title: `Vendendo em ${m === 'orb' ? 'Gemas' : 'Coins'} você recebe cerca de ${melhor.ganho}% a mais, já descontadas as taxas e pelo câmbio de hoje`, text: `+${melhor.ganho}%` }) : null)
+      const g = el('b', { class: `v-val rosa${melhor && melhor.moeda !== 'orb' ? ' v-pior' : ''}` }, [valor, valor !== '—' && valor !== '…' ? el('span', { class: 'gema-ico', 'aria-hidden': 'true' }) : null, selo('orb')])
+      return coins == null ? g : el('span', { class: 'v-precos' }, [g, el('b', { class: `v-val v-val-coin${melhor && melhor.moeda !== 'gold' ? ' v-pior' : ''}` }, [coins, el('span', { class: 'coin-ico', 'aria-hidden': 'true' }), selo('gold')])])
+    })(),
+    pe: [valor === '…' ? el('span', { class: 'delta igual', text: 'calculando' }) : pilula(p)],
     dica
   })
 }
@@ -688,7 +716,10 @@ function pintarVisor() {
     sprite(lookDe(f, st.sim.shiny), 56),
     el('div', { style: 'min-width:0' }, [
       el('span', { class: 'tag', text: 'Resultado' }),
-      el('strong', {}, [s.nome || f?.nome || '', st.sim.shiny ? ico('estrela', 14, 'estrela') : null]),
+      el('div', { class: 'id-nome-linha' }, [
+        el('strong', {}, [s.nome || f?.nome || '', st.sim.shiny ? ico('estrela', 14, 'estrela') : null]),
+        tierDoScore(s.score?.pvp) ? el('a', { class: 'v-tier', href: '../tier/', title: `Tier ${tierDoScore(s.score.pvp)} no meta PvP de hoje`, style: `--ct:${COR_TIER[tierDoScore(s.score.pvp)] || '#ffd34d'}`, text: tierDoScore(s.score.pvp) }) : null
+      ]),
       el('span', { class: 'v-sub' }, [`Nv ${fmt.format(st.sim.level)} · `, el('b', { class: 'pot-txt', style: `color:${COR_POT[st.sim.potencia]}`, text: `P${st.sim.potencia}` })])
     ])
   )
@@ -700,7 +731,7 @@ function pintarVisor() {
     rotulo: 'Nota',
     valor: el('b', { class: 'v-val', style: fn ? `color:${fn[2]}` : null }, [ehNum(s.nota) ? fmtNota(s.nota) : '—', el('small', { text: '/10' })]),
     barra: escalaNota(s.nota),
-    pe: [fn ? el('span', { class: 'v-nome', style: `color:${fn[2]}`, text: fn[1] }) : null, dn == null ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: dn ? `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))}` : 'igual' })],
+    pe: [fn ? el('span', { class: 'v-nome', style: `color:${fn[2]}`, text: fn[1] }) : null, !dn ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))}` })],
     dica: fn ? `Nota do jogo: ${fmtNota(s.nota)}, ${fn[1]}` : 'Nota do jogo, de 0 a 10'
   })
   $('visor-cels').replaceChildren(
@@ -746,7 +777,7 @@ function pintarScoreInfo() {
   nota.replaceChildren(
     el('span', { class: 'luta-rot', text: 'Nota do jogo' }),
     el('div', { class: 'nd-valor' }, [el('b', { style: `color:${f[2]}`, text: fmtNota(s.nota) }), el('small', { text: '/10' })]),
-    el('div', { class: 'nd-pe' }, [el('span', { class: 'selo', style: `--cor:${f[2]}`, text: f[1] }), dn == null ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: dn ? `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))} vs hoje` : 'igual a hoje' })]),
+    el('div', { class: 'nd-pe' }, [el('span', { class: 'selo', style: `--cor:${f[2]}`, text: f[1] }), !dn ? null : el('span', { class: `delta ${classeDelta(dn)}`, text: `${dn > 0 ? '+' : '−'}${fmt3.format(Math.abs(dn))} vs hoje` })]),
     escalaNota(s.nota)
   )
 }
@@ -846,7 +877,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   if (!pronto) box.replaceChildren(cabPreco(el('span', { class: 'resumo', text: 'calculando…' })), el('div', { class: 'precos3' }, [el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' }), el('div', { class: 'esqueleto' })]))
   const [ds, dh] = await Promise.all([pS, pH])
   if (seq !== st.seq) return
-  const trocaPreco = (valor, p = null, dica = '', coins = null, conf = null) => $('v-preco')?.replaceWith(celPreco(valor, p, dica, coins, conf))
+  const trocaPreco = (valor, p = null, dica = '', coins = null, conf = null, melhor = null) => $('v-preco')?.replaceWith(celPreco(valor, p, dica, coins, conf, melhor))
   if (!ds || ds.erro) {
     trocaPreco('—', null, 'Preço indisponível')
     box.replaceChildren(cabPreco(), el('p', { class: 'preco-nota', text: ds?.erro || 'Não consegui estimar o preço agora.' }))
@@ -861,7 +892,8 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
   const hojeJusto = dh && !dh.erro && ehNum(dh.gemas?.justo) ? Number(dh.gemas.justo) : null
   const p = hojeJusto ? variacao(hojeJusto, g.justo) : null
   const coinsTopo = !pkS.shiny && ehNum(ds.coins?.justo) ? Number(ds.coins.justo) : null
-  trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas${coinsTopo != null ? ` ou ${grande(coinsTopo)} coins` : ''}${ehNum(ds.confianca) ? ` · confiança ${Math.round(ds.confianca)}%` : ''}`, coinsTopo != null ? grande(coinsTopo) : null, ds.confianca)
+  const melhor = coinsTopo != null ? melhorMoeda(g.justo, coinsTopo, ds.cambio) : null
+  trocaPreco(Math.abs(g.justo) >= 100000 ? fmtCurto.format(g.justo) : gemas(g.justo), hojeJusto != null ? p : null, `Preço justo: ${gemas(g.justo)} gemas${coinsTopo != null ? ` ou ${grande(coinsTopo)} coins` : ''}${melhor ? ` · em ${melhor.moeda === 'orb' ? 'Gemas' : 'Coins'} rende ${melhor.ganho}% a mais` : ''}`, coinsTopo != null ? grande(coinsTopo) : null, ds.confianca, melhor)
   const pontos = [['rapido', 'Rápido', g.rapido], ['justo', 'Justo', g.justo], ['esperar', 'Esperar', g.esperar]].filter(([, , v]) => ehNum(v))
   const valores = pontos.map(([, , v]) => Number(v))
   const min = Math.min(...valores)
@@ -883,11 +915,11 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     el('strong', {}, [grande(v), el('span', { class: 'coin-ico', 'aria-hidden': 'true' })]),
     el('small', { text: DESCR_PRECO[k] })
   ])
-  const subMoeda = (ico, nome, hoje, pv, fmtV) => el('div', { class: 'preco-moeda' }, [el('span', { class: ico, 'aria-hidden': 'true' }), el('span', { text: nome }), hoje != null ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${fmtV(hoje)}` }), pv != null ? el('span', { class: `delta ${classeDelta(pv)}`, text: textoVariacao(pv) }) : null]) : null])
+  const subMoeda = (ico, nome, hoje, pv, fmtV) => el('div', { class: 'preco-moeda' }, [el('span', { class: ico, 'aria-hidden': 'true' }), el('span', { text: nome }), hoje != null && pv !== 0 ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${fmtV(hoje)}` }), pilula(pv)]) : null])
   const regua = el('div', { class: 'preco-regua', 'aria-hidden': 'true' }, [
     el('span', { class: 'pr-faixa', style: `left:${pos(pontos[0][2])}%;right:${(100 - pos(pontos[pontos.length - 1][2])).toFixed(1)}%` }),
     ...pontos.map(([k, , v]) => el('i', { class: `pr-ponto pc-${k}`, style: `left:${pos(v)}%` })),
-    hojeJusto != null ? el('b', { class: `pr-hoje${posNum(hojeJusto) < 0 ? ' antes' : posNum(hojeJusto) > 100 ? ' depois' : ''}`, style: `left:${pos(hojeJusto)}%` }, [el('span', { text: `hoje ${gemas(hojeJusto)}` })]) : null
+    hojeJusto != null && p !== 0 ? el('b', { class: `pr-hoje${posNum(hojeJusto) < 0 ? ' antes' : posNum(hojeJusto) > 100 ? ' depois' : ''}`, style: `left:${pos(hojeJusto)}%` }, [el('span', { text: `hoje ${gemas(hojeJusto)}` })]) : null
   ])
   const detalhes = []
   if (ehNum(ds.confianca)) {
@@ -901,7 +933,7 @@ async function pintarPreco(seq, pkH, rh, pkS, rs) {
     const nome = String(a.nome || '').replace(/Z-Move ([A-Z]+)/, (_, t) => `Z-\u2060Move ${nomeTipo(t)}`)
     detalhes.push(el('span', { class: 'pd-chip' }, [`${nome} +${gemas(a.total)}`, el('span', { class: 'gema-ico', 'aria-hidden': 'true' })]))
   }
-  const hojeTxt = hojeJusto != null ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${gemas(hojeJusto)}` }), p != null ? el('span', { class: `delta ${classeDelta(p)}`, text: textoVariacao(p) }) : null]) : null
+  const hojeTxt = hojeJusto != null && p !== 0 ? el('span', { class: 'preco-cab-hoje' }, [el('span', { text: `hoje ${gemas(hojeJusto)}` }), pilula(p)]) : null
   box.replaceChildren(...[
     cabPreco(o ? null : hojeTxt),
     o ? subMoeda('gema-ico', 'Gemas', hojeJusto, p, gemas) : null,
