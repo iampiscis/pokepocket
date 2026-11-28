@@ -19,6 +19,13 @@
 .painel-pe .pe-ferr { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .painel-pe .pe-ferr a { flex-direction: column; gap: 5px; padding: 10px 4px 9px; font-size: 13.5px; line-height: 1.15; text-align: center; white-space: normal; }
 .painel-pe .pe-ferr a svg { width: 20px; height: 20px; }
+.ferr-sec { padding: 6px 8px 2px; font-family: var(--display); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }
+.ferr-sec:not(:first-child) { margin-top: 4px; padding-top: 10px; border-top: 1px solid rgba(255, 233, 163, 0.08); }
+.painel-pe .pe-ferr { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.pe-grupo { display: grid; gap: 6px; }
+.pe-sec { padding: 0 4px; font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--apagado); }
+.pe-itens { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 8px; }
+.painel-pe .pe-itens a { padding-left: 2px; padding-right: 2px; font-size: 13px; letter-spacing: -0.01em; }
 .pe-rot { grid-column: 1 / -1; padding: 0 4px; font-family: var(--display); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }
 
 @media (max-width: 799px), (min-width: 1181px) and (max-width: 1359px) {
@@ -285,3 +292,20 @@
 .topo .acoes-topo a.estrela, .topo .acoes-topo .baixar { display: none !important; }
 .painel-menu > .apoio { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 11px 14px; border-radius: 14px; border: 1px solid rgba(244, 114, 182, 0.3); background: rgba(236, 72, 153, 0.08); color: #fce7f3; font-weight: 800; font-size: 16px; text-decoration: none; }
 .painel-menu > .apoio svg { flex: none; width: 20px; height: 20px; color: #f9a8d4; }
+
+.so-ferr .topo .secoes[data-ferr] .sec-menu { position: relative; }
+.so-ferr .topo .secoes[data-ferr] .sec-botao { position: relative; display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 11px 0 13px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 800; line-height: 1; color: var(--suave); background: transparent; white-space: nowrap; cursor: pointer; transition: color 0.2s, background-color 0.2s; }
+.so-ferr .topo .secoes[data-ferr] .sec-botao:hover { color: var(--tinta); background: rgba(255, 233, 163, 0.07); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao.ativo { color: var(--ouro); background: linear-gradient(180deg, rgba(255, 233, 163, 0.14), rgba(255, 233, 163, 0.04)); box-shadow: inset 0 0 0 1px rgba(255, 211, 77, 0.2); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao[aria-expanded="true"] { color: #fff3df; background: rgba(255, 233, 163, 0.12); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao .ic { color: color-mix(in srgb, var(--suave) 75%, transparent); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao.ativo .ic, .so-ferr .topo .secoes[data-ferr] .sec-botao:hover .ic { color: var(--ouro); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao .seta { width: 13px; height: 13px; color: var(--apagado); transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+.so-ferr .topo .secoes[data-ferr] .sec-botao[aria-expanded="true"] .seta { transform: rotate(180deg); color: var(--ouro); }
+.so-ferr .topo .secoes[data-ferr] .sec-pop { top: calc(100% + 12px); left: 50%; right: auto; width: 300px; margin-left: -150px; transform-origin: top center; }
+.so-ferr .topo .secoes[data-ferr] .sec-pop a { display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; height: auto; gap: 11px; padding: 8px; border-radius: 12px; font-size: inherit; line-height: normal; white-space: normal; }
+.so-ferr .topo .secoes[data-ferr] .sec-pop a::before { display: none; }
+.so-ferr .topo .secoes[data-ferr] .sec-pop a.ativo { background: rgba(255, 233, 163, 0.09); }
+.so-ferr .topo .secoes[data-ferr] .sec-pop a.ativo .ferr-ic { color: #2a1a12; background: linear-gradient(180deg, #ffe9a3, #e2a93f); box-shadow: 0 2px 0 var(--ouro-esc); }
+.so-ferr .painel-menu nav[data-ferr] .nav-sec { padding: 12px 8px 4px; font-family: var(--display); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--apagado); }
+@media (prefers-reduced-motion: reduce) { .so-ferr .topo .secoes[data-ferr] .sec-botao .seta { transition: none; } }
