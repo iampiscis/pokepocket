@@ -668,20 +668,6 @@ function celModo(icone, iconePoder, rotulo, sc, scHoje, pod, podHoje, dicaExtra 
   })
 }
 
-function escalaConfianca(c) {
-  if (!ehNum(c)) return null
-  const v = Math.max(0, Math.min(100, Number(c)))
-  const segs = [[0, 40, '#f87171'], [40, 70, '#fbbf24'], [70, 100, '#4ade80']].map(([de, ate, cor]) => {
-    const cheio = Math.max(0, Math.min(1, (v - de) / (ate - de)))
-    const aqui = v >= de && (v < ate || ate === 100)
-    return el('span', { class: 'esc-f', style: `flex-grow:${ate - de};--c:${cor}` }, [
-      el('i', { style: `width:${(cheio * 100).toFixed(1)}%` }),
-      aqui ? el('b', { class: 'esc-marca', style: `left:${(cheio * 100).toFixed(1)}%` }) : null
-    ])
-  })
-  return el('span', { class: 'escala', 'aria-hidden': 'true' }, segs)
-}
-
 function celPreco(valor, p = null, dica = '', coins = null, conf = null) {
   return vCel({
     id: 'v-preco',
@@ -689,7 +675,7 @@ function celPreco(valor, p = null, dica = '', coins = null, conf = null) {
     icone: 'gema',
     rotulo: ['Preço', 'justo'],
     valor: el('b', { class: 'v-val rosa' }, [valor, valor !== '—' && valor !== '…' ? el('span', { class: 'gema-ico', 'aria-hidden': 'true' }) : null]),
-    barra: escalaConfianca(conf),
+    barra: coins != null ? el('span', { class: 'escala v-divisor', 'aria-hidden': 'true' }) : null,
     pe: [coins != null ? el('span', { class: 'v-poder v-coin' }, [el('span', { class: 'coin-ico', 'aria-hidden': 'true' }), coins]) : null, p === undefined || p === null ? el('span', { class: 'delta igual', text: valor === '…' ? 'calculando' : '—' }) : pilula(p)],
     dica
   })
