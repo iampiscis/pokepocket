@@ -22,6 +22,7 @@ const ICO = {
   pontos: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   vitorias: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
   frente: '<path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/>',
+  pokebola: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h5.5M15 12h5.5"/><circle cx="12" cy="12" r="3"/>',
   busca: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
   link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/>'
 }
@@ -147,6 +148,7 @@ function pintar() {
   const secao = outrosSecao(outros)
   const busca = buscaCampo(grade, secao)
   corpo.replaceChildren(linha, resumo(dados.resumo || [], n), busca.campo, busca.vazio, grade, secao)
+  aplicarFiltro()
   abrirDoLink()
 }
 
@@ -243,7 +245,7 @@ function outro(j) {
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const d = /^\d{4}-\d{2}-\d{2}$/.test(String(j.usadoEm || '')) ? fmtDia.format(new Date(`${j.usadoEm}T12:00:00`)) : null
   const pks = [...j.pks].sort((a, b) => (CASAS[a.casa]?.fileira ?? 0) - (CASAS[b.casa]?.fileira ?? 0) || a.casa - b.casa)
-  const item = el('button', { type: 'button', class: 'pos-outro', 'data-busca': textoBusca(j), title: `Ver a formação de ${j.nick}` }, [
+  const item = el('button', { type: 'button', class: 'pos-outro', 'data-busca': textoBusca(j), 'data-esp': espDe(j), title: `Ver a formação de ${j.nick}` }, [
     el('span', { class: 'pos-lugar', text: `${j.pos}º` }),
     el('span', { class: 'pos-outro-quem' }, [
       el('span', { class: 'pos-outro-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
@@ -267,11 +269,11 @@ function bloco(icone, titulo, texto) {
 function resumo(lista, n) {
   if (!lista.length) return null
   return el('section', { class: 'pos-usos', 'aria-labelledby': 'pos-usos-t' }, [
-    el('h2', { id: 'pos-usos-t', class: 'pos-sub' }, [ico('usados'), el('span', { text: `Mais usados nos ${n} times` })]),
+    el('h2', { id: 'pos-usos-t', class: 'pos-sub' }, [ico('usados'), el('span', { text: `Mais usados nos ${n} times` }), el('span', { class: 'pos-sub-dica', text: 'toque para filtrar' })]),
     el('div', { class: 'pos-usos-lista' }, lista.map((r) => {
       const f = r.fileiras || []
       const z = [['frente', f[0] || 0], ['meio', (f[1] || 0) + (f[2] || 0)], ['fundo', (f[3] || 0) + (f[4] || 0)]].sort((a, b) => b[1] - a[1])[0][0]
-      return el('div', { class: 'pos-uso', title: `${r.nome}: em ${r.usos} de ${n} times, mais na ${z}`, style: `--p:${Math.min(1, r.usos / n)}` }, [
+      return el('button', { type: 'button', class: 'pos-uso', 'data-filtro-esp': String(r.speciesId), 'aria-pressed': 'false', title: `${r.nome}: em ${r.usos} de ${n} times, mais na ${z}. Toque para filtrar.`, style: `--p:${Math.min(1, r.usos / n)}` }, [
         el('span', { class: 'poke-img' }, [sprite(r), r.shiny ? el('i', { class: 'poke-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
         el('span', { class: 'pos-uso-txt' }, [
           el('span', { class: 'pos-uso-nome', text: r.nome }),
@@ -295,26 +297,121 @@ function guildTag(g) {
 const textoBusca = (j) => normalizar(`${j.nick} ${j.guild?.tag || ''} ${j.guild?.nome || ''}`)
 const normalizar = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 
+const espDe = (j) => (j.pks || []).map((p) => Number(p.speciesId)).join(',')
+const filtro = { q: '', esp: [] }
+let aplicarFiltro = () => {}
+let alternarEsp = () => {}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-filtro-esp]')
+  if (!b) return
+  const id = Number(b.dataset.filtroEsp)
+  alternarEsp(id)
+  if (filtro.esp.includes(id)) document.querySelector('.pos-filtros')?.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+})
+function especiesDe(lista) {
+  const m = new Map()
+  for (const j of lista) for (const p of j.pks || []) {
+    const id = Number(p.speciesId)
+    const r = m.get(id) || { speciesId: id, nome: p.nome, looktype: p.looktype, shiny: p.shiny, n: 0, jog: new Set() }
+    if (!r.jog.has(j.nick)) { r.jog.add(j.nick); r.n++ }
+    m.set(id, r)
+  }
+  return [...m.values()].sort((a, b) => b.n - a.n || a.nome.localeCompare(b.nome))
+}
 function buscaCampo(grade, secao) {
+  const todos = [...(dados.jogadores || []), ...(dados.outros || [])]
+  const especies = especiesDe(todos)
+  const porId = new Map(especies.map((e) => [e.speciesId, e]))
   const input = el('input', { id: 'pos-busca', class: 'campo', type: 'search', autocomplete: 'off', spellcheck: 'false', placeholder: 'Buscar jogador ou guild', 'aria-label': 'Buscar jogador ou guild' })
-  const vazio = el('p', { class: 'vazio pos-busca-vazio', hidden: true, text: 'Nenhum jogador ou guild com esse nome.' })
-  input.addEventListener('input', () => {
-    const q = normalizar(input.value)
+  const pkIn = el('input', { id: 'pos-busca-pk', class: 'campo', type: 'search', autocomplete: 'off', spellcheck: 'false', placeholder: 'Filtrar por pokémon', 'aria-label': 'Filtrar por pokémon usado', 'aria-controls': 'pos-pk-sug', 'aria-expanded': 'false' })
+  const sug = el('div', { id: 'pos-pk-sug', class: 'pos-pk-sug', role: 'listbox', hidden: true })
+  const chips = el('div', { class: 'pos-chips', 'aria-live': 'polite' })
+  const vazio = el('p', { class: 'vazio pos-busca-vazio', hidden: true, text: 'Nenhuma formação com esse filtro.' })
+  const conta = el('span', { class: 'pos-filtro-conta' })
+  let ativo = -1
+  const fechar = () => { sug.hidden = true; sug.replaceChildren(); ativo = -1; pkIn.setAttribute('aria-expanded', 'false') }
+  const pintarSug = () => {
+    const q = normalizar(pkIn.value)
+    const lista = especies.filter((e) => !filtro.esp.includes(e.speciesId) && (!q || normalizar(e.nome).includes(q))).slice(0, 8)
+    if (!lista.length) { sug.replaceChildren(el('p', { class: 'pos-pk-sug-vazio', text: q ? 'Nenhum pokémon com esse nome nas formações.' : 'Todos já estão no filtro.' })); sug.hidden = false; return }
+    sug.replaceChildren(...lista.map((e, i) => el('button', { type: 'button', role: 'option', class: `pos-pk-op${i === ativo ? ' foco' : ''}`, 'data-esp': String(e.speciesId) }, [
+      el('span', { class: 'poke-img' }, [sprite(e)]),
+      el('span', { class: 'pos-pk-op-nome', text: e.nome }),
+      el('span', { class: 'pos-pk-op-n', text: `${e.n} ${e.n === 1 ? 'formação' : 'formações'}` })
+    ])))
+    sug.hidden = false
+    pkIn.setAttribute('aria-expanded', 'true')
+  }
+  const pintarChips = () => {
+    chips.replaceChildren(...filtro.esp.map((id) => {
+      const e = porId.get(id)
+      return el('button', { type: 'button', class: 'pos-chip', 'data-tirar': String(id), title: `Tirar ${e?.nome || ''} do filtro`, 'aria-label': `Tirar ${e?.nome || ''} do filtro` }, [el('span', { class: 'poke-img' }, [sprite(e || { speciesId: id })]), el('span', { text: e?.nome || `#${id}` }), el('i', { 'aria-hidden': 'true', text: '×' })])
+    }), ...(filtro.esp.length > 1 ? [el('button', { type: 'button', class: 'pos-chip-limpar', 'data-limpar': '', text: 'Limpar' })] : []))
+    chips.hidden = !filtro.esp.length
+    document.querySelectorAll('[data-filtro-esp]').forEach((b) => { const on = filtro.esp.includes(Number(b.dataset.filtroEsp)); b.classList.toggle('no-filtro', on); b.setAttribute('aria-pressed', String(on)) })
+  }
+  aplicarFiltro = () => {
+    const q = normalizar(filtro.q)
     let achou = 0
     for (const sel of [grade, secao]) {
       if (!sel) continue
       let n = 0
       for (const it of sel.querySelectorAll('[data-busca]')) {
-        const ok = !q || it.dataset.busca.includes(q)
+        const esp = (it.dataset.esp || '').split(',').map(Number)
+        const ok = (!q || it.dataset.busca.includes(q)) && filtro.esp.every((id) => esp.includes(id))
         it.hidden = !ok
         if (ok) n++
       }
       sel.hidden = !n
       achou += n
+      const t = sel === secao ? sel.querySelector('#pos-outros-t span') : null
+      if (t) t.textContent = `Mais formações do top 200 · ${n}`
     }
     vazio.hidden = !!achou
+    conta.textContent = filtro.esp.length || q ? `${achou} ${achou === 1 ? 'formação' : 'formações'}` : ''
+    pintarChips()
+  }
+  const alternar = (id) => {
+    const i = filtro.esp.indexOf(id)
+    if (i >= 0) filtro.esp.splice(i, 1)
+    else filtro.esp.push(id)
+    aplicarFiltro()
+  }
+  input.value = filtro.q
+  filtro.esp = filtro.esp.filter((id) => porId.has(id))
+  input.addEventListener('input', () => { filtro.q = input.value; aplicarFiltro() })
+  pkIn.addEventListener('input', () => { ativo = -1; pintarSug() })
+  pkIn.addEventListener('focus', pintarSug)
+  pkIn.addEventListener('blur', () => setTimeout(fechar, 120))
+  pkIn.addEventListener('keydown', (e) => {
+    const ops = [...sug.querySelectorAll('[data-esp]')]
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!ops.length) return
+      e.preventDefault()
+      ativo = (ativo + (e.key === 'ArrowDown' ? 1 : -1) + ops.length) % ops.length
+      ops.forEach((o, i) => o.classList.toggle('foco', i === ativo))
+    } else if (e.key === 'Enter') {
+      const o = ops[ativo >= 0 ? ativo : 0]
+      if (o) { e.preventDefault(); alternar(Number(o.dataset.esp)); pkIn.value = ''; pintarSug() }
+    } else if (e.key === 'Escape') fechar()
+    else if (e.key === 'Backspace' && !pkIn.value && filtro.esp.length) { filtro.esp.pop(); aplicarFiltro(); pintarSug() }
   })
-  return { campo: el('label', { class: 'busca pos-busca' }, [el('span', { class: 'busca-ico', 'aria-hidden': 'true' }, [ico('busca')]), input]), vazio }
+  sug.addEventListener('mousedown', (e) => e.preventDefault())
+  sug.addEventListener('click', (e) => { const o = e.target.closest('[data-esp]'); if (o) { alternar(Number(o.dataset.esp)); pkIn.value = ''; pintarSug(); pkIn.focus() } })
+  chips.addEventListener('click', (e) => {
+    if (e.target.closest('[data-limpar]')) { filtro.esp = []; return aplicarFiltro() }
+    const b = e.target.closest('[data-tirar]')
+    if (b) alternar(Number(b.dataset.tirar))
+  })
+  alternarEsp = alternar
+  const campo = el('div', { class: 'pos-filtros' }, [
+    el('label', { class: 'busca pos-busca' }, [el('span', { class: 'busca-ico', 'aria-hidden': 'true' }, [ico('busca')]), input]),
+    el('div', { class: 'busca pos-busca pos-busca-pk' }, [el('span', { class: 'busca-ico', 'aria-hidden': 'true' }, [ico('pokebola')]), pkIn, sug]),
+    conta,
+    chips
+  ])
+  chips.hidden = true
+  return { campo, vazio }
 }
 
 function usadoEm(dia) {
@@ -417,7 +514,7 @@ function cartao(j) {
   const jogos = (j.vitorias || 0) + (j.derrotas || 0)
   const wr = jogos ? Math.round((100 * j.vitorias) / jogos) : null
   const podio = j.pos <= 3 ? ` p${j.pos}` : ''
-  return el('article', { class: `pos-card${podio}`, 'data-busca': textoBusca(j), 'data-nick': normalizar(j.nick) }, [
+  return el('article', { class: `pos-card${podio}`, 'data-busca': textoBusca(j), 'data-esp': espDe(j), 'data-nick': normalizar(j.nick) }, [
     el('header', { class: 'pos-card-cab' }, [
       el('span', { class: 'pos-lugar', title: 'Posição no PvP mensal', text: `${j.pos}º` }),
       el('strong', { class: 'pos-nick', title: j.guild?.nome ? `${j.nick} · ${j.guild.nome}` : j.nick }, [el('span', { text: j.nick })]),
