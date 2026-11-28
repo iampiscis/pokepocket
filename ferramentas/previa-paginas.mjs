@@ -13,6 +13,7 @@ const PREVIAS = [
   { html: 'ferramentas/previas/nivel.html', png: 'previa-nivel.png', paginas: ['nivel/index.html'] },
   { html: 'ferramentas/previas/monte-seu-time.html', png: 'previa-monte-seu-time.png', paginas: ['monte-seu-time/index.html'] },
   { html: 'ferramentas/previas/posicionamento.html', png: 'previa-posicionamento.png', paginas: ['posicionamento/index.html'] },
+  { html: 'ferramentas/previas/farm.html', png: 'previa-farm.png', paginas: ['farm/index.html'] },
   { html: 'ferramentas/previas/ferramentas.html', png: 'previa-ferramentas.png', paginas: ['ferramentas/inicio.html'] }
 ]
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.webp': 'image/webp' }
