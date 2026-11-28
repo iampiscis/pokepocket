@@ -381,6 +381,7 @@ select option { background: #1c1016; color: var(--tinta); }
 .regua { display: block; width: 100%; min-width: 0; accent-color: var(--ouro); }
 
 .formas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+.larga .formas { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .forma { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border: 2px solid rgba(255, 233, 163, 0.16); border-radius: 10px; background: rgba(255, 255, 255, 0.03); text-align: left; font-weight: 800; font-size: 13px; line-height: 1.2; }
 .forma:hover { border-color: rgba(255, 211, 77, 0.55); }
 .forma[aria-pressed="true"] { border-color: var(--ouro); background: rgba(255, 211, 77, 0.14); }

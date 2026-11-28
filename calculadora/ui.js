@@ -462,8 +462,7 @@ function montarSimulacao() {
 
   const tipoSel = el('select', { 'aria-label': 'Tipo do Z-Move' }, TIPOS.map((t) => el('option', { value: t, text: nomeTipo(t) })))
   const cat = seg([['e', 'Especial'], ['f', 'Físico']], s.tmFisico ? 'f' : 'e', (k) => { s.tmFisico = k === 'f'; mudou() }, 'Categoria do Z-Move')
-  const aoe = alternar('AoE', 'area', s.tmAoe, (v) => { s.tmAoe = v; mudou() }, 'chip-aoe')
-  aoe.title = 'Golpe em área (TM AoE)'
+  const aoe = seg([['sem', 'Sem AoE'], ['com', 'Com AoE']], s.tmAoe ? 'com' : 'sem', (k) => { s.tmAoe = k === 'com'; mudou() }, 'AoE')
   const detalhe = el('div', { class: 'z-detalhe' }, [tipoSel, cat])
   tipoSel.value = s.tmElemental || 'NORMAL'
   tipoSel.addEventListener('change', () => { s.tmElemental = tipoSel.value; mudou() })
@@ -477,14 +476,15 @@ function montarSimulacao() {
     detalhe.hidden = !s.tmElemental
     mudou()
   }, 'Z-Move')
-  ui.z = bloco('zmove', 'Z-Move e AoE', [el('div', { class: 'z-topo' }, [z, aoe]), detalhe])
+  ui.z = bloco('zmove', 'Z-Move', [z, detalhe])
+  ui.aoe = bloco('area', 'AoE', [aoe])
 
   const refino = STATS.map(([k, rot]) => celula(rot, passos({ valor: s.refino[k], min: 0, max: 999, rotulo: `refino de ${rot}`, aoMudar: (v) => { s.refino[k] = v; mudou() } })))
   ui.refino = bloco('refino', 'Refino', [el('div', { class: 'grade6' }, refino)])
   ui.refino.classList.add('larga')
-  if (!secForma) ui.z.classList.add('larga')
+  if (secForma) secForma.classList.add('larga')
 
-  caixa.replaceChildren(ui.nivel, ui.nasc, ...(secForma ? [secForma] : []), ui.z, ui.refino)
+  caixa.replaceChildren(ui.nivel, ui.nasc, ...(secForma ? [secForma] : []), ui.z, ui.aoe, ui.refino)
   resumos()
 }
 
@@ -500,7 +500,8 @@ function resumos() {
   else nasc.push(`P${s.potencia}`)
   if (s.shiny) nasc.push('shiny')
   ui.nasc.resumo.textContent = nasc.join(' · ')
-  ui.z.resumo.textContent = s.tmElemental ? `${nomeTipo(s.tmElemental)} · ${s.tmFisico ? 'físico' : 'especial'}${s.tmAoe ? ' · AoE' : ''}` : s.tmAoe ? 'só AoE' : 'nenhum'
+  ui.z.resumo.textContent = s.tmElemental ? `${nomeTipo(s.tmElemental)} · ${s.tmFisico ? 'físico' : 'especial'}` : 'nenhum'
+  ui.aoe.resumo.textContent = s.tmAoe ? 'golpe em área' : 'nenhum'
   const ref = somaRefino(s.refino)
   ui.refino.resumo.textContent = ref ? `+${fmt.format(ref)}` : 'nenhum'
 }
