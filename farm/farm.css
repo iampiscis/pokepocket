@@ -58,13 +58,33 @@
 .farm-pod.p3 { --cor: #ffa25a; }
 .pod-lugar { position: absolute; top: -12px; left: 50%; translate: -50% 0; padding: 2px 12px; border-radius: 999px; font-family: var(--display); font-size: 17px; line-height: 1.3; color: #2a1a12; background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 55%, #fff), var(--cor)); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); }
 .farm-pod.p1 .pod-lugar { font-size: 20px; padding: 2px 16px; }
-.pod-pk { position: relative; display: grid; place-items: center; width: 96px; height: 96px; margin-bottom: 6px; overflow: hidden; }
+.pod-pk { position: relative; display: grid; place-items: center; width: 96px; height: 96px; margin-bottom: 6px; }
 .pod-nome { position: relative; z-index: 1; }
 .farm-pod.p1 .pod-pk { width: 120px; height: 120px; }
 .pod-luz { position: absolute; left: 10%; right: 10%; bottom: 6%; height: 22%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--cor) 55%, transparent), transparent); filter: blur(2px); }
 .pod-pk img { position: absolute; inset: 0; margin: auto; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6)); }
 .pod-pk img.bola { width: 40%; height: 40%; opacity: 0.45; image-rendering: auto; }
 .pod-pk .farm-shiny { top: 4px; right: 6px; font-size: 15px; }
+.pod-lugar { z-index: 3; }
+.pod-pk img:not(.bola) { animation: pod-resp 2.4s steps(1, end) infinite; }
+.farm-pod.p2 .pod-pk img { animation-delay: -0.8s; }
+.farm-pod.p3 .pod-pk img { animation-delay: -1.6s; }
+@keyframes pod-resp { 0%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-1px); } 50% { transform: translateY(-2px); } }
+.farm-pod.p1 .farm-shiny { animation: pod-estrela 1.8s ease-in-out infinite; }
+@keyframes pod-estrela { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.75); } }
+.pod-brilho { position: absolute; inset: -1px; z-index: 2; padding: 3px; border-radius: inherit; overflow: hidden; pointer-events: none; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.pod-brilho i { position: absolute; top: -50%; left: 0; width: 30%; height: 200%; background: linear-gradient(90deg, transparent, rgba(255, 214, 110, 0.6) 30%, #fff3c4 50%, rgba(255, 214, 110, 0.6) 70%, transparent); transform: translateX(-120%) rotate(18deg); animation: pod-brilho 4s ease-in-out infinite; }
+@keyframes pod-brilho { 0% { transform: translateX(-120%) rotate(18deg); } 35%, 100% { transform: translateX(320%) rotate(18deg); } }
+.farm-podio.entra .farm-pod { animation: pod-entra 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.farm-podio.entra .farm-pod.p2 { animation-delay: 0.15s; }
+.farm-podio.entra .farm-pod.p1 { animation-delay: 0.3s; }
+@keyframes pod-entra { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .farm-podio .farm-pod, .pod-pk img, .pod-brilho i, .farm-pod .farm-shiny { animation: none !important; }
+  .pod-brilho { display: none; }
+}
+html.embed .farm-podio .farm-pod, html.embed .pod-pk img, html.embed .farm-pod .farm-shiny { animation: none !important; }
+html.embed .pod-brilho { display: none; }
 .pod-nome { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 6px; min-width: 0; max-width: 100%; }
 .pod-nome .pos-nick { font-size: 17px; }
 .farm-pod.p1 .pod-nome .pos-nick { font-size: 20px; }

@@ -116,6 +116,7 @@ function podio(ord) {
     const pk = j.pk
     const mini = [m !== 'xph' ? `${curto(j.xph)} XP/h` : null, m !== 'coinsh' && ehNum(j.coinsh) ? `≈${curto(j.coinsh)} coins/h` : null, m !== 'kph' ? `${fmt.format(Math.round(j.kph))} abates/h` : null].filter(Boolean)
     return el('div', { class: `farm-pod p${i + 1}` }, [
+      i === 0 ? el('i', { class: 'pod-brilho', 'aria-hidden': 'true' }, [el('i')]) : null,
       el('span', { class: 'pod-lugar', text: `${i + 1}º` }),
       el('span', { class: 'pod-pk' }, [el('i', { class: 'pod-luz', 'aria-hidden': 'true' }), pk ? sprite(pk) : el('img', { class: 'bola', src: BOLA, alt: '' }), pk?.shiny ? el('i', { class: 'farm-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
       el('span', { class: 'pod-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
@@ -153,7 +154,8 @@ function pintar() {
   const topo = el('div', { class: 'info-linha' }, [el('ul', { class: 'indicadores', 'aria-label': 'Resumo' }, inds), info, explica])
 
   const lista = el('div', { class: 'farm-lista' })
-  const pod = el('div', { class: 'farm-podio', 'aria-label': 'Os 3 primeiros' })
+  const pod = el('div', { class: 'farm-podio entra', 'aria-label': 'Os 3 primeiros' })
+  setTimeout(() => pod.classList.remove('entra'), 1200)
   const chips = el('div', { class: 'farm-ordem', role: 'tablist', 'aria-label': 'Ordenar por' })
   const desenhar = () => {
     const ord = js.slice().sort((a, b) => (Number(b[ordem]) || 0) - (Number(a[ordem]) || 0))
