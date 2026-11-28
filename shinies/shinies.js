@@ -159,41 +159,47 @@ function cartao(l) {
   const scJogo = scorePoder(l.fz?.pvpJogo)
   const fs = sc != null ? faixaScore(sc) : null
   const nf = Number(l.nf)
+  const temFinal = Number.isFinite(nf) && l.nf != null && !(Number(l.nota) >= nf - 0.0005)
   const tipos = (l.tipos || []).filter((t) => NOME_TIPO[t])
   const pe = [l.fz?.mesma === false && l.fz?.nome ? `como ${l.fz.nome}` : '', scJogo != null ? `PvE ${fmt.format(scJogo)}` : ''].filter(Boolean).join(' · ')
   const lado = l.an
-    ? el('span', { class: `sh-preco ${l.an.moeda}`, title: l.an.moeda === 'orb' ? 'Preço em Gemas' : 'Preço em Coins' }, [ico(l.an.moeda === 'orb' ? 'gema' : 'coin'), el('b', { text: l.an.moeda === 'orb' ? fmt.format(l.an.preco) : curto(l.an.preco) }), el('small', { text: l.an.moeda === 'orb' ? 'Gemas' : 'Coins' })])
+    ? el('span', { class: `sh-preco ${l.an.moeda}`, title: l.an.moeda === 'orb' ? 'À venda em Gemas' : 'À venda em Coins' }, [ico(l.an.moeda === 'orb' ? 'gema' : 'coin'), el('b', { text: l.an.moeda === 'orb' ? fmt.format(l.an.preco) : curto(l.an.preco) })])
     : el('span', { class: 'sh-fora', text: 'Fora do Mercado' })
   const origem = l.cap === true
-    ? el('div', { class: 'sh-origem primeiro' }, [el('strong', {}, [ico('dono'), el('span', { text: '1º dono' })]), el('span', { text: 'ainda com quem capturou' })])
+    ? el('span', { class: 'sh-origem primeiro', title: 'Ainda com quem capturou' }, [ico('dono'), el('span', { text: '1º dono' })])
     : typeof l.cap === 'string' && l.cap
-      ? el('div', { class: 'sh-origem revendido' }, [el('strong', {}, [ico('troca'), el('span', { text: 'Já vendido' })]), el('span', { text: `capturado por ${l.cap}` })])
+      ? el('span', { class: 'sh-origem revendido', title: `Já vendido: capturado por ${l.cap}` }, [ico('troca'), el('span', { text: 'revendido' })])
       : null
-  const notaFinal = Number.isFinite(nf) && l.nf != null && !(Number(l.nota) >= nf - 0.0005) ? el('div', { class: 'sh-nf' }, [el('strong', { style: `color:${faixaNota(nf)?.[2] || 'inherit'}`, text: `Nota final ${fmtNota.format(nf)}` }), el('span', { text: 'se evoluir' })]) : null
   const fav = Number(l.an?.fav) || 0
-  const meta = [el('span', { class: 'sh-dono', text: `de ${l.dono || '?'}` }), fav > 0 ? el('span', { class: 'sh-fav', title: `${fmt.format(fav)} ${fav === 1 ? 'jogador favoritou' : 'jogadores favoritaram'} este anúncio` }, [ico('coracao', true), el('span', { text: fmt.format(fav) })]) : null, ehNum(l.em) ? el('span', { class: 'sh-ha', title: `Capturado em ${fmtDia.format(new Date(l.em))} às ${fmtHora.format(new Date(l.em))}`, text: fmtHa(Date.now() - l.em) }) : null].filter(Boolean)
+  const meta = [
+    el('span', { class: 'sh-dono', text: `de ${l.dono || '?'}` }),
+    origem,
+    fav > 0 ? el('span', { class: 'sh-fav', title: `${fmt.format(fav)} ${fav === 1 ? 'jogador favoritou' : 'jogadores favoritaram'} este anúncio` }, [ico('coracao', true), el('span', { text: fmt.format(fav) })]) : null,
+    ehNum(l.em) ? el('span', { class: 'sh-ha', title: `Capturado em ${fmtDia.format(new Date(l.em))} às ${fmtHora.format(new Date(l.em))}`, text: fmtHa(Date.now() - l.em) }) : null
+  ].filter(Boolean)
+  const selo = el('span', { class: 'sh-selo', style: fx ? `--n:${fx[2]}` : null, title: fx ? `Nota ${fmtNota.format(nota)} · ${fx[1]}${temFinal ? ` · nota final ${fmtNota.format(nf)} se evoluir` : ''}` : 'Sem nota' }, [
+    ico('estrela', true),
+    el('span', { text: nota != null ? fmtNota.format(nota) : 'shiny' }),
+    temFinal ? el('span', { class: 'sh-final', style: `color:${faixaNota(nf)?.[2] || 'inherit'}`, text: `› ${fmtNota.format(nf)}` }) : null
+  ])
+  const d = (rot, val, titulo) => el('span', { class: 'sh-d', title: titulo }, [el('small', { text: rot }), el('b', { text: val })])
   return el('article', { class: `sh-cartao${ehNovo(l) ? ' sh-recente' : ''}${acabouDeChegar(l) ? ' sh-chegou' : ''}` }, [
     el('div', { class: 'sh-topo' }, [
       el('span', { class: 'sh-arte' }, [sprite(l), el('i', { class: 'sh-brilho', 'aria-hidden': 'true', text: '✦' })]),
       el('div', { class: 'sh-id' }, [
         el('div', { class: 'sh-nome' }, [el('b', { text: l.nome || 'Pokémon' }), ehNum(l.nv) ? el('span', { class: 'sh-nv', text: `Nv ${fmt.format(l.nv)}` }) : null, ehNovo(l) ? el('span', { class: 'sh-novo', text: 'novo' }) : null]),
-        el('div', { class: 'sh-linha2' }, [
-          el('span', { class: 'sh-selo', style: fx ? `--n:${fx[2]}` : null, title: fx ? `Nota ${fmtNota.format(nota)} · ${fx[1]}` : 'Sem nota' }, [ico('estrela', true), el('span', { text: nota != null ? fmtNota.format(nota) : 'shiny' })]),
-          ...tipos.map((t) => el('span', { class: 'chip-tipo sh-tipo', style: `--c:${COR_TIPO[t]}`, text: NOME_TIPO[t] }))
-        ]),
-        el('div', { class: 'sh-meta' }, meta.flatMap((x, i) => (i ? [el('span', { class: 'sh-sep', text: '·' }), x] : [x])))
+        el('div', { class: 'sh-linha2' }, [selo, ...tipos.map((t) => el('span', { class: 'chip-tipo sh-tipo', style: `--c:${COR_TIPO[t]}`, text: NOME_TIPO[t] }))]),
+        el('div', { class: 'sh-meta' }, meta)
       ]),
       sc != null ? el('div', { class: 'sh-score', style: `--s:${fs[2]}`, title: `Score PvP ${sc} de 1000 (${fs[1]}): ataque real em 60 s + resistência por tipo contra o meta, na evolução máxima e sem refino` }, [el('b', { text: fmt.format(sc) }), el('small', { text: fs[1] })]) : null
     ]),
-    sc != null ? el('div', { class: 'sh-faixa' }, [barraScore(sc), pe ? el('small', { text: pe }) : null]) : null,
-    el('div', { class: 'sh-dados' }, [
-      el('span', {}, [el('small', { text: 'Potência' }), el('b', { text: `P${l.p || 1}` })]),
-      el('span', {}, [el('small', { text: 'Qualidade' }), el('b', { text: ehNum(l.q) ? fmtQ.format(l.q) : '—' })]),
-      el('span', {}, [el('small', { text: 'IV' }), el('b', { text: ehNum(l.iv) ? `${fmt.format(l.iv)}/192` : '—' })])
-    ]),
-    origem,
-    notaFinal,
-    el('div', { class: `sh-lado${l.an ? ' venda' : ''}` }, [lado])
+    sc != null ? el('div', { class: 'sh-faixa' }, [barraScore(sc), pe ? el('small', { text: pe, title: pe }) : null]) : null,
+    el('div', { class: 'sh-rodape' }, [
+      d('Pot', `P${l.p || 1}`, 'Potência'),
+      d('Qual', ehNum(l.q) ? fmtQ.format(l.q) : '—', 'Qualidade'),
+      d('IV', ehNum(l.iv) ? `${fmt.format(l.iv)}/192` : '—', 'Soma dos IVs'),
+      el('span', { class: 'sh-lado' }, [lado])
+    ])
   ])
 }
 
@@ -251,6 +257,19 @@ async function carregar() {
 }
 let ultimaBusca = Date.now()
 let agendada = null
+const aviso = el('button', { type: 'button', class: 'sh-aviso', hidden: true })
+aviso.onclick = () => { aviso.hidden = true; lista.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }) }
+document.body.append(aviso)
+let avisoTimer = null
+function avisarNovos(n) {
+  if (!n) return
+  const topoLista = lista.getBoundingClientRect().top
+  if (topoLista > 60 && topoLista < innerHeight - 120) return
+  aviso.replaceChildren(el('i', { 'aria-hidden': 'true', text: '✦' }), el('span', { text: n === 1 ? '1 shiny novo' : `${fmt.format(n)} shinies novos` }), ico('seta'))
+  aviso.hidden = false
+  clearTimeout(avisoTimer)
+  avisoTimer = setTimeout(() => { aviso.hidden = true }, 9000)
+}
 async function atualizar() {
   clearTimeout(agendada)
   if (document.hidden) return
@@ -265,6 +284,7 @@ async function atualizar() {
       const digitando = topo.contains(document.activeElement)
       if (aberto || digitando) pintarLista()
       else pintar()
+      avisarNovos(filtrar(dados.linhas).filter(ladoOk).filter(acabouDeChegar).length)
     } else pintarInds()
   } catch {}
   agendada = setTimeout(atualizar, A_CADA)

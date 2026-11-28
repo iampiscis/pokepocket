@@ -43,8 +43,8 @@
 .sh-chip svg:last-child { width: 12px; height: 12px; color: var(--apagado); }
 .sh-chip:hover svg:last-child { color: #fff3df; }
 
-.sh-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 14px; }
-.sh-cartao { display: grid; align-content: start; gap: 10px; min-width: 0; padding: 12px 14px 12px 12px; border-radius: 16px; background: radial-gradient(120% 70% at 0% 0%, rgba(255, 233, 163, 0.07), transparent 60%), rgba(21, 11, 16, 0.82); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.1), 0 8px 22px rgba(0, 0, 0, 0.3); }
+.sh-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); gap: 12px; margin-top: 14px; }
+.sh-cartao { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 10px 12px 10px 10px; border-radius: 16px; background: radial-gradient(120% 70% at 0% 0%, rgba(255, 233, 163, 0.07), transparent 60%), rgba(21, 11, 16, 0.82); box-shadow: inset 0 0 0 1px rgba(255, 233, 163, 0.1), 0 8px 22px rgba(0, 0, 0, 0.3); }
 .sh-topo { display: grid; grid-template-columns: 60px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
 .sh-arte { position: relative; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 14px; background: rgba(255, 233, 163, 0.05); }
 .sh-arte img { position: absolute; inset: 4px; width: 52px; height: 52px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); }
@@ -65,37 +65,35 @@
 .sh-fav { display: inline-flex; align-items: center; gap: 3px; color: #ff8fb8; }
 .sh-fav svg { width: 11px; height: 11px; }
 .sh-score { --s: var(--ouro); display: grid; justify-items: end; align-self: start; line-height: 1; }
-.sh-score b { font-family: var(--display); font-size: 26px; color: var(--s); text-shadow: 0 0 14px color-mix(in srgb, var(--s) 35%, transparent); font-variant-numeric: tabular-nums; }
+.sh-score b { font-family: var(--display); font-size: 24px; color: var(--s); text-shadow: 0 0 14px color-mix(in srgb, var(--s) 35%, transparent); font-variant-numeric: tabular-nums; }
 .sh-score small { margin-top: 3px; font-size: 10.5px; font-weight: 900; color: var(--s); text-transform: uppercase; letter-spacing: 0.05em; }
-.sh-faixa { display: grid; gap: 5px; }
-.sh-faixa small { font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+.sh-faixa { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.sh-faixa small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 700; color: var(--apagado); }
 .sh-barra { display: flex; gap: 3px; height: 6px; }
 .sh-barra-faixa { position: relative; border-radius: 999px; background: color-mix(in srgb, var(--c) 18%, rgba(255, 255, 255, 0.04)); }
 .sh-barra-cheio { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--c); }
 .sh-barra-marca { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: #fff3df; box-shadow: 0 0 0 2px var(--c), 0 0 8px var(--c); transform: translate(-50%, -50%); }
-.sh-dados { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.sh-dados span { display: grid; gap: 1px; padding: 6px 8px; border-radius: 10px; background: rgba(8, 4, 6, 0.5); text-align: center; }
-.sh-dados small { font-size: 10px; font-weight: 800; color: var(--apagado); text-transform: uppercase; letter-spacing: 0.05em; }
-.sh-dados b { font-size: 14px; color: #fff3df; font-variant-numeric: tabular-nums; }
-.sh-origem, .sh-nf { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; padding: 6px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--apagado); background: rgba(8, 4, 6, 0.4); }
-.sh-origem strong { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; }
-.sh-origem svg { width: 14px; height: 14px; }
-.sh-origem.primeiro strong { color: #5ee69a; }
-.sh-origem.revendido strong { color: #b495ff; }
-.sh-nf strong { font-size: 12.5px; }
-.sh-lado { display: flex; justify-content: flex-end; padding-top: 8px; border-top: 1px solid rgba(255, 233, 163, 0.08); }
-.sh-preco { display: inline-flex; align-items: center; gap: 6px; }
-.sh-preco svg { width: 17px; height: 17px; }
-.sh-preco b { font-family: var(--display); font-size: 19px; font-variant-numeric: tabular-nums; }
-.sh-preco small { font-size: 11px; font-weight: 800; color: var(--apagado); }
-.sh-preco.gold { color: #ffd75e; }
-.sh-preco.orb { color: #f472b6; }
-.sh-fora { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 800; color: var(--apagado); background: rgba(255, 255, 255, 0.05); }
 .sh-vazio { display: grid; justify-items: center; gap: 4px; grid-column: 1 / -1; padding: 34px 12px; text-align: center; }
 .sh-vazio b { color: #fff3df; }
 .sh-mais { display: flex; justify-content: center; margin-top: 16px; }
 .sh-mais:empty { display: none; }
 
+.sh-meta .sh-origem { display: inline-flex; align-items: center; gap: 3px; padding: 0 6px 0 4px; height: 18px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.sh-origem svg { width: 12px; height: 12px; }
+.sh-origem.primeiro { color: #5ee69a; background: rgba(94, 230, 154, 0.1); }
+.sh-origem.revendido { color: #c3adff; background: rgba(180, 149, 255, 0.12); }
+.sh-final { margin-left: 2px; font-weight: 900; }
+.sh-rodape { display: flex; align-items: center; gap: 6px; min-width: 0; margin-top: auto; padding-top: 7px; border-top: 1px solid rgba(255, 233, 163, 0.08); }
+.sh-d { display: inline-flex; align-items: baseline; gap: 4px; height: 24px; padding: 0 8px; border-radius: 8px; line-height: 24px; white-space: nowrap; background: rgba(8, 4, 6, 0.5); }
+.sh-d small { font-size: 10px; font-weight: 800; color: var(--apagado); text-transform: uppercase; letter-spacing: 0.04em; }
+.sh-d b { font-size: 12.5px; color: #fff3df; font-variant-numeric: tabular-nums; }
+.sh-lado { display: flex; justify-content: flex-end; margin-left: auto; min-width: 0; }
+.sh-preco { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.sh-preco svg { width: 16px; height: 16px; }
+.sh-preco b { font-family: var(--display); font-size: 17px; line-height: 1; font-variant-numeric: tabular-nums; }
+.sh-preco.gold { color: #ffd75e; }
+.sh-preco.orb { color: #f472b6; }
+.sh-fora { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px; font-weight: 800; color: var(--apagado); }
 @media (max-width: 700px) {
   .sh-filtros, .sh-barra-topo { width: 100%; }
   .sh-barra-topo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
@@ -114,25 +112,30 @@
   .sh-campo { width: 74px; height: 34px; }
   .sh-grupo .sh-seg button { height: 30px; padding: 0 9px; font-size: 12.5px; }
   .sh-lista { grid-template-columns: 1fr; gap: 10px; }
-  .sh-cartao { padding: 11px 12px 11px 10px; gap: 8px; }
+  .sh-cartao { padding: 10px 11px 10px 9px; gap: 7px; }
   .sh-topo { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 9px; }
   .sh-arte { width: 52px; height: 52px; }
   .sh-arte img { inset: 4px; width: 44px; height: 44px; }
   .sh-score b { font-size: 23px; }
-  .sh-dados span { padding: 4px 6px; }
-  .sh-dados b { font-size: 13px; }
-  .sh-origem, .sh-nf { padding: 5px 9px; font-size: 11.5px; }
-  .sh-lado { padding-top: 6px; }
 }
 html.embed .pos-corpo { margin-top: 0; }
 html.embed .sh-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 14px 0; }
-html.embed .sh-origem, html.embed .sh-nf, html.embed .sh-lado { display: none; }
+html.embed .sh-rodape { display: none; }
 .sh-vivo { color: #5ee69a; box-shadow: inset 0 0 0 1px rgba(94, 230, 154, 0.35); }
 .sh-vivo-ponto { position: relative; width: 8px; height: 8px; margin: 0 2px; border-radius: 50%; background: #5ee69a; }
 .sh-vivo-ponto::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #5ee69a; animation: sh-pulso 1.8s ease-out infinite; }
 @keyframes sh-pulso { from { opacity: 0.7; transform: scale(1); } to { opacity: 0; transform: scale(2.6); } }
 .sh-novo { flex: none; padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #10261a; background: linear-gradient(180deg, #9cf5c1, #3fcf7e); }
 .sh-cartao.sh-recente { box-shadow: inset 0 0 0 1.5px rgba(94, 230, 154, 0.55), 0 0 22px rgba(94, 230, 154, 0.16), 0 8px 22px rgba(0, 0, 0, 0.3); }
+.sh-cartao { position: relative; overflow: hidden; }
 .sh-cartao.sh-chegou { animation: sh-chega 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sh-cartao.sh-chegou::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 30%, rgba(255, 233, 163, 0.16) 48%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 233, 163, 0.16) 52%, transparent 70%); transform: translateX(-110%); animation: sh-varre 1.3s 0.35s ease-out both; }
+@keyframes sh-varre { to { transform: translateX(110%); } }
+.sh-aviso { position: fixed; left: 50%; top: 86px; z-index: 40; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 900; color: #10261a; background: linear-gradient(180deg, #9cf5c1, #3fcf7e); box-shadow: 0 3px 0 #1d6b40, 0 10px 26px rgba(0, 0, 0, 0.45); transform: translateX(-50%); cursor: pointer; animation: sh-aviso-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sh-aviso[hidden] { display: none; }
+.sh-aviso svg { width: 15px; height: 15px; transform: rotate(180deg); }
+.sh-aviso i { font-style: normal; }
+@keyframes sh-aviso-in { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 @keyframes sh-chega { from { opacity: 0; transform: translateY(-8px) scale(0.98); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .sh-vivo-ponto::after, .sh-cartao.sh-chegou { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .sh-vivo-ponto::after, .sh-cartao.sh-chegou, .sh-aviso { animation: none; }
+  .sh-cartao.sh-chegou::after { display: none; } }
