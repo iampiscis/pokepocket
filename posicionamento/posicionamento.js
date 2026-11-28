@@ -128,7 +128,7 @@ function pintar() {
   const explica = el('div', { id: 'pos-explica', class: 'explica explica-pop', role: 'dialog', 'aria-label': 'Como as formações são escolhidas', hidden: true }, [
     el('div', { class: 'ex-cab' }, [el('b', { text: 'Como as formações são escolhidas' })]),
     el('div', { class: 'ex-grade' }, [
-      bloco('⚔', 'Formação montada', 'Jogadores do top que fogem da formação automática.'),
+      bloco('⚔', 'Formações vistas', 'Todas as formações do top 200 vistas em partidas contra as nossas contas.'),
       bloco('★', 'Ranking', 'Os 10 mais bem colocados em destaque; abaixo, o resto até o top 200.'),
       bloco('↑', 'Tabuleiro', 'Adversário em cima. Toque num pokémon para ver o alcance.'),
       bloco('➶', 'Alcance', 'Espada luta colado, arco ataca de longe.')
