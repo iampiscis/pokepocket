@@ -108,6 +108,26 @@ function linha(j, i, maxXp) {
   return item
 }
 
+function podio(ord) {
+  const [m, rot] = ORDENS.find((o) => o[0] === ordem)
+  const valor = (j) => (m === 'kph' ? fmt.format(Math.round(j.kph)) : m === 'coinsh' ? (ehNum(j.coinsh) ? `≈${curto(j.coinsh)}` : '—') : curto(j.xph))
+  const cartao = (j, i) => {
+    if (!j) return el('div', { class: 'farm-pod vazio' })
+    const pk = j.pk
+    const mini = [m !== 'xph' ? `${curto(j.xph)} XP/h` : null, m !== 'coinsh' && ehNum(j.coinsh) ? `≈${curto(j.coinsh)} coins/h` : null, m !== 'kph' ? `${fmt.format(Math.round(j.kph))} abates/h` : null].filter(Boolean)
+    return el('div', { class: `farm-pod p${i + 1}` }, [
+      el('span', { class: 'pod-lugar', text: `${i + 1}º` }),
+      el('span', { class: 'pod-pk' }, [el('i', { class: 'pod-luz', 'aria-hidden': 'true' }), pk ? sprite(pk) : el('img', { class: 'bola', src: BOLA, alt: '' }), pk?.shiny ? el('i', { class: 'farm-shiny', 'aria-hidden': 'true', text: '✦' }) : null]),
+      el('span', { class: 'pod-nome' }, [el('strong', { class: 'pos-nick' }, [el('span', { text: j.nick })]), guildTag(j.guild)]),
+      el('small', { class: 'pod-pkn', text: pk ? `${pk.shiny ? 'Shiny ' : ''}${pk.nome}` : 'Pokémon fora da vitrine' }),
+      el('b', { class: 'pod-valor' }, [valor(j), el('small', { text: rot })]),
+      el('span', { class: 'pod-mini' }, mini.map((t) => el('span', { text: t }))),
+      el('span', { class: 'pod-hunt', text: ehNum(j.hunt) ? `Hunt Nv ${fmt.format(j.hunt)}` : '' })
+    ])
+  }
+  return [cartao(ord[1], 1), cartao(ord[0], 0), cartao(ord[2], 2)]
+}
+
 function pintar() {
   const corpo = $('farm-corpo')
   const js = Array.isArray(dados?.jogadores) ? dados.jogadores.slice() : []
@@ -133,11 +153,13 @@ function pintar() {
   const topo = el('div', { class: 'info-linha' }, [el('ul', { class: 'indicadores', 'aria-label': 'Resumo' }, inds), info, explica])
 
   const lista = el('div', { class: 'farm-lista' })
+  const pod = el('div', { class: 'farm-podio', 'aria-label': 'Os 3 primeiros' })
   const chips = el('div', { class: 'farm-ordem', role: 'tablist', 'aria-label': 'Ordenar por' })
   const desenhar = () => {
     const ord = js.slice().sort((a, b) => (Number(b[ordem]) || 0) - (Number(a[ordem]) || 0))
     const maxXp = Math.max(...js.map((j) => Number(j.xph) || 0), 1)
     lista.replaceChildren(...ord.map((j, i) => linha(j, i, maxXp)))
+    pod.replaceChildren(...podio(ord))
     for (const b of chips.children) b.setAttribute('aria-selected', String(b.dataset.ordem === ordem))
     filtrar()
   }
@@ -151,12 +173,14 @@ function pintar() {
   const filtrar = () => {
     const q = normalizar(input.value)
     let n = 0
-    for (const it of lista.children) { const ok = !q || it.dataset.busca.includes(q); it.hidden = !ok; if (ok) n++ }
-    vazio.hidden = !!n
+    let i = 0
+    for (const it of lista.children) { const ok = q ? it.dataset.busca.includes(q) : i >= 3; it.hidden = !ok; if (ok) n++; i++ }
+    pod.hidden = !!q
+    vazio.hidden = !q || !!n
   }
   input.addEventListener('input', filtrar)
   const barra = el('div', { class: 'farm-barra-topo' }, [el('label', { class: 'busca pos-busca' }, [el('span', { class: 'busca-ico', 'aria-hidden': 'true' }, [ico('busca')]), input]), chips])
-  corpo.replaceChildren(topo, barra, vazio, lista)
+  corpo.replaceChildren(topo, pod, barra, vazio, lista)
   desenhar()
 }
 const bloco = (sim, tit, txt) => el('div', { class: 'ex-bloco' }, [el('span', { class: 'ex-sim', 'aria-hidden': 'true', text: sim }), el('b', { text: tit }), el('p', { text: txt })])

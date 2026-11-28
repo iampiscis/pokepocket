@@ -50,6 +50,34 @@
   .farm-num.abates { grid-area: abates; }
   .farm-hunt { grid-area: hunt; }
 }
+.farm-podio { display: grid; grid-template-columns: 1fr 1.12fr 1fr; align-items: end; gap: 14px; width: 100%; max-width: 980px; margin: 8px auto 4px; }
+.farm-podio[hidden] { display: none; }
+.farm-pod { --cor: #c9a24c; position: relative; display: grid; justify-items: center; gap: 4px; min-width: 0; padding: 14px 12px 14px; border-radius: 18px; text-align: center; background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--cor) 22%, transparent), transparent 70%), rgba(21, 11, 16, 0.82); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cor) 45%, transparent), 0 10px 28px rgba(0, 0, 0, 0.35); }
+.farm-pod.p1 { --cor: #ff6fae; padding-top: 22px; padding-bottom: 20px; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--cor) 60%, transparent), 0 0 34px color-mix(in srgb, var(--cor) 28%, transparent), 0 12px 30px rgba(0, 0, 0, 0.4); }
+.farm-pod.p2 { --cor: #b495ff; }
+.farm-pod.p3 { --cor: #ffa25a; }
+.pod-lugar { position: absolute; top: -12px; left: 50%; translate: -50% 0; padding: 2px 12px; border-radius: 999px; font-family: var(--display); font-size: 17px; line-height: 1.3; color: #2a1a12; background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 55%, #fff), var(--cor)); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); }
+.farm-pod.p1 .pod-lugar { font-size: 20px; padding: 2px 16px; }
+.pod-pk { position: relative; display: grid; place-items: center; width: 96px; height: 96px; margin-bottom: 6px; overflow: hidden; }
+.pod-nome { position: relative; z-index: 1; }
+.farm-pod.p1 .pod-pk { width: 120px; height: 120px; }
+.pod-luz { position: absolute; left: 10%; right: 10%; bottom: 6%; height: 22%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--cor) 55%, transparent), transparent); filter: blur(2px); }
+.pod-pk img { position: relative; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6)); }
+.pod-pk img.bola { width: 40%; height: 40%; opacity: 0.45; image-rendering: auto; }
+.pod-pk .farm-shiny { top: 4px; right: 6px; font-size: 15px; }
+.pod-nome { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 6px; min-width: 0; max-width: 100%; }
+.pod-nome .pos-nick { font-size: 17px; }
+.farm-pod.p1 .pod-nome .pos-nick { font-size: 20px; }
+.pod-nome .pos-guild { height: 18px; padding: 0 6px 0 5px; font-size: 10.5px; }
+.pod-nome .pos-guild svg { width: 10px; height: 10px; }
+.pod-pkn { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; color: var(--apagado); }
+.pod-valor { display: grid; justify-items: center; margin-top: 4px; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1; color: #ffe9a3; text-shadow: 0 2px 0 #3b1208, 0 0 18px color-mix(in srgb, var(--cor) 40%, transparent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.farm-pod.p1 .pod-valor { font-size: 38px; }
+.pod-valor small { margin-top: 3px; font-family: inherit; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ouro); text-shadow: none; }
+.pod-mini { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; font-size: 11.5px; font-weight: 800; color: #e6c9b9; font-variant-numeric: tabular-nums; }
+.pod-hunt { font-size: 11px; font-weight: 800; color: var(--apagado); }
+html.embed .farm .info-linha, html.embed .farm-barra-topo { display: none; }
+html.embed .farm-podio { margin-top: 16px; }
 .farm-curto { display: none; }
 @media (max-width: 700px) {
   .farm-longo { display: none; }
@@ -82,3 +110,40 @@
   .farm-ordem { width: 100%; justify-content: space-between; }
   .farm-chip { flex: 1; justify-content: center; height: 30px; padding: 0 6px; font-size: 12.5px; }
 }
+@media (max-width: 700px) {
+  .farm-podio { gap: 6px; align-items: end; }
+  .farm-pod { padding: 14px 6px 10px; gap: 2px; border-radius: 14px; }
+  .farm-pod.p1 { padding-top: 18px; padding-bottom: 12px; }
+  .pod-lugar { top: -10px; font-size: 13px; padding: 1px 9px; }
+  .farm-pod.p1 .pod-lugar { font-size: 15px; padding: 1px 11px; }
+  .pod-pk { width: 64px; height: 64px; }
+  .farm-pod.p1 .pod-pk { width: 78px; height: 78px; }
+  .pod-nome .pos-nick { font-size: 13px; }
+  .farm-pod.p1 .pod-nome .pos-nick { font-size: 14.5px; }
+  .pod-nome .pos-guild { height: 15px; padding: 0 4px; font-size: 9px; }
+  .pod-nome .pos-guild svg { display: none; }
+  .pod-pkn { font-size: 10px; }
+  .pod-valor { font-size: 20px; }
+  .farm-pod.p1 .pod-valor { font-size: 24px; }
+  .pod-valor small { font-size: 9px; }
+  .pod-mini { flex-direction: column; gap: 0; font-size: 10px; }
+  .pod-hunt { font-size: 9.5px; }
+}
+html.embed .farm-lista, html.embed .farm .vazio { display: none !important; }
+html.embed .farm-podio { gap: 10px; margin: 104px auto 0; align-items: end; }
+html.embed .farm-pod { padding: 16px 8px 14px; gap: 3px; border-radius: 16px; }
+html.embed .farm-pod.p1 { padding-top: 24px; padding-bottom: 18px; }
+html.embed .pod-lugar { top: -13px; font-size: 17px; padding: 2px 12px; }
+html.embed .farm-pod.p1 .pod-lugar { font-size: 20px; padding: 2px 15px; }
+html.embed .pod-pk { width: 96px; height: 96px; }
+html.embed .farm-pod.p1 .pod-pk { width: 124px; height: 124px; }
+html.embed .pod-nome .pos-nick { font-size: 17px; }
+html.embed .farm-pod.p1 .pod-nome .pos-nick { font-size: 20px; }
+html.embed .pod-nome .pos-guild { height: 17px; font-size: 10px; }
+html.embed .pod-pkn { font-size: 12px; }
+html.embed .pod-valor { font-size: 32px; }
+html.embed .farm-pod.p1 .pod-valor { font-size: 40px; }
+html.embed .pod-valor small { font-size: 11px; }
+html.embed .pod-mini { font-size: 12px; }
+html.embed .pod-hunt { font-size: 11.5px; }
+
